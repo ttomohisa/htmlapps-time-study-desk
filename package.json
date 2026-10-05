@@ -1,0 +1,11 @@
+{
+  "name": "time-study-desk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:unit": "node scripts/run-unit-tests.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": { "@playwright/test": "1.57.0" }
+}

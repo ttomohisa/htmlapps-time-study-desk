@@ -1,19 +1,15 @@
 name: Time Study Desk app tests
-
 on:
   push:
     branches: ["feat/time-study-desk-v1"]
   pull_request:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: time-study-tests-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   app-tests:
     runs-on: windows-latest
@@ -23,17 +19,29 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-      - name: Archive the tested source
+      - name: Install exact development tools and create initial lock
         shell: pwsh
-        run: git archive --format=zip HEAD -o source-snapshot.zip
+        run: |
+          if (Test-Path package-lock.json) { npm ci } else { npm install }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Compress-Archive -Path node_modules,package-lock.json -DestinationPath test-tooling.zip
+      - name: Install Chromium for testing only
+        run: npx playwright install chromium
       - name: PowerShell syntax and encoding
         shell: powershell
         run: .\scripts\check-powershell-syntax.ps1
       - name: Build and verify both HTML variants
         shell: pwsh
         run: ./scripts/check-repository.ps1
-      - name: Foundation acceptance tests
-        run: node scripts/run-unit-tests.mjs
+      - name: Browser acceptance tests
+        run: npm run test:e2e -- --project=chromium
+      - name: Foundation unit tests
+        if: always()
+        run: npm run test:unit
+      - name: Archive tested source
+        if: always()
+        shell: pwsh
+        run: git archive --format=zip HEAD -o source-snapshot.zip
       - name: Upload source and build evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -41,6 +49,10 @@ jobs:
           name: time-study-evidence-${{ github.sha }}
           path: |
             source-snapshot.zip
+            test-tooling.zip
+            package-lock.json
             dist/
+            test-results/
+            playwright-report/
           retention-days: 7
           if-no-files-found: error
