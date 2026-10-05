@@ -1,6 +1,6 @@
 # Time Study Desk analysis JSON — schema 1
 
-The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.4.0 exporter; it does not imply the import UI exists.
+The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.5.0 exporter/importer and browser-local recovery behavior.
 
 ## Envelope
 
@@ -9,7 +9,7 @@ UTF-8 compact JSON, extension `.tsd.json`:
 ```text
 format: "time-study-desk"
 schemaVersion: 1
-appVersion: "0.4.0"
+appVersion: "0.5.0"
 projectId, createdAt, updatedAt, title, note
 source: { name, size, lastModified, durationUs, width, height }
 phases: []
@@ -34,11 +34,21 @@ The validator rejects unknown keys (including prototype-related keys), invalid t
 
 Validation builds a fresh allow-listed JSON object. Commands commit only validated states. Undo/Redo applies checked differences and revalidates them; histories are bounded but never serialized.
 
-## Export versus resume
+## Export, import and source reconnection
 
-v0.4.0 supports manual export, including work in progress, but **cannot reopen a saved file**. Import, original-video comparison/reconnection and autosave remain v0.5.0 work. Keep the original video separately; its metadata in JSON does not prove identity. A future successful import must never autoplay or start recording automatically.
+v0.5.0 can reopen schema-1 `.tsd.json`. It checks the raw file size before reading, then parses and validates the full allow-listed object. Malformed JSON, unsupported schema versions, unknown fields, invalid references/states, or values beyond the existing limits reject the whole import and leave the current analysis unchanged. Import never executes embedded text or treats JSON as HTML.
+
+A successful import opens detached from video. Measurement and evidence seeking remain unavailable until the source is explicitly reconnected. The app compares saved metadata against the candidate: size and dimensions must match, duration difference must be at most 100,000 µs, and the candidate must reach every recorded boundary. Filename/mtime changes are warnings. A metadata match is not proof of identity and always requires confirmation. Reconnection never autoplays or rewrites saved times.
 
 Save filenames are editable and sanitized, with `.tsd.json` fixed by the app. The success notice says the download was started, not that disk persistence was verified. No upload is performed.
+
+## Browser-local autosave
+
+When enabled and available, IndexedDB database `time-study-desk` stores one analysis recovery snapshot in `snapshots` and recovery/revision metadata in `meta`. Video bytes and runtime objects are never stored. The preference is device-side and defaults on; an imported JSON file cannot silently change it. Confirmed edits are queued after 750 ms and continuous edits force an attempt within five seconds.
+
+Each stored project has a monotonically increasing revision. `save(project, expectedRevision)` checks the expected revision in the same transaction; a mismatch returns a conflict and does not overwrite the newer snapshot. A success status is shown only after transaction completion. Storage unavailable/quota/conflict states remain visible while manual JSON export remains usable.
+
+The restore card never automatically replaces a new session's state. Browser-data deletion clears only this app's stores. Pending timers are invalidated and any in-flight save is awaited before clear so an older queued write cannot recreate deleted recovery data. `file://` storage behavior is not assumed; the app probes the environment and falls back to manual JSON saving when persistence is unavailable.
 
 ## v0.3.0 repeated-cycle behavior
 
@@ -46,7 +56,7 @@ New cycles copy a procedure's phase-ID order into new planned occurrences, retai
 
 Each observation has explicit start/end boundaries. Chronological numbers and between-cycle gaps are derived, not persisted, and gaps are not added to a cycle's duration. Overlapping observations and concurrent open cycles are rejected. Review selection never changes the recording target.
 
-Initial multiline names are one atomic creation operation. Display language and selected procedure are not part of history; Undo repairs a selected-procedure reference only if its target no longer exists. All existing schema-1 invariants and the v0.2.0 fixture are retained. Import remains a later milestone.
+Initial multiline names are one atomic creation operation. Display language and selected procedure are not part of history; Undo repairs a selected-procedure reference only if its target no longer exists. All existing schema-1 invariants and the original v0.2.0 fixture are retained and are import-regression inputs.
 
 
 ## v0.4.0 exceptions and review

@@ -218,18 +218,35 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 .phase-duration { white-space:normal; text-align:right; max-width:135px; }
 .record-breakdown { white-space:pre-line; overflow-wrap:anywhere; }
 @media(max-width:600px) { .interval-actions { grid-template-columns:1fr; } .review-finalize .button { max-width:100%; } }
+
+/* v0.5.0 local persistence / detached analysis. */
+.restore-card { display:flex; align-items:center; justify-content:space-between; gap:14px; margin:0 0 16px; padding:14px 16px; border:1px solid #b0c8bd; border-radius:14px; background:var(--accent-soft); }
+.restore-card strong { display:block; margin-bottom:3px; }
+.restore-card p { margin:0; color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+.restore-actions { display:flex; gap:8px; flex:none; }
+.restore-actions .button { min-height:44px; }
+.autosave-box { margin:10px 0 14px; padding:12px; border:1px solid var(--line); border-radius:11px; background:var(--surface-muted); }
+.toggle-row { display:flex; align-items:flex-start; gap:9px; min-height:44px; font-size:12px; font-weight:700; }
+.toggle-row input { width:20px; height:20px; margin:1px 0 0; accent-color:var(--accent); flex:none; }
+.storage-status[data-state="saved"] { color:var(--accent); }
+.storage-status[data-state="conflict"],.storage-status[data-state="unavailable"] { color:var(--danger); }
+.source-connection { margin:0 0 10px !important; }
+.source-actions { display:grid; gap:8px; margin-top:14px; }
+#sourceMatchError { margin-top:10px; }
+@media(max-width:600px) { .restore-card { align-items:stretch; flex-direction:column; } .restore-actions { display:grid; grid-template-columns:1fr 1fr; } .restore-actions .button { min-width:0; } }
 </style>
 </head>
 <body data-current-page="measure">
-<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.4.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.5.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
 <main class="main">
 <section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">動画作業分析</h1><p data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">動画をアップロードしません</span></div></section>
 <!-- APP:BEGIN Time Study Desk First Measurement -->
-<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 中断・未観測・区間編集</span><span data-i18n="versionLimit">中断・未観測・実施なしの記録と、区間の修正ができます。再読込は後続版です。</span></div>
+<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 保存・再開</span><span data-i18n="versionLimit">保存した分析の再読込、元動画の再接続、自動保存に対応しています。</span></div>
+<section id="restoreCard" class="restore-card" hidden aria-labelledby="restoreTitle"><div><strong id="restoreTitle" data-i18n="restoreTitle">前回の分析があります</strong><p id="restoreSummary"></p></div><div class="restore-actions"><button id="restoreAnalysisButton" class="button primary" type="button" data-i18n="restoreAnalysis">前回の分析を復元</button><button id="discardRestoreButton" class="button" type="button" data-i18n="deleteBrowserData">ブラウザ内の分析データを削除</button></div></section>
 <div id="errorMessage" class="notice error" role="alert" hidden></div>
 <div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
 <div id="backgroundNotice" class="notice" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
-<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" data-i18n="tabReview">見直す</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button></div><div id="videoHost" hidden></div></div>
+<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" data-i18n="tabReview">見直す</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button><button id="openAnalysisInlineButton" class="button" type="button" data-i18n="openAnalysis" data-i18n-aria-label="openAnalysisStartAria" aria-label="保存した分析を開く（開始画面）">保存した分析を開く</button><button id="reconnectInlineButton" class="button primary" type="button" hidden data-i18n="reconnectOriginal">元動画を選び直す</button></div><div id="videoHost" hidden></div></div>
 <div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
 <details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
   <div class="section-heading"><h2 id="measureTitle" data-i18n="measureTitle">最初の一回を計測</h2><strong id="currentStep" class="current-step"></strong></div>
@@ -283,13 +300,16 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 <div class="procedure-buttons"><button id="editProcedureButton" class="button" type="button" data-i18n="editProcedure" disabled>工程順・条件を変更</button></div>
 <details id="phaseLibraryDetails" class="notes-details"><summary data-i18n="managePhases">工程名・分類の管理</summary><div style="padding:0 10px 12px"><p class="small-note" data-i18n="renameAllHint">工程名の訂正は、その工程を使う全回へ反映します。</p><label class="field"><span data-i18n="procedureLabel">選択手順の表示名</span><input id="procedureRename" type="text" disabled></label><div id="phaseLibrary"></div><label class="field"><span data-i18n="newPhaseLabel">新しい工程名</span><input id="newPhaseName" type="text" disabled></label><button id="createPhaseButton" class="button" type="button" data-i18n="createPhase" disabled>工程を登録</button><p class="small-note" data-i18n="createPhaseHint">登録だけでは手順は変わりません。「工程順・条件を変更」で手順に追加します。</p></div></details></section>
 <section class="side-card app-mobile-page" data-screen="results" id="analysisCard"><h2 data-i18n="analysisTitle">分析データ</h2>
+<div class="autosave-box"><label class="toggle-row"><input id="autosaveToggle" type="checkbox" checked><span data-i18n="autosaveLabel">分析データをこのブラウザに自動保存する</span></label><p id="autosaveStatus" class="small-note storage-status" role="status" data-state="checking" data-i18n="autosaveChecking">自動保存を確認しています。</p><button id="clearBrowserDataButton" class="text-button" type="button" data-i18n="deleteBrowserData">ブラウザ内の分析データを削除</button></div>
 <label class="field"><span data-i18n="projectTitle">分析タイトル（任意）</span><input id="projectTitle" type="text" autocomplete="off"></label>
 <details class="notes-details"><summary data-i18n="notesTitle">分析・今回のメモ</summary><label class="field"><span data-i18n="projectNote">分析メモ</span><textarea id="projectNote" rows="3"></textarea></label><label class="field"><span data-i18n="cycleNote">今回のメモ</span><textarea id="cycleNote" rows="2" disabled></textarea></label></details>
 <label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label>
-<p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存はありません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
-<button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：保存した分析の読み込み・再開</strong><span data-i18n="nextStageBody">v0.5.0で分析の読み込み・元動画の再接続・自動保存を追加予定です。</span></p></section>
-<section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><button id="replaceVideoButton" type="button" class="button" style="margin-top:16px" data-i18n="replaceVideo">別の動画を選択</button></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
+<p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存も動画を保存しません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
+<button id="openAnalysisButton" class="button" type="button" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importReady">.tsd.jsonを検証して開きます。元動画は別に選び直します。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：時間表・統計と根拠映像</strong><span data-i18n="nextStageBody">v0.6.0で件数付きの集計と、数値から対象区間へ戻る見直しを追加予定です。</span></p></section>
+<section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><p id="sourceConnectionState" class="small-note source-connection"></p><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><div class="source-actions"><button id="reconnectOriginalButton" type="button" class="button primary" hidden data-i18n="reconnectOriginal">元動画を選び直す</button><button id="replaceVideoButton" type="button" class="button" data-i18n="newAnalysisVideo">別の動画で新しい分析を始める</button></div><p id="sourceMatchError" class="field-error" role="alert" hidden></p></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
 <input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
+<input id="reconnectVideoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
+<input id="analysisInput" type="file" accept="application/json,.json,.tsd.json" hidden>
 <!-- APP:END -->
 <section class="build-section"><details><summary data-i18n="buildInfo">ビルド情報</summary><div class="build-grid"><div class="build-item"><span data-i18n="appVersion">アプリ版</span><strong id="buildVersion"></strong></div><div class="build-item"><span data-i18n="builtAt">生成日時</span><strong id="builtAt"></strong></div><div class="build-item"><span data-i18n="dependencies">実行時の外部依存</span><strong id="dependencyCount"></strong></div></div></details></section>
 </main>
@@ -361,17 +381,17 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   // I18N
   const translations = {
     ja: {
-      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 中断・未観測・区間編集", versionLimit:"中断・未観測・実施なしの記録と、区間の修正ができます。再読込は後続版です。",
+      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 保存・再開", versionLimit:"保存した分析の再読込、元動画の再接続、自動保存に対応しています。",
       playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
-      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:"この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。", savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存はありません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：保存した分析の読み込み・再開", nextStageBody:"v0.5.0で分析の読み込み・元動画の再接続・自動保存を追加予定です。",
+      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importReady:'.tsd.jsonを検証して開きます。元動画は別に選び直します。', savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存も動画を保存しません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：時間表・統計と根拠映像", nextStageBody:"v0.6.0で件数付きの集計と、数値から対象区間へ戻る見直しを追加予定です。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
       confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
-      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.4.0では反復計測に加えて、中断・未観測・実施なしを分けて記録できます。「その他の記録」から操作し、工程へ戻ると同じ実施の続きを記録します。見直しでは区間の分割・結合・割当て、追加工程、実施状態の訂正、回の削除ができます。変更は取り消せます。初回は「ここから開始」→「ここで区切る」→「この回を終了」。次回は開始位置を選んで明示的に開始し、最後の工程では主ボタンが終了に変わります。回間時間は別表示です。工程名の訂正は全回へ反映され、順番・開始終了条件の変更は別の手順を作ります。統計、分析の再読込、CSV、自動保存はまだありません。",
+      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.5.0では、これまでの反復計測・例外記録・区間編集に加えて、保存した.tsd.jsonを検証して開き、元動画を選び直して続きから作業できます。分析データは初期値ONの設定でブラウザ内へ自動保存できます。別タブの新しい保存を検出した場合は上書きせず競合を表示します。統計とCSVはまだありません。",
       helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。",
-      helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動でJSON保存し、動画は含めません。ブラウザ内へ自動保存するのは言語設定だけです。ページを閉じると未保存の分析を失います。元動画は変更・削除しません。",
+      helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動JSONまたはIndexedDBへ保存できますが、どちらにも動画は含めません。自動保存は端末内のブラウザ保存領域で、設定は端末側に保持します。保存領域は永久保管や暗号化保管を保証しません。元動画は変更・削除しません。",
       helpLimitsTitle:'形式・時間・精度', helpLimitsBody:'8 GiB以下、長さが正の有限値で24時間以下、映像とシーク可能な位置を持つ動画が対象です。拡張子だけで再生対応を保証しません。音声のみ、破損、未対応コーデックは扱えません。通常速度で撮影された動画を前提とし、スロー撮影・タイムラプス・編集で変更した速度から実時間を復元しません。動画内時刻はブラウザの精度に依存し、フレーム単位の精度は保証しません。',
-      helpRecoveryTitle:'選び直しと画面の復帰', helpRecoveryBody:"別の動画は確認後に新しい分析として開きます。失敗・キャンセルでは元の分析を保持します。動画末尾は未完了とし、自動で完了させません。未完了のまま保存でき、見直しで各工程の状態を確認した後に、最後の確定境界で明示的に完了できます。画面復帰後は最後の確定境界から再開を押し、映像を確認して再生してください。保存したJSONを開く機能はv0.5.0で追加予定です。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン実機のファイル選択・保存と大容量動画は未検証です。',
+      helpRecoveryTitle:'保存・復元と元動画', helpRecoveryBody:"前回の自動保存がある場合は開始画面から明示的に復元できます。保存JSONを開いても動画は自動接続・自動再生しません。元動画候補はサイズ・縦横・長さを照合し、候補情報が一致しても同一動画の証明とはせず、確認後に接続します。不一致では既存分析を変更しません。自動保存できない環境では警告し、手動保存と計測は続けられます。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン実機のファイル選択・保存と大容量動画は未検証です。',
       FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。',
       screenNavigation:"分析画面",
       tabMeasure:"計測",
@@ -539,20 +559,26 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       EXCEPTION_ACTIVE:"中断・未観測を終了してから、工程の区切りを記録してください。",
       HAS_RECORDED_TIME:"この実施には工程・未観測の区間があります。区間の割当てを見直してから「実施なし」にしてください。",
       RESOLUTION_CONFLICT:"区間の記録と状態が一致しません。未観測を含む工程を観測済みにしたり、区間のない工程を観測済みにしたりできません。",
+      restoreTitle:"前回の分析があります", restoreAnalysis:"前回の分析を復元", openAnalysisStartAria:"保存した分析を開く（開始画面）", deleteBrowserData:"ブラウザ内の分析データを削除",
+      autosaveLabel:"分析データをこのブラウザに自動保存する", autosaveChecking:"自動保存を確認しています。", autosaveReady:"自動保存は利用できます。動画は保存しません。", autosaveDisabled:"自動保存はオフです。必要な分析データは手動で保存してください。", autosaveSaving:"分析データを自動保存しています。", autosaveSaved:"自動保存済み", autosaveUnavailable:"この環境では自動保存できません。分析データを手動で保存してください。", autosaveQuota:"ブラウザの保存領域が不足しています。分析データを手動で保存してください。", autosaveConflict:"別タブで新しい分析データが保存されています。自動では上書きしません。現在の分析を手動で保存してください。", browserDataCleared:"ブラウザ内の分析データを削除しました。",
+      deleteBrowserTitle:"ブラウザ内の分析データを削除しますか？", deleteBrowserBody:"このアプリがブラウザ内へ自動保存した分析データを削除します。元動画とダウンロード済みファイルは削除しません。", deleteBrowserAction:"分析データを削除",
+      importReady:".tsd.jsonを検証して開きます。元動画は別に選び直します。", importReplaceTitle:"現在の分析を置き換えますか？", importReplaceBody:"検証済みの分析データへ置き換えます。この操作は取り消せません。必要な現在の分析は先に保存してください。", importReplaceAction:"分析を開く", importLoaded:"分析データを開きました。元動画を選び直すと映像へ戻れます。",
+      reconnectOriginal:"元動画を選び直す", newAnalysisVideo:"別の動画で新しい分析を始める", sourceAttached:"元動画を接続済みです。", sourceDetached:"分析データだけを開いています。元動画は接続されていません。", reconnectConfirmTitle:"この動画を元動画として接続しますか？", reconnectConfirmBody:"候補情報を照合しましたが、同一動画であることの証明ではありません。保存時と同じ動画か確認してください。", reconnectConfirmAction:"この動画を接続", sourceNameWarning:"ファイル名が保存時と異なります。", sourceModifiedWarning:"更新日時が保存時と異なります。", sourceMismatch:"保存時の動画情報と一致しないため接続できません。現在の分析は変更していません。", sourceTooShort:"候補動画が記録済みの最後の境界より短いため接続できません。",
+      INVALID_JSON:"分析データをJSONとして読み込めません。ファイルが破損していないか確認してください。", ANALYSIS_FILE_LARGE:"分析データが10 MiBの上限を超えています。", UNSUPPORTED_SCHEMA:"この分析データの保存形式は、この版では読み込めません。",
       STALE_EDIT:"編集中に分析が変更されました。対象を選び直してから操作してください。"
     },
     en: {
-      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · Exceptions & editing", versionLimit:"Record exceptions, review intervals and save analysis. Import follows later.",
+      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · Save & resume", versionLimit:"Reopen saved analysis, reconnect the original video and autosave analysis locally.",
       playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
-      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:"This version cannot reopen saved analysis files. Import and resume are planned for v0.5.0.", savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. There is no autosave.", saveAnalysis:'Save analysis', nextStage:"Next stage: open and resume saved analyses", nextStageBody:"Analysis import, original-video reconnection and autosave are planned for v0.5.0.",
+      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. Autosave also excludes the video.", saveAnalysis:'Save analysis', nextStage:"Next stage: tables, statistics and video evidence", nextStageBody:"v0.6.0 will add count-aware summaries and navigation from a number back to its video interval.",
       buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
       confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
-      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.4.0 adds interruptions, unobserved intervals and steps not performed to repeated measurement. Use More recording options; Resume step continues the same occurrence. Review supports split/merge, reassignment, extra occurrences, state correction and cycle deletion with Undo. Mark the first cycle, then explicitly start each later cycle. The main button changes to Finish for the last step. Time between cycles is shown separately. Renaming steps applies to all cycles; changing order or start/end conditions creates a separate procedure and preserves earlier records. Statistics, analysis import, CSV and autosave are not available yet.",
+      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.5.0 keeps repeated measurement, exception recording and interval editing, and adds validated .tsd.json import, original-video reconnection and local analysis autosave. Autosave starts enabled and detects a newer revision from another tab instead of overwriting it. Statistics and CSV are not available yet.",
       helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping.",
-      helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Manually save analysis as JSON; it does not include video. Only the language setting is automatically persisted. Closing this page loses unsaved analysis. Original videos are never modified or deleted.",
+      helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Analysis can be saved manually as JSON or locally in IndexedDB; neither includes video. Autosave is a device-side setting. Browser storage is not a guarantee of permanent or encrypted retention. Original videos are never modified or deleted.",
       helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
-      helpRecoveryTitle:'Replacement and returning to the page', helpRecoveryBody:"A replacement starts an empty analysis only after confirmation. Failed or cancelled loads preserve your analysis. Reaching the video end records an incomplete cycle, never a completed one. Save it as incomplete, or review every occurrence state and explicitly finish at the last confirmed boundary. After returning to the page, resume from the last confirmed boundary and play explicitly. Reopening saved JSON is planned for v0.5.0.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Real-device mobile file selection/saving and large videos have not been verified.',
+      helpRecoveryTitle:'Saving, restoring and the original video', helpRecoveryBody:"A previous autosave can be restored explicitly from the start screen. Opening saved JSON never reconnects or autoplays video. A candidate original video is compared by size, dimensions and duration; even matching metadata does not prove file identity, so you must confirm before attachment. A mismatch leaves the analysis unchanged. If autosave is unavailable, manual saving and measurement remain available.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Real-device mobile file selection/saving and large videos have not been verified.',
       FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.',
       screenNavigation:"Analysis screens",
       tabMeasure:"Measure",
@@ -720,6 +746,12 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       EXCEPTION_ACTIVE:"End the interruption or unobserved interval before marking a step boundary.",
       HAS_RECORDED_TIME:"This occurrence has recorded step or unobserved intervals. Review their assignments before marking it not performed.",
       RESOLUTION_CONFLICT:"The state conflicts with the intervals. Measured requires a recorded step interval and no unobserved interval.",
+      restoreTitle:"A previous analysis is available", restoreAnalysis:"Restore previous analysis", openAnalysisStartAria:"Open saved analysis from the start screen", deleteBrowserData:"Delete browser analysis data",
+      autosaveLabel:"Autosave analysis data in this browser", autosaveChecking:"Checking local autosave.", autosaveReady:"Autosave is available. Video is never stored.", autosaveDisabled:"Autosave is off. Manually save any analysis you need.", autosaveSaving:"Autosaving analysis data.", autosaveSaved:"Autosaved", autosaveUnavailable:"Autosave is unavailable in this environment. Save the analysis manually.", autosaveQuota:"Browser storage is full. Save the analysis manually.", autosaveConflict:"Another tab saved a newer revision. Autosave will not overwrite it. Save this analysis manually.", browserDataCleared:"Browser analysis data deleted.",
+      deleteBrowserTitle:"Delete browser analysis data?", deleteBrowserBody:"Deletes analysis data autosaved by this app in the browser. It does not delete the original video or downloaded files.", deleteBrowserAction:"Delete analysis data",
+      importReady:"Validates and opens a .tsd.json file. Reconnect the original video separately.", importReplaceTitle:"Replace the current analysis?", importReplaceBody:"Replace it with this validated analysis file? This cannot be undone. Save the current analysis first if needed.", importReplaceAction:"Open analysis", importLoaded:"Analysis opened. Reconnect the original video to return to video evidence.",
+      reconnectOriginal:"Reconnect original video", newAnalysisVideo:"Start a new analysis with another video", sourceAttached:"Original video is connected.", sourceDetached:"Analysis data is open without its original video.", reconnectConfirmTitle:"Connect this as the original video?", reconnectConfirmBody:"The candidate metadata was checked, but this does not prove file identity. Confirm that it is the same video used for this analysis.", reconnectConfirmAction:"Connect this video", sourceNameWarning:"The filename differs from the saved analysis.", sourceModifiedWarning:"The modification time differs from the saved analysis.", sourceMismatch:"The candidate does not match the saved video metadata. The current analysis was not changed.", sourceTooShort:"The candidate is shorter than a recorded boundary and cannot be connected.",
+      INVALID_JSON:"The analysis file is not valid JSON or is damaged.", ANALYSIS_FILE_LARGE:"The analysis file exceeds the 10 MiB limit.", UNSUPPORTED_SCHEMA:"This analysis save format is not supported by this app version.",
       STALE_EDIT:"The analysis changed while this editor was open. Select the current record again before editing."
     }
   };
@@ -822,6 +854,30 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       const timeUs = Number(whole) * 1000000 + Number(fraction.padEnd(6,'0'));
       return Number.isSafeInteger(timeUs) && timeUs >= 0 ? ok(timeUs) : fail('INVALID_TIME_INPUT');
     }
+    function parseProject(textValue) {
+      if (typeof textValue !== 'string') return {ok:false,issues:[{path:'$',code:'INVALID_JSON',messageKey:'INVALID_JSON'}]};
+      if (new TextEncoder().encode(textValue).length > MAX_BYTES) return {ok:false,issues:[{path:'$',code:'ANALYSIS_FILE_LARGE',messageKey:'ANALYSIS_FILE_LARGE'}]};
+      let parsed;
+      try { parsed=JSON.parse(textValue); }
+      catch { return {ok:false,issues:[{path:'$',code:'INVALID_JSON',messageKey:'INVALID_JSON'}]}; }
+      if (parsed && typeof parsed === 'object' && Object.prototype.hasOwnProperty.call(parsed,'schemaVersion') && parsed.schemaVersion !== 1) {
+        return {ok:false,issues:[{path:'$.schemaVersion',code:'UNSUPPORTED_SCHEMA',messageKey:'UNSUPPORTED_SCHEMA'}]};
+      }
+      return validateProject(parsed);
+    }
+    function matchSource(saved,candidate,maxBoundaryUs=0) {
+      const warnings=[];
+      if (!saved || !candidate) return {compatible:false,metadataMatch:false,warnings:['SOURCE_MISMATCH'],requiresConfirmation:true};
+      const metadataMatch = saved.size===candidate.size && saved.width===candidate.width && saved.height===candidate.height && Math.abs(saved.durationUs-candidate.durationUs)<=100000;
+      if (saved.size!==candidate.size) warnings.push('SIZE_MISMATCH');
+      if (saved.width!==candidate.width || saved.height!==candidate.height) warnings.push('DIMENSIONS_MISMATCH');
+      if (Math.abs(saved.durationUs-candidate.durationUs)>100000) warnings.push('DURATION_MISMATCH');
+      if (saved.name!==candidate.name) warnings.push('NAME_CHANGED');
+      if (saved.lastModified!==candidate.lastModified) warnings.push('LAST_MODIFIED_CHANGED');
+      const candidateTooShort = Number.isSafeInteger(maxBoundaryUs) && maxBoundaryUs>0 && candidate.durationUs<maxBoundaryUs;
+      if (candidateTooShort) warnings.push('CANDIDATE_TOO_SHORT');
+      return {compatible:metadataMatch && !candidateTooShort,metadataMatch,warnings,requiresConfirmation:true};
+    }
     function validateProject(value) {
       let path = '$';
       try {
@@ -910,7 +966,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     function createProject(source,context) {
       const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
-      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.4.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.5.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
       assert(validateProject(project).ok); return project;
     }
     // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
@@ -1197,7 +1253,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       // Compact output keeps the exported UTF-8 byte budget identical to validation.
       return JSON.stringify(validation.value);
     }
-    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,createProject,validateProject,applyCommand,createHistory,listCycles,createNamedProcedure,occurrenceEvidence,cycleBreakdown,serializeProject});
+    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,parseProject,matchSource,createProject,validateProject,applyCommand,createHistory,listCycles,createNamedProcedure,occurrenceEvidence,cycleBreakdown,serializeProject});
   })();
   // TSD:CORE:END
 
@@ -1332,11 +1388,89 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   }
   // TSD:MEDIA:END
 
-  // UI / CONTROLLER. Analysis stays in memory until the user exports JSON.
+  // TSD:STORAGE:BEGIN
+  const StorageAdapter = (() => {
+    const DB_NAME='time-study-desk', DB_VERSION=1, SNAPSHOTS='snapshots', META='meta';
+    let dbPromise=null;
+    function failure(reason) { return {ok:false,reason}; }
+    function classify(error) { return error?.name==='QuotaExceededError' ? 'quota' : 'failed'; }
+    function openDb() {
+      if (typeof indexedDB==='undefined') return Promise.reject(Object.assign(new Error('IndexedDB unavailable'),{code:'unavailable'}));
+      if (dbPromise) return dbPromise;
+      dbPromise=new Promise((resolve,reject)=>{
+        let request;
+        try { request=indexedDB.open(DB_NAME,DB_VERSION); }
+        catch(error) { reject(error); return; }
+        request.onupgradeneeded=()=>{
+          const db=request.result;
+          if(!db.objectStoreNames.contains(SNAPSHOTS))db.createObjectStore(SNAPSHOTS,{keyPath:'projectId'});
+          if(!db.objectStoreNames.contains(META))db.createObjectStore(META,{keyPath:'key'});
+        };
+        request.onerror=()=>reject(request.error || new Error('IndexedDB open failed'));
+        request.onblocked=()=>reject(Object.assign(new Error('IndexedDB blocked'),{code:'unavailable'}));
+        request.onsuccess=()=>{const db=request.result;db.onversionchange=()=>db.close();resolve(db);};
+      }).catch(error=>{dbPromise=null;throw error;});
+      return dbPromise;
+    }
+    function requestValue(request) { return new Promise((resolve,reject)=>{request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error || new Error('IndexedDB request failed'));}); }
+    async function probe() { try { const db=await openDb(); await requestValue(db.transaction(META,'readonly').objectStore(META).get('__probe__')); return {ok:true}; } catch { return failure('unavailable'); } }
+    async function load() {
+      try {
+        const db=await openDb();
+        const last=await requestValue(db.transaction(META,'readonly').objectStore(META).get('lastProjectId'));
+        if(!last?.value)return null;
+        const snapshot=await requestValue(db.transaction(SNAPSHOTS,'readonly').objectStore(SNAPSHOTS).get(last.value));
+        return snapshot ? {project:snapshot.project,revision:snapshot.revision,savedAt:snapshot.savedAt} : null;
+      } catch { return null; }
+    }
+    async function save(project,expectedRevision) {
+      let db; try { db=await openDb(); } catch { return failure('unavailable'); }
+      return await new Promise(resolve=>{
+        let result=null,nextRevision=null;
+        let tx; try { tx=db.transaction([SNAPSHOTS,META],'readwrite'); } catch { resolve(failure('unavailable')); return; }
+        const snapshots=tx.objectStore(SNAPSHOTS),meta=tx.objectStore(META),get=snapshots.get(project.projectId),last=meta.get('lastProjectId');
+        let currentRecord, lastRecord, readyCount=0;
+        const failRequest=request=>{result=failure(classify(request.error));try{tx.abort();}catch{}};
+        const commit=()=>{
+          if(++readyCount<2)return;
+          const current=currentRecord?.revision ?? 0;
+          if(current!==expectedRevision){result=failure('conflict');try{tx.abort();}catch{};return;}
+          const revision=current+1;
+          if(lastRecord?.value && lastRecord.value!==project.projectId)snapshots.delete(lastRecord.value);
+          snapshots.put({projectId:project.projectId,revision,project,savedAt:new Date().toISOString()});
+          meta.put({key:'lastProjectId',value:project.projectId});
+          nextRevision=revision;
+        };
+        get.onerror=()=>failRequest(get);last.onerror=()=>failRequest(last);
+        get.onsuccess=()=>{currentRecord=get.result;commit();};last.onsuccess=()=>{lastRecord=last.result;commit();};
+        tx.oncomplete=()=>resolve(nextRevision!==null?{ok:true,revision:nextRevision}:(result || failure('failed')));
+        tx.onabort=()=>resolve(result?.ok===false?result:failure(classify(tx.error)));
+        tx.onerror=()=>{};
+      });
+    }
+    async function clear() {
+      try {
+        const db=await openDb();
+        await new Promise((resolve,reject)=>{
+          const tx=db.transaction([SNAPSHOTS,META],'readwrite');tx.objectStore(SNAPSHOTS).clear();tx.objectStore(META).clear();
+          tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error || new Error('clear aborted'));tx.onerror=()=>{};
+        });
+        return {ok:true};
+      } catch { return failure('unavailable'); }
+    }
+    return Object.freeze({probe,load,save,clear});
+  })();
+  // TSD:STORAGE:END
+
+  // UI / CONTROLLER. Analysis stays in memory until export or browser-local autosave.
   let project = null, history = TsdCore.createHistory(), selectedBoundaryId = null;
   let selectedCycleId = null, recordingCycleId = null, procedureDraft = null, selectedSpanId = null;
   let suspended = false, projectRevision = 0, attachedSource = null, savedSnapshot = null;
   let errorCode = '', displayedSource = null;
+  let storageAvailable=false, storageRevision=0, restoreSnapshot=null, autosaveConflict=false, storageEpoch=0;
+  let autosaveEnabled=true, autosaveDebounceTimer=0, autosaveMaxTimer=0, autosaveGeneration=0, autosaveBusyPromise=null, autosaveStatusKey='autosaveChecking', autosaveStatusState='checking';
+  let analysisLoadGeneration=0;
+  try { const saved=localStorage.getItem('time-study-desk:autosave'); if(saved==='off')autosaveEnabled=false; if(saved==='on')autosaveEnabled=true; } catch { /* Session-only autosave preference. */ }
   const media = new MediaController($('#videoHost'),onMediaChange);
   const commandContext = {makeId:() => 'id-'+[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join(''),nowIso:() => new Date().toISOString(),get language() { return language; }};
   function setError(error) {
@@ -1367,6 +1501,112 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     const index=cycle.occurrences.findIndex(o=>o.id===cycle.cursor.occurrenceId);
     return index>=0 && !cycle.occurrences.slice(index+1).some(o=>o.resolution!=='not-performed');
   }
+  function setAutosaveStatus(key,state='default') {
+    autosaveStatusKey=key;autosaveStatusState=state;
+    const node=$('#autosaveStatus');if(!node)return;node.textContent=translate(key);node.dataset.state=state;
+  }
+  function renderRestoreCard() {
+    const card=$('#restoreCard');if(!card)return;
+    card.hidden=!restoreSnapshot || Boolean(project);
+    if(card.hidden)return;
+    const p=restoreSnapshot.project,date=restoreSnapshot.savedAt ? new Date(restoreSnapshot.savedAt).toLocaleString(language==='ja'?'ja-JP':'en-US') : '';
+    $('#restoreSummary').textContent=`${p.source.name} · ${p.cycles.length} ${language==='ja'?'回':'cycles'}${date?' · '+date:''}`;
+  }
+  function renderPersistenceText() { setAutosaveStatus(autosaveStatusKey,autosaveStatusState);renderRestoreCard(); }
+  function cancelAutosave(invalidate=false) {
+    clearTimeout(autosaveDebounceTimer);clearTimeout(autosaveMaxTimer);autosaveDebounceTimer=0;autosaveMaxTimer=0;if(invalidate)autosaveGeneration++;
+  }
+  function scheduleAutosave() {
+    if(!project || !autosaveEnabled || !storageAvailable || autosaveConflict)return;
+    setAutosaveStatus('autosaveSaving','saving');
+    clearTimeout(autosaveDebounceTimer);autosaveDebounceTimer=setTimeout(()=>flushAutosave(),750);
+    if(!autosaveMaxTimer)autosaveMaxTimer=setTimeout(()=>flushAutosave(),5000);
+  }
+  async function flushAutosave() {
+    clearTimeout(autosaveDebounceTimer);clearTimeout(autosaveMaxTimer);autosaveDebounceTimer=0;autosaveMaxTimer=0;
+    if(!project || !autosaveEnabled || !storageAvailable || autosaveConflict)return;
+    if(autosaveBusyPromise){await autosaveBusyPromise.catch(()=>{});if(project && autosaveEnabled && storageAvailable && !autosaveConflict)scheduleAutosave();return;}
+    const generation=autosaveGeneration,identity=project.projectId,revisionAtStart=projectRevision,expected=storageRevision;
+    let snapshot;
+    try { snapshot=JSON.parse(TsdCore.serializeProject(project,APP_CONFIG.version)); }
+    catch(error) { setAutosaveStatus(error.code==='SAVE_LIMIT'?'autosaveQuota':'autosaveUnavailable','unavailable'); return; }
+    setAutosaveStatus('autosaveSaving','saving');
+    const pending=StorageAdapter.save(snapshot,expected);autosaveBusyPromise=pending;
+    const result=await pending; if(autosaveBusyPromise===pending)autosaveBusyPromise=null;
+    if(generation!==autosaveGeneration || project?.projectId!==identity)return;
+    if(result.ok){
+      storageRevision=result.revision;
+      if(projectRevision===revisionAtStart){savedSnapshot=JSON.stringify(project);setAutosaveStatus('autosaveSaved','saved');}
+      else scheduleAutosave();
+      return;
+    }
+    if(result.reason==='conflict'){autosaveConflict=true;setAutosaveStatus('autosaveConflict','conflict');return;}
+    if(result.reason==='quota'){setAutosaveStatus('autosaveQuota','unavailable');return;}
+    if(result.reason==='unavailable')storageAvailable=false;
+    setAutosaveStatus('autosaveUnavailable','unavailable');
+  }
+  async function clearBrowserAnalysis() {
+    storageEpoch++;cancelAutosave(true);const pending=autosaveBusyPromise;if(pending)await pending.catch(()=>{});
+    const result=await StorageAdapter.clear();
+    if(!result.ok){storageAvailable=false;setAutosaveStatus('autosaveUnavailable','unavailable');return false;}
+    restoreSnapshot=null;storageRevision=0;autosaveConflict=false;if(project)savedSnapshot=null;setAutosaveStatus(autosaveEnabled?'browserDataCleared':'autosaveDisabled',autosaveEnabled?'saved':'default');renderRestoreCard();return true;
+  }
+  async function initializeStorage() {
+    const epoch=storageEpoch;$('#autosaveToggle').checked=autosaveEnabled;
+    const probe=await StorageAdapter.probe();if(epoch!==storageEpoch)return;
+    if(!probe.ok){storageAvailable=false;setAutosaveStatus('autosaveUnavailable','unavailable');return;}
+    storageAvailable=true;setAutosaveStatus(autosaveEnabled?'autosaveReady':'autosaveDisabled',autosaveEnabled?'default':'default');
+    const stored=await StorageAdapter.load();if(epoch!==storageEpoch)return;
+    if(stored){
+      const validation=TsdCore.validateProject(stored.project);
+      if(validation.ok)restoreSnapshot={project:validation.value,revision:stored.revision,savedAt:stored.savedAt};
+      else setAutosaveStatus('autosaveUnavailable','unavailable');
+    }
+    renderRestoreCard();
+  }
+  function resetRuntimeForProject(next,{revision=0,durable=false,detached=true}={}) {
+    analysisLoadGeneration++;cancelAutosave(true);AppToast.dismiss();clearError();
+    if(detached){media.dispose();attachedSource=null;displayedSource=null;}
+    project=next;projectRevision++;history=TsdCore.createHistory();selectedBoundaryId=null;selectedSpanId=null;selectedCycleId=project.cycles.at(-1)?.id || null;recordingCycleId=null;
+    suspended=Boolean(project.cycles.some(c=>c.status==='open'));storageRevision=revision;autosaveConflict=false;savedSnapshot=durable?JSON.stringify(project):null;
+    outputFilename.value=project.settings.outputBaseName || TsdCore.sanitizeFilename(project.source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9);
+    document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
+    $('#boundaryError').hidden=true;$('#sourceMatchError').hidden=true;$('#saveStatus').textContent='';$('#backgroundNotice').hidden=true;
+    renderProject();renderMedia(media);renderRestoreCard();
+  }
+  function maxRecordedBoundaryUs(value=project) { return Math.max(0,...(value?.cycles || []).map(c=>c.boundaries.at(-1)?.timeUs || 0)); }
+  async function openAnalysisFile(file) {
+    const generation=++analysisLoadGeneration;clearError();
+    if(!file || file.size>10*1024*1024){setError({code:'ANALYSIS_FILE_LARGE'});return;}
+    let textValue;try{textValue=await file.text();}catch{setError({code:'INVALID_JSON'});return;}
+    if(generation!==analysisLoadGeneration)return;
+    const parsed=TsdCore.parseProject(textValue);
+    if(!parsed.ok){setError({code:parsed.issues?.[0]?.code || 'INVALID_PROJECT'});return;}
+    const identity=project?.projectId || null,revision=projectRevision;
+    if(project){
+      const accepted=await AppConfirm.ask({title:translate('importReplaceTitle'),message:translate('importReplaceBody'),confirmLabel:translate('importReplaceAction'),cancelLabel:translate('cancel')});
+      if(!accepted)return;if(generation!==analysisLoadGeneration || project?.projectId!==identity || projectRevision!==revision){setError({code:'STALE_EDIT'});return;}
+    }
+    if($('#procedureDialog').open)$('#procedureDialog').close();
+    resetRuntimeForProject(parsed.value,{revision:0,durable:true,detached:true});$('#saveStatus').textContent=translate('importLoaded');selectPage('results');
+  }
+  async function reconnectFile(file) {
+    if(!project || media.source)return;clearError();$('#sourceMatchError').hidden=true;
+    const identity=project.projectId,revision=projectRevision;
+    try {
+      const candidate=await media.loadCandidate(file);
+      if(project?.projectId!==identity || projectRevision!==revision){media.cancelCandidate();setError({code:'STALE_EDIT'});return;}
+      const match=TsdCore.matchSource(project.source,candidate.source,maxRecordedBoundaryUs(project));
+      if(!match.compatible){
+        media.cancelCandidate();const key=match.warnings.includes('CANDIDATE_TOO_SHORT')?'sourceTooShort':'sourceMismatch';$('#sourceMatchError').textContent=translate(key);$('#sourceMatchError').hidden=false;return;
+      }
+      const warnings=[];if(match.warnings.includes('NAME_CHANGED'))warnings.push(translate('sourceNameWarning'));if(match.warnings.includes('LAST_MODIFIED_CHANGED'))warnings.push(translate('sourceModifiedWarning'));
+      const accepted=await AppConfirm.ask({title:translate('reconnectConfirmTitle'),message:[translate('reconnectConfirmBody'),...warnings].join('\n'),confirmLabel:translate('reconnectConfirmAction'),cancelLabel:translate('cancel')});
+      if(project?.projectId!==identity || projectRevision!==revision || candidate.generation!==media.generation)return;
+      if(!accepted){media.cancelCandidate();return;}
+      media.commitCandidate(candidate);attachedSource=media.source;$('#sourceMatchError').hidden=true;$('#backgroundNotice').hidden=true;renderMedia(media);
+    } catch(error){setError(error);}
+  }
   function onMediaChange(controller,event) {
     renderMedia(controller);
     const cycle = activeCycle();
@@ -1378,33 +1618,34 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
   }
   function renderMedia(controller) {
-    const source = controller.source, video = controller.video;
-    const ready = Boolean(source) && controller.state === 'ready' && !controller.pending;
-    document.body.classList.toggle('has-source',Boolean(source));
-    const status = $('#mediaStatus'), text = translate(controller.state);
-    status.dataset.state = controller.state; if (status.textContent !== text) status.textContent = text;
-    $('#loadingNotice').hidden = !controller.pending;
-    $('#emptyView').hidden = Boolean(source); $('#videoHost').hidden = !source;
-    $('#sourceInfo').hidden = !source; $('#noSource').hidden = Boolean(source);
-    for (const element of document.querySelectorAll('#playButton, #playbackRate, #volume, #muteButton, [data-seek]')) element.disabled = !ready;
-    $('#seekBar').disabled = !source || Boolean(controller.pending) || controller.state === 'error';
-    if (source) {
-      $('#sourceName').textContent = source.name; $('#sourceName').title = source.name;
-      $('#sourceDuration').textContent = formatTime(source.durationUs / 1000000);
-      $('#sourceDimensions').textContent = `${source.width} × ${source.height} px`;
-      $('#sourceSize').textContent = formatBytes(source.size); $('#largeVideoHint').hidden = source.size < 1024 ** 3;
-      $('#seekBar').max = String(source.durationUs / 1000000); $('#seekBar').value = String(video.currentTime);
-      $('#seekBar').setAttribute('aria-valuetext',formatTime(video.currentTime));
-      $('#position').textContent = formatTime(video.currentTime); $('#duration').textContent = formatTime(source.durationUs / 1000000);
-      $('#playbackRate').value = String(video.playbackRate); $('#volume').value = String(video.volume);
-      $('#muteButton').textContent = translate(video.muted ? 'unmute' : 'mute'); $('#muteButton').setAttribute('aria-pressed',String(video.muted));
-      if (displayedSource !== source) { displayedSource = source; outputFilename.value = TsdCore.sanitizeFilename(source.name.replace(/\.[^.]+$/,'') + '-time-study','.tsd.json').slice(0,-9); }
+    const source=controller.source,video=controller.video,displaySource=source || project?.source || null;
+    const ready=Boolean(source) && controller.state==='ready' && !controller.pending;
+    document.body.classList.toggle('has-source',Boolean(source));document.body.classList.toggle('has-analysis',Boolean(project));
+    const status=$('#mediaStatus'),text=source?translate(controller.state):(project?translate('sourceDetached'):translate('empty'));
+    status.dataset.state=source?controller.state:(project?'detached':'empty');if(status.textContent!==text)status.textContent=text;
+    $('#loadingNotice').hidden=!controller.pending;
+    $('#emptyView').hidden=Boolean(source);$('#videoHost').hidden=!source;
+    $('#chooseVideoButton').hidden=Boolean(project && !source);$('#openAnalysisInlineButton').hidden=Boolean(project && !source);$('#reconnectInlineButton').hidden=!project || Boolean(source);
+    if(project && !source)$('#emptyView').querySelector('strong').textContent=translate('sourceDetached');
+    $('#sourceInfo').hidden=!displaySource;$('#noSource').hidden=Boolean(displaySource);
+    $('#reconnectOriginalButton').hidden=!project || Boolean(source);
+    $('#sourceConnectionState').textContent=source?translate('sourceAttached'):(project?translate('sourceDetached'):'');
+    for(const element of document.querySelectorAll('#playButton, #playbackRate, #volume, #muteButton, [data-seek]'))element.disabled=!ready;
+    $('#seekBar').disabled=!source || Boolean(controller.pending) || controller.state==='error';
+    if(displaySource){
+      $('#sourceName').textContent=displaySource.name;$('#sourceName').title=displaySource.name;
+      $('#sourceDuration').textContent=formatTime(displaySource.durationUs/1000000);
+      $('#sourceDimensions').textContent=`${displaySource.width} × ${displaySource.height} px`;
+      $('#sourceSize').textContent=formatBytes(displaySource.size);$('#largeVideoHint').hidden=displaySource.size<1024**3;
+      if(displayedSource!==displaySource){displayedSource=displaySource;if(project)outputFilename.value=project.settings.outputBaseName;else outputFilename.value=TsdCore.sanitizeFilename(displaySource.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9);}
     }
-    const playing = Boolean(video && !video.paused);
-    $('#playLabel').textContent = translate(playing ? 'pause' : 'play');
-    $('#playIcon').setAttribute('d',playing ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'm8 4 12 8-12 8z');
-    if (controller.state === 'error' && !errorCode) setError({code:'UNSUPPORTED'});
-    renderMeasurementControls();
+    if(source){
+      $('#seekBar').max=String(source.durationUs/1000000);$('#seekBar').value=String(video.currentTime);$('#seekBar').setAttribute('aria-valuetext',formatTime(video.currentTime));
+      $('#position').textContent=formatTime(video.currentTime);$('#duration').textContent=formatTime(source.durationUs/1000000);$('#playbackRate').value=String(video.playbackRate);$('#volume').value=String(video.volume);
+      $('#muteButton').textContent=translate(video.muted?'unmute':'mute');$('#muteButton').setAttribute('aria-pressed',String(video.muted));
+    } else { $('#position').textContent='00:00.0';$('#duration').textContent=displaySource?formatTime(displaySource.durationUs/1000000):'00:00.0'; }
+    const playing=Boolean(video && !video.paused);$('#playLabel').textContent=translate(playing?'pause':'play');$('#playIcon').setAttribute('d',playing?'M6 4h4v16H6zM14 4h4v16h-4z':'m8 4 12 8-12 8z');
+    if(controller.state==='error' && !errorCode)setError({code:'UNSUPPORTED'});renderMeasurementControls();
   }
   function renderMeasurementControls() {
     const cycle=measurementCycle(), position=media.captureTime(), ready=Boolean(project && position.ok);
@@ -1461,7 +1702,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     if (result.undoPatch.length) $('#saveStatus').textContent='';
     if(recordingCycleId && !project.cycles.some(c=>c.id===recordingCycleId))recordingCycleId=null;
-    renderProject(); return result;
+    renderProject();if(result.undoPatch.length)scheduleAutosave();return result;
   }
   function runMeasurement(type) {
     const position = media.captureTime(); if (!position.ok) { setError(position.error); return; }
@@ -1506,7 +1747,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     if (!result.ok) { setError(result.error); return; }
     AppToast.dismiss(); project=result.project; projectRevision++; suspended=false; clearError();
     recordingCycleId=activeCycle()?.id || null; if(recordingCycleId) selectedCycleId=recordingCycleId;
-    $('#saveStatus').textContent=''; $('#boundaryError').hidden=true; renderProject();
+    $('#saveStatus').textContent=''; $('#boundaryError').hidden=true; renderProject();scheduleAutosave();
   }
   function syncInput(input,value) {
     if (document.activeElement !== input && !input.validationMessage) input.value=value;
@@ -1516,7 +1757,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     if (!project) return;
     const result = TsdCore.applyCommand(project,command,commandContext);
     if (!result.ok) { input.setCustomValidity(translate(result.error.code)); input.setAttribute('aria-invalid','true'); setError(result.error); return; }
-    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; clearError(); $('#saveStatus').textContent=''; renderProject();
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; clearError(); $('#saveStatus').textContent=''; renderProject();if(result.undoPatch.length)scheduleAutosave();
   }
   function element(tag,className='',content='') { const node=document.createElement(tag); node.className=className; node.textContent=content; return node; }
   function renderProject() {
@@ -1680,11 +1921,11 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     if(!result.ok){$('#procedureError').textContent=translate(result.error.code);$('#procedureError').hidden=false;return;}
     project=result.project;history.push(result.undoPatch);projectRevision++;AppToast.dismiss();$('#saveStatus').textContent='';clearError();
-    $('#procedureDialog').close();renderProject();
+    $('#procedureDialog').close();renderProject();if(result.undoPatch.length)scheduleAutosave();
   }
   $('#cycleSelect').addEventListener('change',event=>selectReviewCycle(event.target.value));
   $('#procedureSelect').addEventListener('change',event=>{
-    if(project?.procedures.some(p=>p.id===event.target.value)){project.settings.selectedProcedureId=event.target.value;projectRevision++;renderProcedures();renderMeasurementControls();}
+    if(project?.procedures.some(p=>p.id===event.target.value)){project.settings.selectedProcedureId=event.target.value;projectRevision++;renderProcedures();renderMeasurementControls();scheduleAutosave();}
   });
   $('#procedureRename').addEventListener('change',event=>{const procedure=nextProcedure();if(procedure)commitInput(event.target,{type:'renameProcedure',procedureId:procedure.id,label:event.target.value});});
   $('#createPhaseButton').addEventListener('click',()=>{if(execute({type:'createPhase',label:$('#newPhaseName').value,kind:'operation'}))$('#newPhaseName').value='';});
@@ -1791,7 +2032,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     const result=timeResult.ok ? TsdCore.applyCommand(project,{type:'moveBoundary',cycleId:selected.cycle.id,boundaryId:selected.boundary.id,timeUs:timeResult.value},commandContext) : timeResult;
     if(!result.ok) { $('#boundaryError').textContent=translate(result.error.code); $('#boundaryError').hidden=false; $('#boundaryTime').setAttribute('aria-invalid','true'); return; }
     AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; $('#boundaryError').hidden=true; $('#boundaryTime').removeAttribute('aria-invalid'); $('#saveStatus').textContent=''; renderProject();
-    if(result.undoPatch.length) AppToast.show({message:translate('boundaryApplied'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});
+    if(result.undoPatch.length){scheduleAutosave();AppToast.show({message:translate('boundaryApplied'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});}
   }
   function selectPage(page) {
     if (!['measure','review','results'].includes(page)) return;
@@ -1802,22 +2043,20 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     if (matchMedia('(max-width:600px)').matches) window.scrollTo({top:0,behavior:'instant'});
   }
   async function chooseFile(file) {
-    AppConfirm.cancel(); clearError();
+    analysisLoadGeneration++;AppConfirm.cancel();clearError();
     try {
       const candidate=await media.loadCandidate(file);
-      if(media.source) {
+      if(project) {
+        const identity=project.projectId,revision=projectRevision;
         const accepted=await AppConfirm.ask({message:`${translate('replaceMessage')}\n\n${candidate.source.name}`});
-        if(candidate.generation!==media.generation) return;
-        if(!accepted) {media.cancelCandidate();return;}
+        if(candidate.generation!==media.generation)return;
+        if(!accepted){media.cancelCandidate();return;}
+        if(project?.projectId!==identity || projectRevision!==revision){media.cancelCandidate();setError({code:'STALE_EDIT'});return;}
       }
-      const next=TsdCore.createProject(candidate.source,commandContext);
-      media.commitCandidate(candidate);
-      if ($('#procedureDialog').open) $('#procedureDialog').close();
-      project=next; attachedSource=media.source; projectRevision++; history=TsdCore.createHistory(); selectedBoundaryId=null; selectedCycleId=null; recordingCycleId=null; selectedSpanId=null; suspended=false; savedSnapshot=null;
-      document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
-      $('#boundaryError').hidden=true; $('#saveStatus').textContent=''; $('#backgroundNotice').hidden=true; AppToast.dismiss();
-      renderProject(); selectPage('measure');
-    } catch(error) { setError(error); }
+      const next=TsdCore.createProject(candidate.source,commandContext);media.commitCandidate(candidate);
+      if($('#procedureDialog').open)$('#procedureDialog').close();
+      resetRuntimeForProject(next,{revision:0,durable:false,detached:false});attachedSource=media.source;displayedSource=media.source;renderMedia(media);selectPage('measure');
+    } catch(error){setError(error);}
   }
   function seekBy(delta) {
     if(!media.source) return;
@@ -1831,13 +2070,14 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     let url=null;
     try {
       outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);
-      project.settings.outputBaseName=outputFilename.value; project.settings.language=language;
+      const settingsChanged=project.settings.outputBaseName!==outputFilename.value || project.settings.language!==language;
+      project.settings.outputBaseName=outputFilename.value;project.settings.language=language;if(settingsChanged)projectRevision++;
       const text=TsdCore.serializeProject(project,APP_CONFIG.version);
       const blob=new Blob([text],{type:'application/json;charset=utf-8'});
       if(blob.size>10*1024*1024) throw Object.assign(new Error('SAVE_LIMIT'),{code:'SAVE_LIMIT'});
       url=URL.createObjectURL(blob); const link=element('a'); link.href=url; link.download=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json');
       document.body.append(link); try {link.click();} finally {link.remove();}
-      savedSnapshot=JSON.stringify(project); $('#saveStatus').textContent=translate('downloadStarted');
+      savedSnapshot=JSON.stringify(project);$('#saveStatus').textContent=translate('downloadStarted');if(settingsChanged)scheduleAutosave();
     } catch(error) { $('#saveStatus').textContent=translate('saveFailed'); setError({code:typeof error.code==='string' && translations.en[error.code] ? error.code : 'saveFailed'}); }
     finally { if(url) setTimeout(()=>URL.revokeObjectURL(url),30000); }
   }
@@ -1848,13 +2088,23 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     $('#languageButton').textContent=language==='ja' ? 'EN' : '日本語';
     $('#languageButton').setAttribute('aria-label',language==='ja' ? '英語に切り替え' : 'Switch to Japanese');
     document.title=language==='ja' ? 'Time Study Desk / 動画作業分析' : 'Time Study Desk / Video work analysis';
-    if(project) project.settings.language=language;
-    if(errorCode) $('#errorMessage').textContent=translate(errorCode);
-    renderMedia(media); renderProject();
+    if(project){const changed=project.settings.language!==language;project.settings.language=language;if(changed){projectRevision++;scheduleAutosave();}}
+    if(errorCode)$('#errorMessage').textContent=translate(errorCode);
+    renderMedia(media);renderProject();renderPersistenceText();
   }
   $('#chooseVideoButton').addEventListener('click',()=>$('#videoInput').click());
   $('#replaceVideoButton').addEventListener('click',()=>$('#videoInput').click());
-  $('#videoInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1) chooseFile(files[0]);else if(files.length) setError({code:'MULTIPLE_FILES'});});
+  $('#reconnectOriginalButton').addEventListener('click',()=>$('#reconnectVideoInput').click());
+  $('#reconnectInlineButton').addEventListener('click',()=>$('#reconnectVideoInput').click());
+  $('#openAnalysisButton').addEventListener('click',()=>$('#analysisInput').click());
+  $('#openAnalysisInlineButton').addEventListener('click',()=>$('#analysisInput').click());
+  $('#videoInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1)chooseFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
+  $('#reconnectVideoInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1)reconnectFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
+  $('#analysisInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1)openAnalysisFile(files[0]);else if(files.length)setError({code:'INVALID_JSON'});});
+  $('#restoreAnalysisButton').addEventListener('click',()=>{if(!restoreSnapshot)return;resetRuntimeForProject(restoreSnapshot.project,{revision:restoreSnapshot.revision,durable:true,detached:true});setAutosaveStatus(autosaveEnabled?'autosaveSaved':'autosaveDisabled',autosaveEnabled?'saved':'default');selectPage('results');});
+  async function confirmClearBrowserData(){const accepted=await AppConfirm.ask({title:translate('deleteBrowserTitle'),message:translate('deleteBrowserBody'),confirmLabel:translate('deleteBrowserAction'),cancelLabel:translate('cancel'),tone:'danger'});if(accepted)await clearBrowserAnalysis();}
+  $('#discardRestoreButton').addEventListener('click',confirmClearBrowserData);$('#clearBrowserDataButton').addEventListener('click',confirmClearBrowserData);
+  $('#autosaveToggle').addEventListener('change',()=>{autosaveEnabled=$('#autosaveToggle').checked;try{localStorage.setItem('time-study-desk:autosave',autosaveEnabled?'on':'off');}catch{/* Session-only preference. */}if(!autosaveEnabled){cancelAutosave(true);setAutosaveStatus('autosaveDisabled','default');}else if(storageAvailable){autosaveConflict=false;setAutosaveStatus('autosaveReady','default');if(project)scheduleAutosave();}else setAutosaveStatus('autosaveUnavailable','unavailable');});
   $('#cancelLoadButton').addEventListener('click',()=>{AppConfirm.cancel();media.cancelCandidate();clearError();});
   $('#playButton').addEventListener('click',()=>{clearError();if(media.video?.paused) media.play().catch(setError);else media.pause();});
   $('#seekBar').addEventListener('change',event=>media.seekTo(Math.round(Number(event.target.value)*1000000)).catch(setError));
@@ -1893,7 +2143,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   $('#cycleNote').addEventListener('change',event=>{const c=cycleNow();if(c) commitInput(event.target,{type:'editNote',targetType:'cycle',cycleId:c.id,targetId:c.id,note:event.target.value});});
   $('#spanNote').addEventListener('change',event=>{const c=cycleNow();if(c && event.target.dataset.spanId) commitInput(event.target,{type:'editNote',targetType:'span',cycleId:c.id,targetId:event.target.dataset.spanId,note:event.target.value});});
   $('#saveAnalysisButton').addEventListener('click',saveAnalysis);
-  outputFilename.addEventListener('blur',()=>{outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);});
+  outputFilename.addEventListener('blur',()=>{outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);if(project && project.settings.outputBaseName!==outputFilename.value){project.settings.outputBaseName=outputFilename.value;projectRevision++;scheduleAutosave();}});
   document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>selectPage(button.dataset.page)));
   $('#languageButton').addEventListener('click',()=>{language=language==='ja'?'en':'ja';try{localStorage.setItem('time-study-desk:language',language);}catch{/* Session-only setting. */}applyLanguage();});
   const helpDialog=$('#helpDialog');
@@ -1903,7 +2153,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   helpDialog.addEventListener('click',event=>{const r=helpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)helpDialog.close();});
   document.addEventListener('dragover',event=>{if(!event.dataTransfer.types.includes('Files'))return;event.preventDefault();$('#dropZone').classList.add('drag-over');});
   document.addEventListener('dragleave',event=>{if(!event.relatedTarget)$('#dropZone').classList.remove('drag-over');});
-  document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1)chooseFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
+  document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1){if(project && !media.source)reconnectFile(files[0]);else chooseFile(files[0]);}else if(files.length)setError({code:'MULTIPLE_FILES'});});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){media.pause();if(media.source)$('#backgroundNotice').hidden=false;if(activeCycle())suspended=true;}renderMeasurementControls();});
   window.addEventListener('beforeunload',event=>{if(project && (project.cycles.length||project.title||project.note) && JSON.stringify(project)!==savedSnapshot){event.preventDefault();event.returnValue='';}});
   // Preserve File/Blob references in the back-forward cache, but never autoplay on return.
@@ -1912,7 +2162,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   $('#buildVersion').textContent=APP_CONFIG.version;
   $('#builtAt').textContent=BUILD_MANIFEST.generatedAtUtc||'—';
   $('#dependencyCount').textContent=String(BUILD_MANIFEST.dependencies?.length||0);
-  applyLanguage();
+  applyLanguage();initializeStorage();
 
 })();
 </script>

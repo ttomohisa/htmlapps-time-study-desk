@@ -1,4 +1,37 @@
-# QA results — v0.4.0 Exceptions / Editing
+# QA results — v0.5.0 Save / Resume
+
+## Current milestone — 2026-10-06
+
+T09–T10 of the approved plan, based on live merged main `c669389b42a9944766f817641f497bc54ff518ba` (PR #3), tree `3c044e0dc2f7545ff0660b173dd9adfb24dd34f8`. Work is on `feat/time-study-desk-v0.5`; main is not edited directly. The schema remains 1 and the v0.2.0 compatibility fixture is unchanged.
+
+### Local tests actually run
+
+Environment: Linux, Node 22.16.0; supplementary Python Playwright with system Chromium using in-memory page rendering because direct URL navigation is restricted by the execution environment.
+
+- Baseline: **54 unit tests passed** before v0.5 changes. New T09 tests first failed because `parseProject` / `matchSource` did not exist. Current full unit suite: **59 passing, zero failed/skipped**.
+- Import tests cover current schema round trip, the retained v0.2.0 fixture, malformed JSON, unsupported future schema, bad references/unknown keys/prototype-related keys and raw UTF-8 files over 10 MiB.
+- Source matching covers the exact 100,000 µs tolerance boundary, size/dimension mismatch, filename/mtime warnings and candidates shorter than recorded evidence. The API deliberately has no “same file” success claim.
+- Supplementary Chromium passed actual JSON download → page reset → detached import → same-video candidate → explicit confirmation → paused reconnection. A wrong-dimension video was rejected while the imported cycles stayed intact; a renamed same-byte candidate produced warnings before confirmation.
+- JavaScript syntax checks pass for the complete substituted app script, all test `.mjs` files and the loopback test server.
+- IndexedDB persistence behavior is not claimed from the in-memory supplementary page because its opaque origin correctly reports storage unavailable. Canonical persistence/competition cases are committed as generated-HTML Playwright tests using the loopback-only development origin and must be confirmed by Windows CI before this milestone is considered complete.
+
+### Persistence design under test
+
+- Analysis-only autosave defaults on as a device-side preference, uses a 750 ms debounce / 5 s maximum delay, and displays success only after the IndexedDB transaction completes.
+- Stored revisions are checked inside the save transaction; stale tabs receive conflict instead of overwriting newer data.
+- Restore is explicit. Imported/restored analysis is detached from video and cannot record/seek until explicit source reconnection.
+- App-specific clear invalidates queued writes, awaits an in-flight save, clears only this app's stores, and makes the current in-memory analysis dirty again so closing after deleting the durable recovery copy cannot look fully saved.
+- `file://` persistence is feature-detected rather than promised. The persistence test origin is development infrastructure only; the distributed app remains a standalone HTML with no server dependency.
+
+### Remaining verification for this branch
+
+Windows PowerShell build/standalone checks, direct-file readable/self-extracting browser tests, loopback IndexedDB tests, exact browser test count/artifact hashes and screenshots are pending the new Draft PR CI. Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS, large real media and screen readers remain later release gates.
+
+Statistics are v0.6.0 and CSV v0.7.0. No merge, tag/release or Browser Kitty site change is part of this milestone.
+
+---
+
+## Historical v0.4.0 evidence
 
 ## Source and scope — 2026-10-06
 

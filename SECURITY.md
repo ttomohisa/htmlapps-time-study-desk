@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.4.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.5.0 is a development build, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -10,15 +10,21 @@ The app CSP allows inline application code/styles and local media Blob URLs; `co
 
 ## Analysis data
 
-Only the language preference is persisted automatically in v0.4.0. Analysis stays in memory until an explicit `.tsd.json` download. The file contains the selected video's metadata, step definitions, boundaries, notes and display settings. It contains no video bytes, local absolute path, File/DOM object, Blob URL or history. A download handoff does not prove a disk write. Local analysis files can contain sensitive names and notes and are not encrypted by this app.
+Language and the autosave preference are device-side settings. When autosave is enabled and IndexedDB is actually available, the app persists one validated analysis snapshot plus revision metadata in its own `time-study-desk` database. It never stores video bytes, File objects, Blob URLs or local absolute paths. Browser storage can contain sensitive filenames, step names and notes and is not described as permanent or encrypted retention. Manual `.tsd.json` download remains available independently.
 
-Schema validation checks allowed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields are errors. The importer is **not exposed in v0.4.0**; future import must validate before replacing state.
+Analysis import checks the file size before reading, parses JSON, then validates allow-listed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields, malformed JSON, unsupported schema versions and inconsistent references reject the whole import. The current analysis is replaced only after successful validation and, when needed, explicit confirmation.
+
+Autosave revisions increase only after a successful IndexedDB transaction. A stale tab receives a conflict instead of overwriting a newer saved revision. App-specific browser-data deletion waits for an in-flight save, invalidates queued work and clears only this app's stores; it does not remove original videos or downloaded files. If IndexedDB is unavailable, blocked or full, a visible warning remains while manual JSON saving and measurement stay usable. `file://` persistence is feature-detected, not promised.
 
 Procedure order and conditions are immutable snapshots; old cycles keep their original references. The selected review cycle does not receive recording or video-end commands for another cycle. Procedure drafts are not applied until validated and saved.
 
 Commands are atomic: validation failure leaves the previous model unchanged. Undo uses validated differences, not permanent duplicated project snapshots. Replacement cancellation and loading failures preserve the previous analysis. Video-end observation is incomplete until explicitly resolved. Never label partly observed time as a complete step value.
 
 User strings go into text nodes or form values, not `innerHTML`. Names resembling HTML remain literal text. Filenames are sanitized before downloads; fixed extensions do not allow directory writes. CSV formula handling is a later requirement and is not claimed implemented here.
+
+## Import and source reconnection
+
+A reopened or browser-restored analysis starts detached from video. Results and text edits remain usable, but measurement and video seeking require an explicit source reconnection. Candidate matching compares saved size/dimensions and allows at most 100,000 µs duration difference; a candidate shorter than any recorded boundary is rejected. Filename and modification-time differences are warnings only. Even compatible metadata never proves that two files are identical, so reconnection still requires confirmation and never autoplays. A rejected or cancelled candidate cannot replace the current analysis or source.
 
 ## Interval editing
 

@@ -4,7 +4,11 @@
 
 The application keeps its editable source in `src/index.template.html`. `TSD:CORE:BEGIN/END` bounds the DOM-free schema, commands, shared boundaries, difference history and JSON export used by the real unit tests. `TSD:MEDIA` owns candidate File/Blob lifecycles, generation/seek/play guards and the video time capture. UI code connects those layers without reading wall time for measurements.
 
-v0.4.0 keeps analysis in memory and exports schema-1 JSON manually. IndexedDB/import/statistics/CSV are later plan milestones, not present implementations. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
+v0.5.0 exports and imports schema-1 JSON, can reconnect a compatible original local video, and adds browser-local analysis recovery. Statistics/CSV remain later plan milestones. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
+
+`TSD:STORAGE` owns IndexedDB capability probing, recovery snapshots, revision-checked writes and app-specific clear. It never receives video bytes. UI/controller code schedules 750 ms / 5 s autosave work, stops on conflict, and keeps manual export independent. Import uses the DOM-free CORE validator before replacing runtime state; MEDIA only receives a reconnect candidate after project metadata checks and explicit confirmation.
+
+Canonical standalone browser cases still open generated readable/self-extracting HTML through `file://`. Persistence-only Playwright cases use the same generated readable HTML from `scripts/serve-test.mjs` on `127.0.0.1` to provide a deterministic IndexedDB origin. That server is development/test infrastructure, not a runtime dependency; actual `file://` persistence is feature-detected.
 
 Repeated measurement keeps an active recording cycle separate from the selected review cycle. Procedure editing builds an in-memory draft and commits one validated new procedure, never mutating historical order/conditions. Cycle numbers and gaps are derived from chronological boundaries.
 
