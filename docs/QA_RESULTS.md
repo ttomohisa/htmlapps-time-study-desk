@@ -1,4 +1,24 @@
-# QA results — v0.5.0 Save / Resume
+# QA results — v0.6.0 Results / Review
+
+## Current milestone — v0.6.0 Results / Review
+
+Scope: T11–T12. Base is the user-merged v0.5.0 main. The implementation adds pure procedure-scoped summaries, reasoned cycle exclusion, result tables/chart and evidence navigation without changing schemaVersion 1.
+
+### Local implementation evidence
+
+- Added the fixed F1–F5 aggregation fixtures and watched the new summary tests fail before `summarize` / exclusion support existed. The full actual-source unit suite is **69 passing, 0 failing, 0 skipped** after implementation.
+- F1 overall mean/median/min/max, F2 not-performed denominator, F3 partial-unobserved denominator, F4 incomplete exclusion and F5 reasoned exclusion match APP_SPEC expectations. Zero/one/even/all-excluded populations and different-procedure separation are covered.
+- T12 browser tests were added before the Results workspace existed and failed on the missing workspace. Supplemental real Chromium rendering then passed result counts, phase n, F1–F5 state labels, 320px page overflow, reason-required exclusion, detached 77–127 s evidence, phase-3 constituent ranges, and explicit connected range playback stopping near the stored end.
+- The table, statistic cards and SVG chart all consume `TsdCore.summarize`; UI code does not maintain a second average formula.
+- Detached evidence selection displays exact saved ranges and never autoplays. Connected evidence seeks paused; explicit playback is bounded by the selected interval.
+
+Supplemental rendering uses manually substituted generated HTML because local direct `file://` Chromium navigation is administratively blocked and PowerShell is unavailable. Canonical Windows build/readable/self-extract/file browser evidence must be taken from this revision's GitHub Actions run before handoff.
+
+### Remaining gates
+
+CSV is v0.7.0. Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS interaction, actual large video files, screen readers, soft-keyboard behavior and release-scale performance remain unverified. No merge, tag/release publication or Browser Kitty site modification is part of this milestone.
+
+---
 
 ## Current milestone — 2026-10-06
 

@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.5.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.6.0 is a development build, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -31,6 +31,8 @@ A reopened or browser-restored analysis starts detached from video. Results and 
 Interruptions and unobserved intervals retain explicit kinds and times. A step not performed has a state but no invented zero-length work span. Reassignment and merging conserve the recorded time range and revalidate affected occurrence states. Losing complete evidence makes a step pending; it is never automatically changed to not performed. Editing a live assignment suspends recording. An explicit review finish is required after incomplete observations are resolved.
 
 A merge that changes assignments or notes is confirmed and guarded by project identity/revision, so an old confirmation cannot apply to a replacement analysis. Reversible deletion removes only the selected cycle, not the source video or phase/procedure definitions. No-op assignment offers no Undo for earlier work.
+
+Result statistics are derived only from validated integer boundaries and explicit states. Incomplete, not-performed, unobserved and excluded records are not coerced into zero values. Result links carry only in-memory cycle/phase identifiers and saved time ranges; selecting evidence does not upload data or autoplay the video. Derived statistics and chart values are not persisted separately in JSON or IndexedDB.
 
 ## Verification
 
