@@ -3,9 +3,9 @@
   "name": "Time Study Desk",
   "nameJa": "動画作業分析",
   "slug": "time-study-desk",
-  "version": "0.2.0",
-  "description": "Measure one work cycle in a local video, edit shared boundaries and save analysis JSON.",
-  "descriptionJa": "動画を見ながら一回の作業を工程ごとに区切り、境界を修正して分析データを保存します。",
+  "version": "0.3.0",
+  "description": "Measure repeated work cycles in a local video, preserve procedure changes and save analysis JSON.",
+  "descriptionJa": "動画の作業を工程・回ごとに区切り、手順を変更しても過去の記録を保って分析データを保存します。",
   "defaultLanguage": "auto",
   "repository": {
     "owner": "ttomohisa",

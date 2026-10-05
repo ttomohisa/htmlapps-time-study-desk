@@ -2,6 +2,16 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.3.0 — 2026-10-05 — Repeat / Procedure (development)
+
+- Repeat an existing procedure without re-entering names. Start and finish each cycle explicitly; the final step uses Finish rather than creating another step or cycle.
+- List cycles chronologically with separate gap durations. Guard overlapping starts, expanding intervals and simultaneous open cycles. Separate the currently recording cycle from the selected review cycle, including at video end.
+- Preserve historical procedures when changing order or start/end conditions. Rename shared phases without replacing their IDs; register/classify/archive phases without deleting observations.
+- Add a transactional procedure editor with keyboard-accessible order controls, cancellation, Unicode limits and Japanese/English phone layouts. Known initial step names can be entered on separate lines as one reversible edit.
+- Preserve schema 1 and the v0.2.0 saved-data fixture. Exclude display selection from Undo while repairing references if their procedure is undone.
+- Close a stale procedure draft only after confirmed successful video replacement; cancellation keeps both analysis and draft.
+- Expand unit, generated-HTML browser, privacy and screenshot coverage. Import, autosave, aggregate statistics and CSV are still not available.
+
 ## 0.2.0 — 2026-10-05 — First Measurement (development)
 
 - Record the first cycle with shared integer-microsecond boundaries, temporary step names and an explicit finish that creates no extra step.

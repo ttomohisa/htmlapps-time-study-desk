@@ -2,9 +2,9 @@
 
 [日本語](README.ja.md)
 
-Measure one work cycle in a local video, edit its step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
+Measure repeated work cycles in one local video, edit their step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
 
-**v0.2.0 — development build.** This version measures the first cycle only. It can save `.tsd.json`, but **cannot reopen those files yet**. Repeated cycles, analysis import, autosave, statistics and CSV are later milestones. It is not a v1.0 release.
+**v0.3.0 — development build.** Measure repeated cycles with shared step names and preserve earlier records when changing procedures. It can save `.tsd.json`, but **cannot reopen those files yet**. Interruption/missing-observation editing, analysis import, autosave, statistics and CSV are later milestones. It is not a v1.0 release.
 
 ## Screenshot
 
@@ -13,19 +13,23 @@ The app tests capture the actual Japanese, English and phone-width UI in `test-r
 ## Features
 
 - One local video: file picker or drag-and-drop, playback, seek, speed 0.25–2×, ±0.1 / ±1 second adjustment, mute and volume.
-- Start a cycle, mark each step change, then explicitly finish. Temporary step names let you measure before typing. Finishing does not create an empty next step.
+- Mark the first cycle with temporary step names, or enter known names on separate lines before measuring. Start each later cycle explicitly with the chosen procedure. The main action becomes Finish on the final step; the app never starts the next cycle automatically.
+- Keep a chronological cycle list with per-cycle durations and separate gaps. Select any earlier cycle for review without redirecting current recording into it.
+- Rename shared steps across all cycles. Changing the step order or start/end conditions creates a new procedure; earlier cycles keep the old procedure. Registered steps can be classified or removed from new choices without deleting earlier observations.
 - Shared boundary editing by entering seconds, using the current video position or moving a slider. Adjacent durations change together. Invalid or non-increasing boundaries are rejected without changing the analysis.
 - Rename steps and edit analysis, cycle, occurrence and interval notes. Undo/Redo retains up to 100 operations or 16 MiB of differences, whichever is reached first.
 - Manually save versioned analysis JSON, including unfinished records and the last confirmed boundary. The video is not included. Failed or cancelled video replacement preserves the previous analysis.
-- Japanese/English, light UI and phone navigation: Measure / Review / Results. “Results” shows this cycle's recorded durations, not multi-cycle statistics.
+- Japanese/English, light UI and phone navigation: Measure / Review / Results. “Results” shows recorded cycles and their durations, not statistical averages.
 
 ## Usage
 
-Open a freshly built `dist/index.html` or `time-study-desk.html`, choose a video, seek to the work's starting position, and select **Start cycle here**. Select **Mark boundary** at each step change and **Finish cycle here** at the end. Use **Review** to correct boundaries and names. Choose **Save analysis** to download a `.tsd.json` file.
+Open a freshly built `dist/index.html` or `time-study-desk.html`, choose a video, seek to the work's starting position, and select **Start cycle here**. Select **Mark boundary** at each step change and **Finish cycle here** at the end. Return to **Measure**, seek to the next cycle's start, and select **Start next cycle here**. Use **Review** to select and correct a cycle. **Results** contains the cycle list, next-procedure selection and **Change order / conditions**. The editor changes nothing until saved; cancelling leaves the original procedure intact. Choose **Save analysis** to download a `.tsd.json` file.
 
 The filename is editable; the extension is fixed. A “Download started” message means the file was handed to the browser, not that a particular disk location was verified. Check the download yourself. There is **no autosave**, and closing this page loses unsaved work. Keep both the analysis file and its original video for later versions' resume support.
 
-At the video end the cycle becomes **Incomplete**, never automatically Complete. Undo to correct the boundary and finish explicitly, or save the unfinished record. Returning from a hidden page requires an explicit resume from the last confirmed boundary; it does not invent a timed interruption.
+At the video end the recording cycle becomes **Incomplete**, never automatically Complete, even when an older cycle is selected for review. Undo to correct the boundary and finish explicitly, or save the unfinished record. Returning from a hidden page requires an explicit resume from the last confirmed boundary; it does not invent a timed interruption.
+
+An incomplete repeated cycle can be left as-is while preparing the next cycle; it remains in the saved analysis. Resuming an earlier incomplete cycle is disabled while another cycle is open. A new cycle or boundary edit cannot overlap an existing observation.
 
 ## Privacy and limits
 
@@ -76,7 +80,7 @@ Unit tests extract the real `TSD:CORE` block, not a copy of its implementation. 
 
 ## Save format and project status
 
-[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The `.tsd.json` fixture emitted at this milestone is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected by the validator rather than silently discarded. Import UI is not implemented in v0.2.0.
+[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected by the validator rather than silently discarded. Import UI is not implemented in v0.3.0.
 
 This work does not publish a release, merge the PR, or add the app to the Browser Kitty site. The user merges the PR.
 
