@@ -1,15 +1,12 @@
 # Third-Party Notices
 
-The default generated starter application contains no bundled third-party library code.
+Time Study Desk's generated runtime contains no bundled third-party library. It uses browser APIs and system fonts. `dependencies.json` and `dependencies.lock.json` have no runtime dependency entries.
 
-Browser APIs and system fonts are used directly. The GitHub Actions workflows reference their respective GitHub-maintained actions under the terms published by those projects.
+Development-only tools locked in `package-lock.json`:
 
-When adding a package to `dependencies.json`:
+- `@playwright/test`, `playwright`, `playwright-core` 1.57.0 — Apache-2.0.
+- Optional macOS `fsevents` 2.3.2 — MIT.
 
-1. Add its name, exact version, license, and homepage to this file.
-2. Sync and commit the corresponding `dependencies.lock.json` entry.
-3. Include every copyright notice and license text required for redistribution.
-4. Update both README files when the dependency materially affects privacy, size, or capability.
-5. Commit the regenerated `dist/dependency-manifest.json` only if the repository policy chooses to track generated artifacts.
+These tools are used for testing and are not embedded in the HTML. GitHub-maintained Actions referenced by the workflows retain their own licenses. Synthetic test media is described in `tests/fixtures/media/README.md` and is not embedded in the application.
 
-Do not assume that a package being available from npm makes it compatible with MIT redistribution.
+Before adding a runtime dependency, record its exact version, license and source, update the dependency lock through the existing tooling, include required notices, and re-verify the generated single HTML and privacy boundary. An available package is not automatic permission to redistribute it.

@@ -1,978 +1,1183 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f5f5f2">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Single HTML App Starter</title>
-  <link rel="icon" href="__APP_ICON_DATA_URI__">
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f5f5f2;
-      --surface: #ffffff;
-      --surface-muted: #f0f0ed;
-      --surface-hover: #e9e9e5;
-      --text: #20211f;
-      --muted: #666963;
-      --line: #dadbd6;
-      --line-strong: #bfc1ba;
-      --accent: #16624f;
-      --accent-hover: #0e503f;
-      --accent-soft: #e1f0ea;
-      --danger: #b3261e;
-      --focus: #4d8bc7;
-      --shadow-sm: 0 1px 2px rgba(25, 28, 24, .08), 0 1px 6px rgba(25, 28, 24, .04);
-      --shadow-md: 0 12px 34px rgba(25, 28, 24, .10);
-      --radius: 12px;
-      --header-height: 66px;
-    }
-    * { box-sizing: border-box; }
-    html { min-height: 100%; background: var(--bg); scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-      font-size: 15px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
-    button, textarea, input { font: inherit; }
-    button { color: inherit; }
-    button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible {
-      outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
-      outline-offset: 2px;
-    }
-    .app-header {
-      position: sticky;
-      z-index: 30;
-      top: 0;
-      min-height: var(--header-height);
-      border-bottom: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
-      background: color-mix(in srgb, var(--bg) 92%, transparent);
-      backdrop-filter: blur(16px) saturate(1.2);
-    }
-    .header-inner {
-      width: min(1180px, 100%);
-      min-height: var(--header-height);
-      margin: 0 auto;
-      padding: 10px clamp(14px, 2.8vw, 30px);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .brand-mark {
-      display: block;
-      width: 38px;
-      height: 38px;
-      flex: 0 0 auto;
-      border-radius: 11px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .brand-mark img { width: 100%; height: 100%; display: block; }
-    .brand-copy { min-width: 0; }
-    .brand-name {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.2;
-      letter-spacing: .01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .version-badge {
-      display: inline-flex;
-      align-items: center;
-      margin-left: 7px;
-      padding: 1px 6px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--surface-muted);
-      font-size: 10px;
-      font-weight: 650;
-      vertical-align: 2px;
-    }
-    .brand-meta {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-    .button {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: border-color .16s ease, background .16s ease, transform .16s ease;
-    }
-    .button:hover { border-color: var(--line-strong); background: var(--surface-hover); }
-    .button:active { transform: translateY(1px); }
-    .language-button {
-      min-width: 0;
-      padding: 5px 1px;
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
-      letter-spacing: .02em;
-      cursor: pointer;
-      transition: color .16s ease, opacity .16s ease;
-    }
-    .language-button:hover { color: var(--text); }
-    .language-button:active { opacity: .65; }
-    .icon-button {
-      display: inline-grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      padding: 0;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--surface);
-      cursor: pointer;
-      transition: border-color .16s ease, background .16s ease, transform .16s ease;
-    }
-    .icon-button:hover { border-color: var(--line-strong); background: var(--surface-hover); }
-    .icon-button:active { transform: translateY(1px); }
-    .icon-button svg { width: 18px; height: 18px; display: block; }
-    .header-icon-button {
-      width: auto;
-      height: auto;
-      padding: 5px 1px;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: var(--muted);
-      transition: color .16s ease, opacity .16s ease;
-    }
-    .header-icon-button:hover { border-color: transparent; background: transparent; color: var(--text); }
-    .header-icon-button:active { transform: none; opacity: .65; }
-    .header-icon-button svg { width: 20px; height: 20px; }
-    .main {
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: 22px clamp(14px, 2.8vw, 30px) 54px;
-    }
-    .page-intro {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 0 2px 18px;
-    }
-    .page-intro h2 {
-      margin: 0;
-      font-size: clamp(21px, 3vw, 26px);
-      line-height: 1.3;
-      letter-spacing: -.025em;
-    }
-    .page-intro p { margin: 5px 0 0; max-width: 760px; color: var(--muted); font-size: 13px; }
-    .local-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      flex: 0 0 auto;
-      margin-top: 3px;
-      padding: 7px 10px;
-      border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
-      border-radius: 999px;
-      color: var(--accent);
-      background: var(--accent-soft);
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .local-badge svg { width: 15px; height: 15px; display: block; }
-    .workspace {
-      margin: 0 0 28px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-    }
-    .workspace-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 15px; }
-    .workspace h2, .section-title { margin: 0; letter-spacing: -.02em; }
-    .workspace h2 { font-size: 19px; }
-    .workspace-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-    .stats { display: flex; flex-wrap: wrap; gap: 7px; }
-    .stat { min-width: 70px; padding: 7px 10px; border-radius: 10px; background: var(--surface-muted); text-align: center; }
-    .stat-value { display: block; font-size: 15px; font-weight: 780; line-height: 1.2; }
-    .stat-label { color: var(--muted); font-size: 10px; }
-    textarea {
-      width: 100%;
-      min-height: 260px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 16px;
-      background: #fbfbf9;
-      color: var(--text);
-      line-height: 1.7;
-    }
-    textarea:hover { border-color: var(--line-strong); }
-    .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 12px; }
-    .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .button { min-height: 40px; padding: 8px 14px; font-weight: 700; }
-    .button.primary { border-color: var(--accent); color: white; background: var(--accent); }
-    .button.primary:hover { border-color: var(--accent-hover); background: var(--accent-hover); }
-    .button.danger { color: var(--danger); }
-    .save-status { align-self: center; color: var(--muted); font-size: 12px; }
-    .export-row { display: flex; align-items: end; gap: 10px; margin-top: 12px; }
-    .export-field { display: grid; gap: 5px; min-width: min(100%, 320px); }
-    .export-label { color: var(--muted); font-size: 11px; font-weight: 700; }
-    .filename-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
-    .filename-control:focus-within { border-color: var(--focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 20%, transparent); }
-    .filename-input { width: 100%; min-width: 0; min-height: 40px; padding: 8px 10px; border: 0; outline: 0; background: transparent; color: var(--text); }
-    .filename-extension { padding: 0 10px; color: var(--muted); font-size: 12px; user-select: none; }
-    .section { padding: 26px 0; }
-    .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 15px; }
-    .section-title { font-size: 20px; }
-    .section-head p { margin: 0; color: var(--muted); font-size: 13px; }
-    .card-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-    .card { min-height: 150px; padding: 17px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-sm); }
-    .card-number { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
-    .card h3 { margin: 17px 0 6px; font-size: 15px; }
-    .card p { margin: 0; color: var(--muted); font-size: 12px; }
-    details { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; box-shadow: var(--shadow-sm); }
-    summary { cursor: pointer; padding: 14px 16px; font-weight: 720; }
-    .build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 16px 16px; }
-    .build-item { padding: 11px; border-radius: 10px; background: var(--surface-muted); }
-    .build-item span { display: block; color: var(--muted); font-size: 10px; }
-    .build-item strong { display: block; overflow-wrap: anywhere; font-size: 12px; }
-    footer { width: min(1180px, 100%); margin: 0 auto; padding: 0 clamp(14px, 2.8vw, 30px) 34px; color: var(--muted); font-size: 12px; }
-    /* Reusable toast / Undo component. Canonical source: components/toast.html */
-    .app-toast {
-      position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 60;
-      display: flex; align-items: center; gap: 12px; max-width: min(420px, calc(100vw - 36px));
-      padding: 10px 12px 10px 14px; border: 1px solid var(--line); border-radius: 12px;
-      background: var(--surface); color: var(--text); box-shadow: var(--shadow-md); opacity: 0;
-      transform: translateY(12px); pointer-events: none; transition: opacity .18s ease, transform .18s ease;
-    }
-    .app-toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .app-toast[data-tone="success"] { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); }
-    .app-toast[data-tone="warning"] { border-color: #c58a24; }
-    .app-toast-message { min-width: 0; flex: 1 1 auto; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
-    .app-toast-action { flex: 0 0 auto; min-height: 34px; padding: 5px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
-    .app-toast-action:hover { background: var(--surface-hover); }
-    .app-toast-action[hidden] { display: none; }
-    dialog {
-      width: min(640px, calc(100% - 28px));
-      max-height: min(760px, calc(100dvh - 28px));
-      padding: 0;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: var(--shadow-md);
-    }
-    dialog::backdrop { background: rgba(15, 17, 14, .52); backdrop-filter: blur(4px); }
-    #helpDialog[open] {
-      display: flex;
-      flex-direction: column;
-      max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    }
-    .dialog-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex: 0 0 auto;
-      gap: 12px;
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--line);
-    }
-    .dialog-header h2 { margin: 0; font-size: 17px; }
-    .dialog-body {
-      min-height: 0;
-      flex: 1 1 auto;
-      padding: 20px 20px calc(28px + env(safe-area-inset-bottom));
-      overflow: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-    }
-    .dialog-body h3 {
-      margin: 25px 0 8px;
-      padding-top: 19px;
-      border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
-      font-size: 14px;
-    }
-    .dialog-body h3:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-    .dialog-body p, .dialog-body li { color: var(--muted); font-size: 13px; line-height: 1.7; }
-    .dialog-body p { margin: 8px 0 0; }
-    .dialog-body ul, .dialog-body ol { margin: 8px 0 0; padding-left: 22px; }
-    .dialog-body li + li { margin-top: 7px; }
-    .dialog-note {
-      margin-top: 12px;
-      padding: 11px 12px;
-      border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line));
-      border-radius: 10px;
-      background: var(--accent-soft);
-      color: var(--text) !important;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#16624f">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; font-src 'none'; worker-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Time Study Desk / 動画作業分析</title>
+<link rel="icon" href="__APP_ICON_DATA_URI__">
+<style>
+/* TOKENS / LAYOUT — light-only, local-first foundation. */
+:root { color-scheme:light; --bg:#f5f5f2; --surface:#fff; --surface-muted:#f0f0ed; --surface-hover:#e9e9e5; --text:#20211f; --muted:#666963; --line:#dadbd6; --line-strong:#bfc1ba; --accent:#16624f; --accent-hover:#0e503f; --accent-soft:#e1f0ea; --danger:#b3261e; --focus:#4d8bc7; --shadow-sm:0 1px 6px #191c1810; --shadow-md:0 12px 34px #191c181a; }
+* { box-sizing:border-box; } [hidden] { display:none !important; }
+html { min-height:100%; background:var(--bg); }
+body { margin:0; color:var(--text); background:var(--bg); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif; -webkit-font-smoothing:antialiased; }
+button,input,select { font:inherit; color:inherit; touch-action:manipulation; }
+button { cursor:pointer; } button:disabled { opacity:.48; cursor:not-allowed; transform:none; }
+:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+h1 { margin:0; font-size:clamp(24px,4vw,32px); letter-spacing:-.035em; }
+.app-header { position:sticky; top:0; z-index:30; border-bottom:1px solid var(--line); background:var(--bg); }
+.header-inner { width:min(1180px,100%); min-height:66px; margin:auto; padding:10px clamp(14px,2.8vw,30px); display:flex; align-items:center; gap:8px; }
+.brand { display:flex; align-items:center; gap:10px; min-width:0; }
+.brand-mark { width:38px; height:38px; border-radius:25%; overflow:hidden; flex:none; }
+.brand-mark img { display:block; width:100%; height:100%; }
+.brand-copy { min-width:0; } .brand-name { margin:0; display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:16px; line-height:1.2; }
+.brand-meta { margin:3px 0 0; max-width:660px; color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.version-badge { border:1px solid var(--line); background:var(--surface-muted); border-radius:999px; padding:1px 6px; font-size:10px; color:var(--muted); }
+.header-actions { display:flex; gap:2px; align-items:center; margin-left:auto; }
+.language-button,.header-icon-button { min-width:44px; min-height:44px; padding:5px; border:0; background:transparent; color:var(--muted); font-size:12px; font-weight:700; }
+.icon-button { display:inline-grid; place-items:center; min-width:44px; min-height:44px; padding:0; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+.header-icon-button { border:0; background:transparent; } .icon-button svg { width:20px; height:20px; }
+.main { width:min(1180px,100%); margin:auto; padding:22px clamp(14px,2.8vw,30px) 24px; }
+.page-intro { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding-bottom:18px; }
+.page-intro p { color:var(--muted); font-size:13px; margin:5px 0 0; }
+.local-badge { display:flex; align-items:center; gap:7px; flex:none; margin-top:3px; padding:7px 10px; border:1px solid #b0c8bd; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+.local-badge svg { width:15px; height:15px; }
+.intro-note { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:6px 0 18px; font-size:12px; color:var(--muted); }
+.stage-tag { border:1px solid var(--line); border-radius:6px; padding:3px 7px; color:var(--text); background:var(--surface); font-weight:700; }
+.desk { display:grid; grid-template-columns:minmax(0,1fr) 284px; gap:20px; align-items:start; }
+.desk>* { min-width:0; }
+.player-panel { min-width:0; border:1px solid var(--line); border-radius:16px; background:var(--surface); overflow:hidden; box-shadow:var(--shadow-sm); }
+.panel-head { display:flex; gap:12px; justify-content:space-between; align-items:center; padding:16px 18px; }
+.panel-head h2 { margin:0; font-size:15px; } .status { color:var(--muted); font-size:12px; } .status[data-state="ready"] { color:var(--accent); }
+.preview { background:#192522; min-height:240px; display:grid; place-items:center; position:relative; }
+.preview.drag-over { outline:4px solid var(--accent); outline-offset:-4px; }
+#videoHost { width:100%; } #videoHost video { display:block; width:100%; height:min(48vh,400px); min-height:180px; object-fit:contain; background:#111a17; }
+.empty-view { min-height:320px; padding:32px 18px; display:grid; align-content:center; justify-items:center; gap:12px; color:#f2f7f4; text-align:center; }
+.empty-view>svg { width:62px; height:62px; opacity:.6; } .empty-view p { margin:0; max-width:34em; color:#cbd6d0; font-size:13px; } .empty-view .button { margin-top:8px; }
+.button { min-height:48px; padding:8px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface); font-weight:700; display:inline-flex; justify-content:center; align-items:center; gap:8px; }
+.button:hover:not(:disabled) { border-color:var(--line-strong); background:var(--surface-hover); }
+.button.primary { border-color:var(--accent); background:var(--accent); color:#fff; } .button.primary:hover:not(:disabled) { background:var(--accent-hover); }
+.button svg { width:20px; height:20px; flex:none; }
+.transport { min-width:0; padding:16px 18px; } .seek-row { display:flex; align-items:center; gap:12px; }
+.time-readout { white-space:nowrap; font-size:12px; font-variant-numeric:tabular-nums; color:var(--muted); } #position { color:var(--text); font-weight:700; }
+input[type="range"] { accent-color:var(--accent); min-width:0; min-height:44px; margin:0; } #seekBar { flex:1; width:100%; }
+.transport-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; } #playButton { min-width:116px; }
+.rate-field { display:flex; align-items:center; gap:8px; margin-left:auto; font-size:12px; color:var(--muted); }
+select { min-width:0; min-height:44px; border:1px solid var(--line); border-radius:9px; padding:7px 10px; background:var(--surface); }
+details { border:1px solid var(--line); border-radius:12px; background:var(--surface); overflow:hidden; } summary { cursor:pointer; padding:14px 16px; font-weight:700; }
+.adjustment { margin-top:12px; } .adjustment summary { min-height:44px; padding:10px 12px; font-size:12px; }
+.adjust-inner { padding:0 12px 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .adjust-inner .button { flex:1; min-width:56px; padding-inline:6px; min-height:44px; }
+.audio-row { display:flex; align-items:center; gap:12px; padding:0 12px 12px; } #volume { flex:1; } .audio-row label { font-size:12px; }
+.transport-hint { margin:12px 0 0; color:var(--muted); font-size:12px; }
+.side-card { border:1px solid var(--line); border-radius:14px; padding:18px; background:var(--surface); margin-bottom:14px; }
+.side-card h2 { font-size:14px; margin:0 0 12px; } .side-card p { color:var(--muted); font-size:12px; margin:6px 0 14px; } .side-card .button { width:100%; }
+.source-name { display:block; font-size:14px; font-weight:700; overflow-wrap:anywhere; margin-bottom:12px; }
+.source-facts { display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px 12px; font-size:12px; margin:0; } .source-facts dt { color:var(--muted); } .source-facts dd { text-align:right; overflow-wrap:anywhere; margin:0; font-variant-numeric:tabular-nums; }
+.notice { border:1px solid #d3be87; border-radius:12px; padding:12px 14px; margin:0 0 16px; background:#fffaf0; color:#69531f; font-size:13px; overflow-wrap:anywhere; }
+.notice.error { border-color:#d5a8a4; color:#852b25; background:#fff6f5; } .loading-note { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.next-features summary { font-size:12px; min-height:44px; padding:11px 12px; } .next-inner { padding:0 12px 14px; } .next-inner p { margin-bottom:8px; }
+.export-field { display:grid; gap:5px; min-width:0; width:100%; } .export-label { color:var(--muted); font-size:11px; font-weight:700; }
+.filename-control { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.filename-input { min-width:0; width:100%; min-height:44px; padding:8px 10px; border:0; background:transparent; } .filename-extension { font-size:10px; padding:0 7px; color:var(--muted); }
+.flow-note { border-left:3px solid var(--accent); padding-left:12px; } .flow-note strong { display:block; color:var(--text); margin-bottom:5px; }
+.build-section { margin-top:22px; } .build-section summary { font-size:12px; } .build-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; padding:0 16px 16px; }
+.build-item { padding:11px; border-radius:10px; background:var(--surface-muted); } .build-item span { display:block; color:var(--muted); font-size:10px; } .build-item strong { display:block; overflow-wrap:anywhere; font-size:12px; }
+footer { width:min(1180px,100%); margin:auto; padding:0 clamp(14px,2.8vw,30px) 34px; color:var(--muted); font-size:12px; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+/* Shared confirmation, help and toast components, adapted from components/. */
+dialog { width:min(640px,calc(100% - 28px)); max-height:min(760px,calc(100dvh - 28px)); padding:0; border:1px solid var(--line); border-radius:16px; color:var(--text); background:var(--surface); box-shadow:var(--shadow-md); }
+dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-direction:column; }
+.dialog-header,.app-confirm-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); flex:none; }
+.dialog-header h2,.app-confirm-title { margin:0; font-size:17px; }
+.dialog-body,.app-confirm-body { min-height:0; overflow:auto; overscroll-behavior:contain; padding:20px 20px calc(28px + env(safe-area-inset-bottom)); }
+.dialog-body h3 { margin:25px 0 8px; padding-top:19px; border-top:1px solid var(--line); font-size:14px; } .dialog-body h3:first-child { margin-top:0; padding-top:0; border-top:0; }
+.dialog-body p { margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.7; } .dialog-note { padding:11px 12px; border:1px solid #b0c8bd; border-radius:10px; background:var(--accent-soft); color:var(--text) !important; }
+.app-confirm-dialog { width:min(420px,calc(100% - 24px)); } .app-confirm-close { display:grid; place-items:center; width:44px; height:44px; border:0; background:transparent; border-radius:10px; } .app-confirm-close svg { width:19px; height:19px; }
+.app-confirm-message { margin:0; color:var(--muted); font-size:13px; line-height:1.7; overflow-wrap:anywhere; white-space:pre-line; }
+.app-confirm-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:18px; }
+.app-confirm-button { min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:11px; background:var(--surface); font-size:12px; font-weight:700; }
+.app-confirm-button.primary { border-color:var(--accent); background:var(--accent); color:#fff; } .app-confirm-button.danger { border-color:var(--danger); background:var(--danger); color:#fff; }
+.app-toast { position:fixed; right:18px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:60; display:flex; align-items:center; gap:12px; max-width:min(420px,calc(100vw - 36px)); padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:var(--shadow-md); opacity:0; pointer-events:none; }
+.app-toast.show { opacity:1; pointer-events:auto; } .app-toast-message { min-width:0; flex:1; font-size:13px; overflow-wrap:anywhere; } .app-toast-action { min-height:44px; border:0; background:transparent; color:var(--accent); font-weight:700; }
+@media(max-width:820px) { .page-intro { flex-direction:column; gap:10px; } .local-badge { align-self:flex-start; } .desk { grid-template-columns:minmax(0,1fr); gap:16px; } .side-column { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } .side-card { margin-bottom:0; } .build-grid { grid-template-columns:1fr; } }
+@media(max-width:520px) { .header-inner { min-height:58px; padding:8px 12px; } .brand-name { font-size:13px; } .version-badge { font-size:9px; } .brand { gap:8px; } .brand-mark { width:30px; height:30px; } .brand-meta { display:none; } .main { padding-top:18px; } .local-badge { padding:4px 8px; font-size:11px; } .panel-head,.transport { padding:12px; } .empty-view { min-height:240px; } .side-column { grid-template-columns:minmax(0,1fr); } #videoHost video { height:min(37vh,300px); min-height:160px; } .preview { min-height:160px; } .time-readout { font-size:11px; } .seek-row { gap:8px; } #playButton { min-width:108px; } .rate-field { gap:5px; } .source-facts { font-size:13px; } #helpDialog { width:calc(100% - 20px); max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); } .app-confirm-dialog { width:100%; max-width:none; margin:auto 0 0; border-radius:22px 22px 0 0; } .app-confirm-actions { grid-template-columns:1fr; } .app-confirm-button { min-height:48px; font-size:14px; } .app-toast { left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); max-width:none; } }
+@media(max-height:500px) { .app-header { position:static; } #videoHost video { height:44vh; min-height:120px; } .preview { min-height:120px; } .empty-view { min-height:160px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+/* Measurement / review use the same player; mobile has one fixed navigation bar. */
+textarea { font:inherit; resize:vertical; min-height:76px; }
+.field { display:grid; gap:5px; margin:10px 0; min-width:0; font-size:12px; color:var(--muted); }
+.field input,.field textarea,.phase-name { width:100%; min-width:0; min-height:44px; border:1px solid var(--line); border-radius:8px; padding:9px; background:var(--surface); color:var(--text); }
+.field input[aria-invalid="true"],.phase-name[aria-invalid="true"] { border-color:var(--danger); }
+.small-note { color:var(--muted); font-size:12px; margin:10px 0; overflow-wrap:anywhere; }
+.measurement,.review-editor { padding:16px 18px; border-top:1px solid var(--line); }
+.measurement { background:#f3f8f5; }
+.section-heading { display:flex; gap:8px; justify-content:space-between; align-items:baseline; flex-wrap:wrap; margin-bottom:12px; }
+.section-heading h2 { font-size:15px; margin:0; }
+.current-step { color:var(--accent); overflow-wrap:anywhere; }
+.measure-actions,.review-actions,.history-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.measure-actions .button { flex:1; } .review-actions .button { flex:1; min-height:44px; font-size:12px; padding:8px; }
+.text-button { border:0; background:transparent; color:var(--accent); min-height:44px; padding:6px 0; text-align:left; font-size:12px; }
+.boundary-controls { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:end; margin-bottom:12px; }
+.boundary-controls .field { margin:0; } .boundary-controls .button { min-height:44px; }
+.boundary-slider-label { display:grid; gap:4px; font-size:12px; color:var(--muted); margin-top:12px; }
+.field-error { color:var(--danger); font-size:12px; margin:8px 0; }
+.record-status { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-variant-numeric:tabular-nums; color:var(--accent); }
+.history-actions { margin:12px 0; } .side-card .history-actions .button { width:auto; flex:1; min-height:44px; padding:6px; font-size:12px; }
+.phase-row { border-top:1px solid var(--line); padding:12px 0 4px; min-width:0; }
+.phase-line { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
+.phase-duration { font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.phase-name { font-size:13px; } .phase-note { font:inherit; width:100%; min-width:0; border:1px solid var(--line); border-radius:8px; padding:8px; }
+.notes-details { margin:10px 0 14px; } .notes-details summary { padding:10px; min-height:44px; font-size:12px; }
+.notes-details .field { margin:8px 10px; } .notes-details textarea { font-size:13px; }
+.save-status { white-space:pre-line; overflow-wrap:anywhere; }
+.mobile-tabs { display:none; } #recordCard { grid-column:1/-1; }
+@media(min-width:821px) { .desk { grid-template-columns:minmax(0,1fr) 310px; } }
+@media(max-width:600px) {
+ body { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
+ .main { padding-top:12px; } .page-intro { padding-bottom:6px; } .page-intro h1 { font-size:23px; }
+ .page-intro .local-badge { display:none; } .intro-note { margin-bottom:12px; }
+ .app-mobile-page { display:none; } .app-mobile-page.is-mobile-active { display:block; }
+ body[data-current-page="results"] .player-panel,body[data-current-page="measure"] #recordCard,body[data-current-page="measure"] .side-column { display:none; }
+ body[data-current-page="review"] #analysisCard,body:not([data-current-page="results"]) #sourceCard { display:none; }
+ .side-column { grid-template-columns:minmax(0,1fr); }
+ .measurement,.review-editor { padding:12px; }
+ #videoHost video { height:min(29dvh,260px); min-height:100px; } .preview { min-height:100px; }
+ .transport-hint { display:none; } .transport { padding:10px 12px; } .transport-row { margin-top:4px; }
+ .adjustment { margin-top:7px; } .measure-actions .button { font-size:13px; padding:8px; }
+ .mobile-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); position:fixed; z-index:50; inset:auto 0 0; padding:6px 10px calc(6px + env(safe-area-inset-bottom)); gap:4px; background:var(--surface); border-top:1px solid var(--line); }
+ .mobile-tabs button { min-width:0; min-height:54px; padding:5px; border:0; border-radius:10px; background:transparent; color:var(--muted); display:grid; justify-items:center; gap:2px; font-size:11px; }
+ .mobile-tabs button[aria-current="page"] { color:var(--accent); background:var(--accent-soft); font-weight:700; }
+ .mobile-tabs svg { width:21px; height:21px; }
+ .app-toast { bottom:calc(84px + env(safe-area-inset-bottom)); }
+ body[data-current-page="measure"] .build-section,body[data-current-page="review"] .build-section { display:none; }
+ .app-confirm-dialog { max-height:calc(100dvh - 16px - env(safe-area-inset-top)); }
+}
+@media(max-height:500px) { #videoHost video { height:36dvh; min-height:80px; } }
 
-    /* Reusable confirmation component. Canonical source: components/confirm-dialog.html */
-    .app-confirm-dialog { width: min(420px, calc(100% - 24px)); max-width: 100%; }
-    .app-confirm-dialog::backdrop { background: rgba(15, 17, 14, .48); backdrop-filter: blur(3px); }
-    .app-confirm-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 15px 18px 13px;
-      border-bottom: 1px solid var(--line);
-    }
-    .app-confirm-title { margin: 0; font-size: 17px; letter-spacing: -.01em; }
-    .app-confirm-close {
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border: 0;
-      border-radius: 10px;
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-    }
-    .app-confirm-close:hover { background: var(--surface-hover); }
-    .app-confirm-close svg { width: 19px; height: 19px; }
-    .app-confirm-body { padding: 18px; }
-    .app-confirm-message {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-    }
-    .app-confirm-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 18px;
-    }
-    .app-confirm-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: var(--surface);
-      color: var(--text);
-      font: inherit;
-      font-size: 12px;
-      font-weight: 760;
-      cursor: pointer;
-    }
-    .app-confirm-button:hover { border-color: var(--line-strong); background: var(--surface-hover); }
-    .app-confirm-button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
-    .app-confirm-button.primary:hover { border-color: var(--accent-hover); background: var(--accent-hover); }
-    .app-confirm-button.danger { border-color: var(--danger); background: var(--danger); color: #fff; }
-    .app-confirm-button:focus-visible, .app-confirm-close:focus-visible {
-      outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
-      outline-offset: 2px;
-    }
 
-    code { padding: 1px 5px; border-radius: 5px; background: var(--surface-muted); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    @media (max-width: 820px) {
-      .page-intro { align-items: stretch; flex-direction: column; gap: 10px; }
-      .local-badge { align-self: flex-start; }
-      .workspace-head, .section-head { align-items: stretch; flex-direction: column; }
-      .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .build-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 520px) {
-      :root { --header-height: 58px; }
-      .header-inner { padding-block: 8px; }
-      .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
-      .brand-name { font-size: 15px; }
-      .brand-meta { display: none; }
-      .header-actions { gap: 11px; }
-      .language-button { padding-block: 6px; }
-      .header-icon-button { padding-block: 6px; }
-      .main { padding-top: 18px; }
-      .page-intro { padding-bottom: 14px; }
-      .workspace { padding: 14px; border-radius: 14px; }
-      .stats { width: 100%; }
-      .stat { flex: 1 1 0; min-width: 0; }
-      .card-grid { grid-template-columns: 1fr; }
-      .toolbar, .button-row { width: 100%; }
-      .button-row .button { flex: 1 1 auto; }
-      .export-row, .export-field { width: 100%; }
-      .app-toast { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); max-width: none; }
-      textarea { min-height: 235px; }
-      #helpDialog {
-        width: calc(100% - 20px);
-        max-height: calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-      }
-      #helpDialog .dialog-body {
-        padding: 18px 18px calc(24px + env(safe-area-inset-bottom));
-      }
-      .app-confirm-dialog {
-        width: 100%;
-        max-width: none;
-        margin: auto 0 0;
-        border-width: 1px 0 0;
-        border-radius: 22px 22px 0 0;
-      }
-      .app-confirm-dialog::backdrop { background: rgba(0, 0, 0, .42); backdrop-filter: blur(2px); }
-      .app-confirm-header { padding: 14px 18px 12px; }
-      .app-confirm-body { padding: 12px 18px calc(env(safe-area-inset-bottom) + 18px); }
-      .app-confirm-message { font-size: 14px; line-height: 1.75; }
-      .app-confirm-actions { grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
-      .app-confirm-button { min-height: 48px; font-size: 14px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
-    }
-  </style>
+/* Keep the video and active editing controls together after opening a file. */
+.has-source .page-intro { display:none; }
+.has-source #videoHost video { height:min(31vh,280px); }
+.workspace-switch { display:flex; gap:4px; margin-left:auto; }
+.workspace-switch button { min-height:44px; padding:7px 13px; border:0; border-radius:9px; background:transparent; color:var(--muted); font:inherit; font-size:12px; }
+.workspace-switch button[aria-current="page"] { background:var(--accent-soft); color:var(--accent); font-weight:700; }
+.measurement:not(.is-mobile-active),.review-editor:not(.is-mobile-active) { display:none; }
+@media(max-width:600px) {
+ .has-source .intro-note [data-i18n="versionLimit"] { display:none; }
+ .has-source .intro-note { margin:0 0 10px; }
+ .has-source #videoHost video { height:min(25dvh,220px); min-height:100px; }
+ .workspace-switch { display:none; }
+}
+@media(max-height:500px) { .has-source #videoHost video { height:30dvh; min-height:80px; } }
+</style>
 </head>
-<body>
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt="">
-        </div>
-        <div class="brand-copy">
-          <p class="brand-name"><span id="brandName">Single HTML App Starter</span><span class="version-badge" id="versionBadge">v1.1.0</span></p>
-          <p class="brand-meta" data-i18n="brandMeta">Single file · Local-first · GitHub Pages</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button class="language-button" id="languageButton" type="button" aria-label="Switch language">EN</button>
-        <button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-title="helpTitle" data-i18n-aria-label="helpTitle" title="使い方と注意事項" aria-label="使い方と注意事項">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1"/><path d="M12 17h.01"/></svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="main">
-    <section class="page-intro" aria-labelledby="heroTitle">
-      <div>
-        <h2 id="heroTitle" data-i18n="introTitle">単一HTMLアプリのスターター</h2>
-        <p data-i18n="lead">PDF Organizerと同じ、固定依存・完全内包・実行時通信なしの構成から、新しいブラウザーアプリを作れます。</p>
-      </div>
-      <div class="local-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
-        <span data-i18n="localBadge">実行時通信なし</span>
-      </div>
-    </section>
-
-    <!-- APP:BEGIN Replace this demo workspace with the real application. -->
-    <section class="shell workspace" aria-labelledby="workspaceTitle">
-      <div class="workspace-head">
-        <div>
-          <h2 id="workspaceTitle" data-i18n="workspaceTitle">Starter workspace</h2>
-          <p data-i18n="workspaceBody">Text stays in this browser. It is never sent by this app.</p>
-        </div>
-        <div class="stats" aria-live="polite">
-          <div class="stat"><span class="stat-value" id="characterCount">0</span><span class="stat-label" data-i18n="characters">Characters</span></div>
-          <div class="stat"><span class="stat-value" id="wordCount">0</span><span class="stat-label" data-i18n="words">Words</span></div>
-          <div class="stat"><span class="stat-value" id="lineCount">0</span><span class="stat-label" data-i18n="lines">Lines</span></div>
-        </div>
-      </div>
-      <label class="sr-only" for="editor" data-i18n="editorLabel">Text editor</label>
-      <textarea id="editor" spellcheck="true"></textarea>
-      <div class="export-row">
-        <label class="export-field" for="outputFilename">
-          <span class="export-label" data-i18n="outputFilename">出力ファイル名</span>
-          <span class="filename-control">
-            <input class="filename-input" id="outputFilename" type="text" maxlength="120" autocomplete="off" spellcheck="false" aria-describedby="outputFilenameHint">
-            <span class="filename-extension" aria-hidden="true">.txt</span>
-          </span>
-          <span class="sr-only" id="outputFilenameHint" data-i18n="outputFilenameHint">拡張子は自動で .txt が付きます</span>
-        </label>
-      </div>
-      <div class="toolbar">
-        <div class="button-row">
-          <button class="button primary" id="copyButton" type="button" data-i18n="copy">Copy</button>
-          <button class="button" id="downloadButton" type="button" data-i18n="download">Download text</button>
-          <button class="button" id="sampleButton" type="button" data-i18n="sample">Restore sample</button>
-        </div>
-        <div class="button-row">
-          <button class="button danger" id="clearButton" type="button" data-i18n="clear">Clear</button>
-        </div>
-        <span class="save-status" id="saveStatus" data-i18n="savedLocally">Saved locally</span>
-      </div>
-    </section>
-    <!-- APP:END -->
-
-    <section class="shell section" aria-labelledby="guaranteesTitle">
-      <div class="section-head">
-        <h2 class="section-title" id="guaranteesTitle" data-i18n="guaranteesTitle">Template guarantees</h2>
-        <p data-i18n="guaranteesBody">Keep these constraints unless the product specification explicitly changes them.</p>
-      </div>
-      <div class="card-grid">
-        <article class="card"><div class="card-number">01</div><h3 data-i18n="card1Title">One deliverable</h3><p data-i18n="card1Body">The release artifact is dist/index.html. It opens directly and can be hosted as a static page.</p></article>
-        <article class="card"><div class="card-number">02</div><h3 data-i18n="card2Title">Pinned dependencies</h3><p data-i18n="card2Body">Third-party npm assets are version-pinned, hashed, and embedded during the build.</p></article>
-        <article class="card"><div class="card-number">03</div><h3 data-i18n="card3Title">No runtime network</h3><p data-i18n="card3Body">Content Security Policy blocks runtime connections. User data stays inside the page.</p></article>
-        <article class="card"><div class="card-number">04</div><h3 data-i18n="card4Title">LLM-ready workflow</h3><p data-i18n="card4Body">AGENTS.md and APP_SPEC.md give coding agents a stable contract, acceptance criteria, and handoff format.</p></article>
-      </div>
-    </section>
-
-    <section class="shell section">
-      <details>
-        <summary data-i18n="buildInfo">Build information</summary>
-        <div class="build-grid">
-          <div class="build-item"><span data-i18n="appVersion">App version</span><strong id="buildVersion">—</strong></div>
-          <div class="build-item"><span data-i18n="builtAt">Built at</span><strong id="builtAt">—</strong></div>
-          <div class="build-item"><span data-i18n="dependencies">Embedded dependencies</span><strong id="dependencyCount">0</strong></div>
-        </div>
-      </details>
-    </section>
-  </main>
-
-  <footer><span id="footerName">Single HTML App Starter</span> · MIT License · <span data-i18n="footer">Generated as one self-contained HTML file</span></footer>
-  <div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" data-tone="default">
-    <span class="app-toast-message" id="appToastMessage"></span>
-    <button class="app-toast-action" id="appToastAction" type="button" hidden></button>
+<body data-current-page="measure">
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.2.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
+<main class="main">
+<section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">動画作業分析</h1><p data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">動画をアップロードしません</span></div></section>
+<!-- APP:BEGIN Time Study Desk First Measurement -->
+<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 動画再生基盤</span><span data-i18n="versionLimit">この版では工程の計測・集計・分析保存はまだ利用できません。</span></div>
+<div id="errorMessage" class="notice error" role="alert" hidden></div>
+<div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
+<div id="backgroundNotice" class="notice" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
+<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" data-i18n="tabReview">見直す</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button></div><div id="videoHost" hidden></div></div>
+<div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
+<details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
+  <div class="section-heading"><h2 id="measureTitle" data-i18n="measureTitle">最初の一回を計測</h2><strong id="currentStep" class="current-step"></strong></div>
+  <div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
+  <div class="history-actions" id="measureHistory" hidden><button class="button" id="undoMeasureButton" type="button" data-i18n="undo" disabled>取り消す</button><button class="button" id="redoMeasureButton" type="button" data-i18n="redo" disabled>やり直す</button></div>
+  <p id="measurementHint" class="small-note"></p><button id="closeIncompleteButton" type="button" class="text-button" data-i18n="closeIncomplete" hidden>この位置まで記録して中断</button>
+</div>
+<div class="review-editor app-mobile-page" data-screen="review" id="reviewPanel" aria-labelledby="reviewTitle">
+  <div class="section-heading"><h2 id="reviewTitle" data-i18n="reviewTitle">区切りを見直す</h2><span class="small-note" id="reviewCycleStatus"></span></div>
+  <p id="reviewEmpty" class="small-note" data-i18n="reviewEmpty">計測を始めると、ここで境界を修正できます。</p>
+  <div id="boundaryEditor" hidden>
+    <label class="field"><span data-i18n="selectedBoundary">修正する境界</span><select id="boundarySelect"></select></label>
+    <div class="boundary-controls"><label class="field"><span data-i18n="boundarySeconds">動画内の時刻（秒）</span><input id="boundaryTime" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="boundaryError"></label><button id="applyBoundaryButton" class="button" type="button" data-i18n="applyTime">時刻を適用</button></div>
+    <p id="boundaryError" class="field-error" role="alert" hidden></p>
+    <div class="review-actions"><button id="boundaryToVideoButton" class="button" type="button" data-i18n="boundaryToVideo">この境界へ移動</button><button id="boundaryFromVideoButton" class="button" type="button" data-i18n="boundaryFromVideo">境界を現在位置へ</button></div>
+    <label class="boundary-slider-label"><span data-i18n="dragBoundary">スライダーで境界を調整</span><input id="boundarySlider" type="range" step="1" min="0" max="1" value="0" aria-describedby="sharedBoundaryHint"></label>
+    <p class="small-note" id="sharedBoundaryHint" data-i18n="sharedBoundaryHint">境界を動かすと、前後の工程時間が同時に変わります。</p>
+    <details class="notes-details"><summary data-i18n="spanNoteTitle">選択境界の後の区間メモ</summary><label class="field"><span id="spanNoteLabel"></span><textarea id="spanNote" rows="2"></textarea></label></details>
   </div>
+</div>
+</section>
+<aside class="side-column">
+<section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><div class="history-actions"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
+<section class="side-card app-mobile-page" data-screen="results" id="analysisCard"><h2 data-i18n="analysisTitle">分析データ</h2>
+<label class="field"><span data-i18n="projectTitle">分析タイトル（任意）</span><input id="projectTitle" type="text" autocomplete="off"></label>
+<details class="notes-details"><summary data-i18n="notesTitle">分析・今回のメモ</summary><label class="field"><span data-i18n="projectNote">分析メモ</span><textarea id="projectNote" rows="3"></textarea></label><label class="field"><span data-i18n="cycleNote">今回のメモ</span><textarea id="cycleNote" rows="2" disabled></textarea></label></details>
+<label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label>
+<p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存はありません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
+<button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：同じ工程を繰り返し計測</strong><span data-i18n="nextStageBody">v0.3.0で複数回の計測を追加します。集計・CSV出力は後続版です。</span></p></section>
+<section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><button id="replaceVideoButton" type="button" class="button" style="margin-top:16px" data-i18n="replaceVideo">別の動画を選択</button></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
+<input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
+<!-- APP:END -->
+<section class="build-section"><details><summary data-i18n="buildInfo">ビルド情報</summary><div class="build-grid"><div class="build-item"><span data-i18n="appVersion">アプリ版</span><strong id="buildVersion"></strong></div><div class="build-item"><span data-i18n="builtAt">生成日時</span><strong id="builtAt"></strong></div><div class="build-item"><span data-i18n="dependencies">実行時の外部依存</span><strong id="dependencyCount"></strong></div></div></details></section>
+</main>
+<nav class="mobile-tabs" aria-label="分析画面" data-i18n-aria-label="screenNavigation">
+<button type="button" data-page="measure" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4z"/></svg><span data-i18n="tabMeasure">計測</span></button>
+<button type="button" data-page="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M9 3v6M16 9v6M8 15v6"/></svg><span data-i18n="tabReview">見直す</span></button>
+<button type="button" data-page="results"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"/></svg><span data-i18n="tabResults">結果</span></button></nav>
+<footer><span>Time Study Desk</span> · <span data-i18n="footer">動画を送信せず、ブラウザで確認</span></footer>
+<div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" data-tone="default"><span class="app-toast-message" id="appToastMessage"></span><button class="app-toast-action" id="appToastAction" type="button" hidden></button></div>
+<dialog class="app-confirm-dialog" id="appConfirmDialog" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage"><div class="app-confirm-header"><h2 class="app-confirm-title" id="appConfirmTitle">確認</h2><button class="app-confirm-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="app-confirm-body"><p class="app-confirm-message" id="appConfirmMessage"></p><div class="app-confirm-actions"><button class="app-confirm-button" id="appConfirmCancel" type="button">キャンセル</button><button class="app-confirm-button primary" id="appConfirmOk" type="button">実行する</button></div></div></dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-header"><h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2><button class="icon-button" id="closeHelpButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-body">
+<!-- APP:HELP:BEGIN -->
+<h3 data-i18n="helpBasicsTitle"></h3><p data-i18n="helpBasicsBody"></p><h3 data-i18n="helpControlsTitle"></h3><p data-i18n="helpControlsBody"></p><h3 data-i18n="helpPrivacyTitle"></h3><p data-i18n="helpPrivacyBody"></p><h3 data-i18n="helpLimitsTitle"></h3><p data-i18n="helpLimitsBody"></p><h3 data-i18n="helpRecoveryTitle"></h3><p data-i18n="helpRecoveryBody"></p><p class="dialog-note" data-i18n="helpOffline"></p>
+<!-- APP:HELP:END -->
+</div></dialog>
+<script>
+(() => {
+  'use strict';
+  const APP_CONFIG = __APP_CONFIG_JSON__;
+  const BUILD_MANIFEST = __BUILD_MANIFEST_JSON__;
+  // Generic template asset API, preserved; no assets are required by this application.
+  const assetBundle = __EMBEDDED_ASSET_BUNDLE_JSON__;
+  const blobUrls = new Set(), assetByteCache = new Map();
+  function decodeBase64Bytes(base64) {
+    const binary = atob(base64), bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
+    return bytes;
+  }
+  function getAsset(dependencyId, assetKey) {
+    const asset = assetBundle.dependencies?.[dependencyId]?.assets?.[assetKey];
+    if (!asset) throw new Error(`Embedded asset not found: ${dependencyId}/${assetKey}`);
+    return asset;
+  }
+  async function inflateAsset(asset) {
+    const stored = decodeBase64Bytes(asset.base64);
+    if (!asset.compression || asset.compression === 'none') return stored;
+    if (asset.compression !== 'gzip') throw new Error(`Unsupported embedded asset compression: ${asset.compression}`);
+    if (typeof DecompressionStream !== 'function') throw new Error('This browser cannot expand gzip-compressed embedded assets.');
+    const stream = new Blob([stored]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const expanded = new Uint8Array(await new Response(stream).arrayBuffer());
+    if (Number.isFinite(asset.originalBytes) && expanded.byteLength !== asset.originalBytes) throw new Error('Embedded gzip asset size mismatch');
+    return expanded;
+  }
+  window.StandaloneAssets = Object.freeze({
+    manifest: BUILD_MANIFEST,
+    list() { return Object.entries(assetBundle.dependencies || {}).flatMap(([id, dependency]) => Object.keys(dependency.assets || {}).map(key => `${id}/${key}`)); },
+    has(id, key) { return Boolean(assetBundle.dependencies?.[id]?.assets?.[key]); },
+    bytes(id, key) { const asset = getAsset(id, key); if (asset.compression && asset.compression !== 'none') throw new Error('Use await StandaloneAssets.bytesAsync() for compressed assets.'); return decodeBase64Bytes(asset.base64); },
+    async bytesAsync(id, key) { const cacheKey = `${id}/${key}`; if (!assetByteCache.has(cacheKey)) assetByteCache.set(cacheKey, inflateAsset(getAsset(id, key))); return new Uint8Array(await assetByteCache.get(cacheKey)); },
+    text(id, key) { return new TextDecoder().decode(this.bytes(id, key)); },
+    async textAsync(id, key) { return new TextDecoder().decode(await this.bytesAsync(id, key)); },
+    blobUrl(id, key) { const asset = getAsset(id, key), url = URL.createObjectURL(new Blob([this.bytes(id, key)], {type:asset.mime || 'application/octet-stream'})); blobUrls.add(url); return url; },
+    async blobUrlAsync(id, key) { const asset = getAsset(id, key), url = URL.createObjectURL(new Blob([await this.bytesAsync(id, key)], {type:asset.mime || 'application/octet-stream'})); blobUrls.add(url); return url; },
+    async loadClassicScript(id, key, globalName = '') {
+      const url = await this.blobUrlAsync(id, key);
+      try { await new Promise((resolve, reject) => { const script = document.createElement('script'); script.src = url; script.onload = resolve; script.onerror = () => reject(new Error('Embedded script failed')); document.head.append(script); }); return globalName ? window[globalName] : true; }
+      finally { URL.revokeObjectURL(url); blobUrls.delete(url); }
+    },
+    async importModule(id, key) { const url = await this.blobUrlAsync(id, key); try { return await import(url); } finally { URL.revokeObjectURL(url); blobUrls.delete(url); } }
+  });
+  window.addEventListener('pagehide', event => { if (!event.persisted) { blobUrls.forEach(url => URL.revokeObjectURL(url)); blobUrls.clear(); } });
 
-  <!-- Reusable confirmation component. Keep in sync with components/confirm-dialog.html. -->
-  <dialog class="app-confirm-dialog" id="appConfirmDialog" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage">
-    <div class="app-confirm-header">
-      <h2 class="app-confirm-title" id="appConfirmTitle">確認</h2>
-      <button class="app-confirm-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
-    </div>
-    <div class="app-confirm-body">
-      <p class="app-confirm-message" id="appConfirmMessage"></p>
-      <div class="app-confirm-actions">
-        <button class="app-confirm-button" id="appConfirmCancel" type="button">キャンセル</button>
-        <button class="app-confirm-button primary" id="appConfirmOk" type="button">実行する</button>
-      </div>
-    </div>
-  </dialog>
+  // I18N
+  const translations = {
+    ja: {
+      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 最初の一回", versionLimit:"一回の計測・修正・分析保存ができます。再読込は後続版です。",
+      playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
+      sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
+      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:"この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。", savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存はありません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：同じ工程を繰り返し計測", nextStageBody:"v0.3.0で複数回の計測を追加します。統計・CSV出力は後続版です。",
+      buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
+      confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
+      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.2.0では一回の作業を計測できます。開始位置で「ここから開始」、工程が変わる位置で「ここで区切る」、最後に「この回を終了」を押します。工程名は後から変えられます。複数回の計測、統計、分析の再読込、CSV、自動保存はまだありません。",
+      helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。",
+      helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動でJSON保存し、動画は含めません。ブラウザ内へ自動保存するのは言語設定だけです。ページを閉じると未保存の分析を失います。元動画は変更・削除しません。",
+      helpLimitsTitle:'形式・時間・精度', helpLimitsBody:'8 GiB以下、長さが正の有限値で24時間以下、映像とシーク可能な位置を持つ動画が対象です。拡張子だけで再生対応を保証しません。音声のみ、破損、未対応コーデックは扱えません。通常速度で撮影された動画を前提とし、スロー撮影・タイムラプス・編集で変更した速度から実時間を復元しません。動画内時刻はブラウザの精度に依存し、フレーム単位の精度は保証しません。',
+      helpRecoveryTitle:'選び直しと画面の復帰', helpRecoveryBody:"別の動画は確認後に新しい分析として開きます。失敗・キャンセルでは元の分析を保持します。動画末尾は未完了とし、自動で完了させません。取り消して区切りを修正するか未完了のまま保存できます。画面復帰後は最後の確定境界から再開を押し、映像を確認して再生してください。保存したJSONを開く機能はv0.5.0で追加予定です。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン実機のファイル選択・保存と大容量動画は未検証です。',
+      FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。',
+      screenNavigation:"分析画面",
+      tabMeasure:"計測",
+      tabReview:"見直す",
+      tabResults:"結果",
+      measureTitle:"最初の一回を計測",
+      startCycle:"ここから開始",
+      markBoundary:"ここで区切る",
+      finishCycle:"この回を終了",
+      resumeCycle:"最後の区切りから再開",
+      closeIncomplete:"この位置まで記録して中断",
+      reviewTitle:"区切りを見直す",
+      precisionNote:"動画内の秒数で調整します",
+      reviewEmpty:"計測を始めると、ここで境界を修正できます。",
+      selectedBoundary:"修正する境界",
+      boundarySeconds:"動画内の時刻（秒）",
+      applyTime:"時刻を適用",
+      boundaryToVideo:"この境界へ移動",
+      boundaryFromVideo:"境界を現在位置へ",
+      dragBoundary:"スライダーで境界を調整",
+      sharedBoundaryHint:"境界を動かすと、前後の工程時間が同時に変わります。",
+      spanNoteTitle:"選択境界の後の区間メモ",
+      recordTitle:"今回の記録",
+      undo:"取り消す",
+      redo:"やり直す",
+      renameHint:"工程名は後から変更できます。名前の変更も取り消せます。",
+      projectTitle:"分析タイトル（任意）",
+      notesTitle:"分析・今回のメモ",
+      projectNote:"分析メモ",
+      cycleNote:"今回のメモ",
+      stepNote:"この工程のメモ",
+      stepLabel:"工程名",
+      startLabel:"開始",
+      endLabel:"最後の境界",
+      boundaryLabel:"境界",
+      emptyRecord:"まだ計測していません",
+      openRecord:"計測中",
+      completeRecord:"完了",
+      incompleteRecord:"未完了",
+      firstHint:"開始位置へ移動して「ここから開始」を押してください。",
+      markHint:"工程が変わる位置で区切ります。最後は「この回を終了」。",
+      completeHint:"計測が終わりました。工程名・境界を見直し、分析データを保存できます。",
+      incompleteHint:"終了は未確定です。続きから再開するか、取り消して境界を修正してください。",
+      suspendedHint:"最後の確定境界から再開して、未確定の続きを見直してください。",
+      recordedOnly:"表示は確定した区間の合計です。未確定の続きは含みません。",
+      recordComplete:"この動画の一回分の観測時間です。標準時間ではありません。",
+      underTenth:"0.1秒未満",
+      secondsUnit:"秒",
+      downloadStarted:"ダウンロードを開始しました。保存先でファイルを確認してください。",
+      saveFailed:"分析データを保存できませんでした。現在の分析は保持しています。",
+      edited:"変更を適用しました",
+      endReached:"動画の末尾です。未完了の記録として保持しました。",
+      boundaryApplied:"境界を修正しました",
+      BOUNDARY_ORDER:"前の区切りより後へ移動するか、見直しで修正してください。境界は隣の境界を越えられません。",
+      INVALID_TIME_INPUT:"0以上の秒数を小数6桁以内で入力してください。",
+      INVALID_PROJECT:"分析データを検証できませんでした。現在の記録を保持しています。",
+      INVALID_TARGET:"対象の記録を選び直してください。",
+      CYCLE_CLOSED:"この回は計測中ではありません。",
+      UNRESOLVED:"未確定の工程があります。取り消して境界を修正するか、未完了として保存してください。",
+      FIRST_CYCLE_ONLY:"この版で計測できるのは最初の一回です。",
+      PHASE_LIMIT:"工程は50個までです。この回を終了するか、前の区切りを取り消してください。",
+      TEXT_LIMIT:"文字数が上限を超えています。工程名80、タイトル160、区間・回のメモ1000、分析メモ4000文字以内にしてください。",
+      SAVE_LIMIT:"分析データの保存上限を超えるため、変更しませんでした。現在の記録を保存してください。",
+      HISTORY_CONFLICT:"取り消し対象と現在のデータが一致しません。記録は変更していません。",
+      HISTORY_EMPTY:"取り消す操作がありません。",
+      UNKNOWN_COMMAND:"この操作はまだ利用できません。",
+      END_REQUIRED:"最後の工程は「この回を終了」で確定してください。"
+    },
+    en: {
+      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · First measurement", versionLimit:"Measure, edit and save one cycle. Import is planned for a later version.",
+      playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
+      sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
+      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:"This version cannot reopen saved analysis files. Import and resume are planned for v0.5.0.", savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. There is no autosave.", saveAnalysis:'Save analysis', nextStage:"Next stage: repeat the same steps", nextStageBody:"Multiple cycles are planned for v0.3.0. Statistics and CSV follow in later versions.",
+      buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
+      confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
+      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.2.0 measures one work cycle. Choose its starting position and select Start cycle here. Mark a boundary at each step change, then Finish cycle here. Name the steps afterwards. Repeated cycles, statistics, analysis import, CSV and autosave are not available yet.",
+      helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping.",
+      helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Manually save analysis as JSON; it does not include video. Only the language setting is automatically persisted. Closing this page loses unsaved analysis. Original videos are never modified or deleted.",
+      helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
+      helpRecoveryTitle:'Replacement and returning to the page', helpRecoveryBody:"A replacement starts an empty analysis only after confirmation. Failed or cancelled loads preserve your analysis. Reaching the video end records an incomplete cycle, never a completed one. Undo to correct its boundaries, or save it as incomplete. After returning to the page, resume from the last confirmed boundary and play explicitly. Reopening saved JSON is planned for v0.5.0.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Real-device mobile file selection/saving and large videos have not been verified.',
+      FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.',
+      screenNavigation:"Analysis screens",
+      tabMeasure:"Measure",
+      tabReview:"Review",
+      tabResults:"Results",
+      measureTitle:"Measure the first cycle",
+      startCycle:"Start cycle here",
+      markBoundary:"Mark boundary",
+      finishCycle:"Finish cycle here",
+      resumeCycle:"Resume from last boundary",
+      closeIncomplete:"Record to here and suspend",
+      reviewTitle:"Review boundaries",
+      precisionNote:"Adjust seconds within the video",
+      reviewEmpty:"Start measuring to edit boundaries here.",
+      selectedBoundary:"Boundary to edit",
+      boundarySeconds:"Video position (seconds)",
+      applyTime:"Apply time",
+      boundaryToVideo:"Seek to boundary",
+      boundaryFromVideo:"Use current position",
+      dragBoundary:"Adjust boundary with slider",
+      sharedBoundaryHint:"Moving a shared boundary changes both neighboring step durations.",
+      spanNoteTitle:"Note for the span after this boundary",
+      recordTitle:"This cycle",
+      undo:"Undo",
+      redo:"Redo",
+      renameHint:"Rename steps after measuring. Renaming can also be undone.",
+      projectTitle:"Analysis title (optional)",
+      notesTitle:"Analysis and cycle notes",
+      projectNote:"Analysis note",
+      cycleNote:"Cycle note",
+      stepNote:"Note for this step",
+      stepLabel:"Step name",
+      startLabel:"Start",
+      endLabel:"Last boundary",
+      boundaryLabel:"Boundary",
+      emptyRecord:"Not started",
+      openRecord:"Measuring",
+      completeRecord:"Complete",
+      incompleteRecord:"Incomplete",
+      firstHint:"Seek to the starting position and select Start cycle here.",
+      markHint:"Mark each step change. For the final step, select Finish cycle here.",
+      completeHint:"Cycle finished. Review the names and boundaries, then save your analysis.",
+      incompleteHint:"The end is not confirmed. Resume or undo to correct the boundaries.",
+      suspendedHint:"Resume from the last confirmed boundary to review the unfinished part.",
+      recordedOnly:"Only confirmed spans are totaled. The unfinished continuation is not included.",
+      recordComplete:"The observed time for one cycle in this video, not a standard time.",
+      underTenth:"Less than 0.1 s",
+      secondsUnit:"s",
+      downloadStarted:"Download started. Check the file in your chosen save location.",
+      saveFailed:"Could not save the analysis. Your current data has been kept.",
+      edited:"Change applied",
+      endReached:"Video ended. The cycle was kept as incomplete.",
+      boundaryApplied:"Boundary updated",
+      BOUNDARY_ORDER:"Move after the previous boundary, or correct it in Review. Boundaries cannot cross their neighbors.",
+      INVALID_TIME_INPUT:"Enter non-negative seconds with up to six decimal places.",
+      INVALID_PROJECT:"Analysis validation failed. Your current data has been kept.",
+      INVALID_TARGET:"Select the record again.",
+      CYCLE_CLOSED:"This cycle is not being measured.",
+      UNRESOLVED:"A step is still unresolved. Undo to correct the boundaries, or save as incomplete.",
+      FIRST_CYCLE_ONLY:"This version measures only the first cycle.",
+      PHASE_LIMIT:"Up to 50 steps are supported. Finish this cycle or undo a boundary.",
+      TEXT_LIMIT:"Text is too long. Limits: step name 80, title 160, span/cycle note 1000, analysis note 4000 characters.",
+      SAVE_LIMIT:"This change would exceed the analysis save limit. Save your existing records.",
+      HISTORY_CONFLICT:"The current data does not match the history entry. Nothing was changed.",
+      HISTORY_EMPTY:"There is no operation to undo.",
+      UNKNOWN_COMMAND:"This operation is not available yet.",
+      END_REQUIRED:"Use Finish cycle here for the last step."
+    }
+  };
+  const $ = selector => document.querySelector(selector);
+  const outputFilename = $('#outputFilename');
+  let language = (navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : 'en';
+  try { const saved = localStorage.getItem('time-study-desk:language'); if (saved === 'ja' || saved === 'en') language = saved; } catch { /* Session-only UI remains usable. */ }
+  function translate(key) { return translations[language]?.[key] ?? translations.en[key] ?? key; }
 
-  <dialog id="helpDialog" aria-labelledby="helpTitle">
-    <div class="dialog-header">
-      <h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2>
-      <button class="icon-button" id="closeHelpButton" type="button" data-i18n-title="close" data-i18n-aria-label="close" title="閉じる" aria-label="閉じる">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
-      </button>
-    </div>
-    <div class="dialog-body">
-      <!-- APP:HELP:BEGIN Update this section together with the real application. -->
-      <h3 data-i18n="helpBasicsTitle">基本操作</h3>
-      <ol>
-        <li data-i18n="helpStep1">作業領域へテキストを入力します。内容は入力のたびに端末内へ保存されます。</li>
-        <li data-i18n="helpStep2">出力ファイル名を必要に応じて変更し、「コピー」または「テキスト保存」で入力内容を取り出せます。</li>
-        <li data-i18n="helpStep3">「サンプルに戻す」や「消去」の直後は、トーストの「元に戻す」から取り消せます。</li>
-      </ol>
+  // Shared confirmation API, adapted from components/confirm-dialog.html.
+  const AppConfirm = (() => {
+    const dialog = $('#appConfirmDialog');
+    let resolver = null, restoreFocus = null;
+    function finish(result) {
+      if (!dialog.open) return;
+      const current = resolver; resolver = null; dialog.close();
+      if (restoreFocus instanceof HTMLElement && restoreFocus.isConnected) restoreFocus.focus({preventScroll:true});
+      restoreFocus = null; current?.(result);
+    }
+    function ask({title, message, confirmLabel, cancelLabel, tone = 'default'} = {}) {
+      if (dialog.open) finish(false);
+      $('#appConfirmTitle').textContent = title || translate('confirmTitle');
+      $('#appConfirmMessage').textContent = message || '';
+      $('#appConfirmCancel').textContent = cancelLabel || translate('cancel');
+      $('#appConfirmOk').textContent = confirmLabel || translate('confirmAction');
+      $('#appConfirmOk').classList.toggle('danger', tone === 'danger');
+      $('#appConfirmOk').classList.toggle('primary', tone !== 'danger');
+      restoreFocus = document.activeElement;
+      return new Promise(resolve => { resolver = resolve; dialog.showModal(); requestAnimationFrame(() => { if (dialog.open) $('#appConfirmCancel').focus({preventScroll:true}); }); });
+    }
+    $('#appConfirmClose').addEventListener('click', () => finish(false));
+    $('#appConfirmCancel').addEventListener('click', () => finish(false));
+    $('#appConfirmOk').addEventListener('click', () => finish(true));
+    dialog.addEventListener('cancel', event => { event.preventDefault(); finish(false); });
+    dialog.addEventListener('click', event => { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) finish(false); });
+    return Object.freeze({ask, cancel:() => finish(false)});
+  })();
+  window.AppConfirm = AppConfirm;
+  // Shared toast/Undo API remains available for subsequent measurement milestones.
+  const AppToast = (() => {
+    let timer = 0, actionHandler = null;
+    const root = $('#appToast'), action = $('#appToastAction');
+    function dismiss() { clearTimeout(timer); timer = 0; root.classList.remove('show'); actionHandler = null; }
+    function show({message = '', actionLabel = '', onAction = null, duration = 3200, tone = 'default'} = {}) {
+      clearTimeout(timer); $('#appToastMessage').textContent = String(message); root.dataset.tone = tone;
+      actionHandler = typeof onAction === 'function' ? onAction : null; action.textContent = actionLabel; action.hidden = !actionHandler || !actionLabel;
+      root.classList.add('show'); if (duration > 0) timer = setTimeout(dismiss, duration);
+      return Object.freeze({dismiss});
+    }
+    action.addEventListener('click', () => { const handler = actionHandler; dismiss(); handler?.(); });
+    return Object.freeze({show,dismiss});
+  })();
+  window.AppToast = AppToast;
 
-      <h3 data-i18n="helpPrivacyTitle">プライバシー</h3>
-      <p data-i18n="helpPrivacyBody">入力内容と操作はブラウザー内で処理され、このアプリから外部へ送信されません。必要なコードと依存ファイルも配布用HTMLに内包されます。</p>
-
-      <h3 data-i18n="helpNotesTitle">注意事項</h3>
-      <ul>
-        <li data-i18n="helpNoteStorage">ブラウザーのサイトデータを削除すると、端末内に保存した入力内容も消える場合があります。必要な内容はファイルとして保存してください。</li>
-        <li data-i18n="helpNoteBrowser">一部の機能はブラウザーの制限や端末性能の影響を受けます。重要な成果物は保存後に内容を確認してください。</li>
-        <li data-i18n="helpNoteTemplate">この画面はスターターの例です。新しいアプリを作る際は、機能と一緒にこのヘルプも実際の操作へ書き換えます。</li>
-      </ul>
-      <p class="dialog-note" data-i18n="helpOffline">配布物は dist/index.html ひとつです。ローカルで直接開くことも、GitHub Pagesで公開することもできます。</p>
-      <!-- APP:HELP:END -->
-    </div>
-  </dialog>
-
-  <script>
-    (() => {
-      'use strict';
-
-      const APP_CONFIG = __APP_CONFIG_JSON__;
-      const BUILD_MANIFEST = __BUILD_MANIFEST_JSON__;
-      // Asset payloads are Base64 exactly once. The JSON bundle itself is embedded directly.
-      const assetBundle = __EMBEDDED_ASSET_BUNDLE_JSON__;
-      const blobUrls = new Set();
-      const assetByteCache = new Map();
-
-      function decodeBase64Bytes(base64) {
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-        return bytes;
-      }
-
-      function getAsset(dependencyId, assetKey) {
-        const asset = assetBundle.dependencies?.[dependencyId]?.assets?.[assetKey];
-        if (!asset) throw new Error(`Embedded asset not found: ${dependencyId}/${assetKey}`);
-        return asset;
-      }
-
-      async function inflateAsset(asset) {
-        const stored = decodeBase64Bytes(asset.base64);
-        if (!asset.compression || asset.compression === 'none') return stored;
-        if (asset.compression !== 'gzip') throw new Error(`Unsupported embedded asset compression: ${asset.compression}`);
-        if (typeof DecompressionStream !== 'function') throw new Error('This browser cannot expand gzip-compressed embedded assets.');
-        const stream = new Blob([stored]).stream().pipeThrough(new DecompressionStream('gzip'));
-        const expanded = new Uint8Array(await new Response(stream).arrayBuffer());
-        if (Number.isFinite(asset.originalBytes) && expanded.byteLength !== asset.originalBytes) {
-          throw new Error(`Embedded gzip asset size mismatch: expected ${asset.originalBytes}, got ${expanded.byteLength}`);
+  // TSD:CORE:BEGIN
+  const TsdCore = (() => {
+    const ok = value => ({ok:true,value});
+    const fail = code => ({ok:false,error:{code,messageKey:code}});
+    function toTimeUs(seconds) {
+      if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return fail('INVALID_TIME');
+      const value = Math.round(seconds * 1000000);
+      return Number.isSafeInteger(value) ? ok(value) : fail('INVALID_TIME');
+    }
+    function validateFile(file) {
+      if (!file || !Number.isSafeInteger(file.size) || file.size < 0) return fail('INVALID_FILE');
+      if (file.size === 0) return fail('FILE_EMPTY');
+      if (file.size > 8 * 1024 ** 3) return fail('FILE_LARGE');
+      return ok(true); // Empty MIME and unknown extensions are decided by actual decoding.
+    }
+    function validateMetadata({duration,width,height}) {
+      if (!Number.isFinite(duration) || duration <= 0 || duration > 86400) return fail('INVALID_DURATION');
+      if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0) return fail('AUDIO_ONLY');
+      return toTimeUs(duration);
+    }
+    function sanitizeFilename(base, suffix) {
+      let name = String(base).trim();
+      if (suffix && name.toLowerCase().endsWith(suffix.toLowerCase())) name = name.slice(0,-suffix.length);
+      name = name.replace(/[\\/:*?"<>|\u0000-\u001f\u007f]/g,'-').replace(/^[. ]+|[. ]+$/g,'');
+      name = [...name].slice(0,160).join('').replace(/[. ]+$/g,'') || 'time-study';
+      if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)) name += '-file';
+      return name + suffix;
+    }
+    // Analysis schema 1. Only integers below the source duration enter the model.
+    const MAX_BYTES = 10 * 1024 * 1024;
+    const clone = value => JSON.parse(JSON.stringify(value));
+    const bytesOf = value => new TextEncoder().encode(JSON.stringify(value)).length;
+    const countChars = value => [...value].length;
+    const integer = (value,min,max) => Number.isSafeInteger(value) && value >= min && value <= max;
+    function assert(condition,code='INVALID_PROJECT') { if (!condition) throw Object.assign(new Error(code),{code}); }
+    function text(value,max,required=false) { return typeof value === 'string' && countChars(value) <= max && (!required || value.trim().length > 0); }
+    function fields(value,names) {
+      assert(value && typeof value === 'object' && !Array.isArray(value));
+      const keys = names.split(' ');
+      assert(Object.keys(value).length === keys.length && keys.every(key => Object.prototype.hasOwnProperty.call(value,key)));
+      assert(Object.keys(value).every(key => keys.includes(key)));
+    }
+    function parseTimeInput(value) {
+      if (typeof value !== 'string' || !/^\d+(?:\.\d{1,6})?$/.test(value.trim())) return fail('INVALID_TIME_INPUT');
+      const [whole,fraction=''] = value.trim().split('.');
+      const timeUs = Number(whole) * 1000000 + Number(fraction.padEnd(6,'0'));
+      return Number.isSafeInteger(timeUs) && timeUs >= 0 ? ok(timeUs) : fail('INVALID_TIME_INPUT');
+    }
+    function validateProject(value) {
+      let path = '$';
+      try {
+        // Bound nesting before stringify; reject cycles and non-JSON values rather than coerce.
+        const visiting = new Set();
+        function inspect(item,depth) {
+          assert(depth <= 20);
+          if (item === null || typeof item === 'string' || typeof item === 'boolean') return;
+          if (typeof item === 'number') { assert(Number.isFinite(item)); return; }
+          assert(typeof item === 'object' && !visiting.has(item)); visiting.add(item);
+          for (const key of Object.keys(item)) { assert(!['__proto__','constructor','prototype'].includes(key)); inspect(item[key],depth+1); }
+          visiting.delete(item);
         }
-        return expanded;
-      }
-
-      window.StandaloneAssets = Object.freeze({
-        manifest: BUILD_MANIFEST,
-        list() {
-          return Object.entries(assetBundle.dependencies || {}).flatMap(([dependencyId, dependency]) =>
-            Object.keys(dependency.assets || {}).map(assetKey => `${dependencyId}/${assetKey}`));
-        },
-        has(dependencyId, assetKey) {
-          return Boolean(assetBundle.dependencies?.[dependencyId]?.assets?.[assetKey]);
-        },
-        bytes(dependencyId, assetKey) {
-          const asset = getAsset(dependencyId, assetKey);
-          if (asset.compression && asset.compression !== 'none') {
-            throw new Error(`Embedded asset ${dependencyId}/${assetKey} is gzip-compressed; use await StandaloneAssets.bytesAsync().`);
+        inspect(value,0); assert(bytesOf(value) <= MAX_BYTES,'SAVE_LIMIT');
+        fields(value,'format schemaVersion appVersion projectId createdAt updatedAt title note source phases procedures cycles settings');
+        assert(value.format === 'time-study-desk' && value.schemaVersion === 1);
+        assert(text(value.appVersion,40,true) && /^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?$/.test(value.appVersion));
+        const iso = s => typeof s === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/.test(s);
+        assert(iso(value.createdAt) && iso(value.updatedAt));
+        assert(text(value.title,160) && text(value.note,4000));
+        const ids = new Map();
+        function id(kind,s) { assert(typeof s === 'string' && /^[a-z0-9][a-z0-9-]{0,63}$/.test(s)); const seen = ids.get(kind) || new Set(); assert(!seen.has(s)); seen.add(s); ids.set(kind,seen); }
+        id('project',value.projectId);
+        path = '$.source'; const source = value.source;
+        fields(source,'name size lastModified durationUs width height');
+        assert(text(source.name,1024,true) && integer(source.size,1,8*1024**3) && integer(source.lastModified,-Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER));
+        assert(integer(source.durationUs,1,86400000000) && integer(source.width,1,Number.MAX_SAFE_INTEGER) && integer(source.height,1,Number.MAX_SAFE_INTEGER));
+        const array = (a,max) => assert(Array.isArray(a) && a.length <= max);
+        array(value.phases,50); array(value.procedures,20); array(value.cycles,1000);
+        const phases = new Map(), procedures = new Map();
+        for (const phase of value.phases) {
+          path = '$.phases'; fields(phase,'id label kind archived'); id('phase',phase.id);
+          assert(text(phase.label,80,true) && ['operation','planned-wait'].includes(phase.kind) && typeof phase.archived === 'boolean'); phases.set(phase.id,phase);
+        }
+        for (const procedure of value.procedures) {
+          path = '$.procedures'; fields(procedure,'id label phaseIds startCondition endCondition createdAt'); id('procedure',procedure.id);
+          assert(text(procedure.label,80,true) && text(procedure.startCondition,1000) && text(procedure.endCondition,1000) && iso(procedure.createdAt));
+          array(procedure.phaseIds,50); assert(procedure.phaseIds.length > 0 && procedure.phaseIds.every(p => phases.has(p))); procedures.set(procedure.id,procedure);
+        }
+        let openCount = 0, spanCount = 0, freeCount = 0; const ranges = [];
+        for (const cycle of value.cycles) {
+          path = '$.cycles'; fields(cycle,'id procedureId status boundaries spans occurrences cursor excluded exclusionReason note'); id('cycle',cycle.id);
+          assert(['open','complete','incomplete'].includes(cycle.status)); if (cycle.status === 'open') openCount++;
+          assert(cycle.procedureId === null || procedures.has(cycle.procedureId));
+          if (cycle.procedureId === null) { freeCount++; assert(cycle.status !== 'complete' && value.procedures.length === 0); }
+          assert(typeof cycle.excluded === 'boolean' && text(cycle.exclusionReason,1000,cycle.excluded) && text(cycle.note,1000));
+          array(cycle.boundaries,10001); array(cycle.spans,10000); array(cycle.occurrences,10000);
+          spanCount += cycle.spans.length; assert(cycle.boundaries.length === cycle.spans.length + 1 && cycle.occurrences.length > 0);
+          let previous = -1;
+          for (const boundary of cycle.boundaries) { fields(boundary,'id timeUs'); id('boundary',boundary.id); assert(integer(boundary.timeUs,0,source.durationUs) && boundary.timeUs > previous); previous = boundary.timeUs; }
+          ranges.push([cycle.boundaries[0].timeUs,previous]);
+          const occurrences = new Map();
+          for (const occurrence of cycle.occurrences) {
+            fields(occurrence,'id phaseId planned resolution note'); id('occurrence',occurrence.id);
+            assert(phases.has(occurrence.phaseId) && typeof occurrence.planned === 'boolean' && ['pending','measured','not-performed','unobserved'].includes(occurrence.resolution) && text(occurrence.note,1000)); occurrences.set(occurrence.id,occurrence);
           }
-          return decodeBase64Bytes(asset.base64);
-        },
-        async bytesAsync(dependencyId, assetKey) {
-          const cacheKey = `${dependencyId}/${assetKey}`;
-          if (!assetByteCache.has(cacheKey)) assetByteCache.set(cacheKey, inflateAsset(getAsset(dependencyId, assetKey)));
-          return new Uint8Array(await assetByteCache.get(cacheKey));
-        },
-        text(dependencyId, assetKey) {
-          return new TextDecoder().decode(this.bytes(dependencyId, assetKey));
-        },
-        async textAsync(dependencyId, assetKey) {
-          return new TextDecoder().decode(await this.bytesAsync(dependencyId, assetKey));
-        },
-        blobUrl(dependencyId, assetKey) {
-          const asset = getAsset(dependencyId, assetKey);
-          const url = URL.createObjectURL(new Blob([this.bytes(dependencyId, assetKey)], { type: asset.mime || 'application/octet-stream' }));
-          blobUrls.add(url);
-          return url;
-        },
-        async blobUrlAsync(dependencyId, assetKey) {
-          const asset = getAsset(dependencyId, assetKey);
-          const url = URL.createObjectURL(new Blob([await this.bytesAsync(dependencyId, assetKey)], { type: asset.mime || 'application/octet-stream' }));
-          blobUrls.add(url);
-          return url;
-        },
-        async loadClassicScript(dependencyId, assetKey, globalName = '') {
-          const sourceUrl = await this.blobUrlAsync(dependencyId, assetKey);
-          try {
-            await new Promise((resolve, reject) => {
-              const script = document.createElement('script');
-              script.src = sourceUrl;
-              script.onload = resolve;
-              script.onerror = () => reject(new Error(`Failed to load embedded script: ${dependencyId}/${assetKey}`));
-              document.head.append(script);
-            });
-            return globalName ? window[globalName] : true;
-          } finally {
-            URL.revokeObjectURL(sourceUrl);
-            blobUrls.delete(sourceUrl);
+          if (cycle.procedureId !== null) {
+            const planned = cycle.occurrences.filter(o => o.planned).map(o => o.phaseId);
+            assert(JSON.stringify(planned) === JSON.stringify(procedures.get(cycle.procedureId).phaseIds));
           }
-        },
-        async importModule(dependencyId, assetKey) {
-          const sourceUrl = await this.blobUrlAsync(dependencyId, assetKey);
-          try {
-            return await import(sourceUrl);
-          } finally {
-            URL.revokeObjectURL(sourceUrl);
-            blobUrls.delete(sourceUrl);
+          const evidence = new Map(cycle.occurrences.map(o => [o.id,{phase:0,unobserved:0}]));
+          function assignment(item) {
+            assert(['phase','interruption','unobserved'].includes(item.kind) && text(item.note,1000));
+            assert(item.occurrenceId === null || occurrences.has(item.occurrenceId));
+            assert(item.kind !== 'phase' || item.occurrenceId !== null);
+            if (item.occurrenceId !== null && item.kind !== 'interruption') assert(occurrences.get(item.occurrenceId).resolution !== 'not-performed');
+          }
+          for (const span of cycle.spans) { fields(span,'id kind occurrenceId note'); id('span',span.id); assignment(span); if (span.occurrenceId && span.kind !== 'interruption') evidence.get(span.occurrenceId)[span.kind]++; }
+          if (cycle.cursor !== null) { fields(cycle.cursor,'kind occurrenceId note'); assignment(cycle.cursor); }
+          if (cycle.status === 'complete') assert(cycle.cursor === null && cycle.spans.length > 0 && cycle.occurrences.every(o => o.resolution !== 'pending'));
+          else assert(cycle.cursor !== null);
+          for (const occurrence of cycle.occurrences) {
+            const ev = evidence.get(occurrence.id);
+            if (occurrence.resolution === 'measured') assert(ev.phase > 0 && ev.unobserved === 0);
+            if (occurrence.resolution === 'not-performed') assert(ev.phase === 0 && ev.unobserved === 0);
+            if (ev.unobserved > 0) assert(occurrence.resolution === 'unobserved');
           }
         }
+        assert(openCount <= 1 && spanCount <= 10000 && freeCount <= 1);
+        ranges.sort((a,b) => a[0]-b[0]); for (let i=1;i<ranges.length;i++) assert(ranges[i][0] >= ranges[i-1][1]);
+        path = '$.settings'; fields(value.settings,'language selectedProcedureId outputBaseName');
+        assert(['ja','en'].includes(value.settings.language) && (value.settings.selectedProcedureId === null || procedures.has(value.settings.selectedProcedureId)) && text(value.settings.outputBaseName,180,true));
+        // Every field has been allow-listed. Reconstruct the JSON object, never retain a caller's object.
+        return ok(clone(value));
+      } catch (error) { return {ok:false,issues:[{path,code:error.code || 'INVALID_PROJECT',messageKey:error.code || 'INVALID_PROJECT'}]}; }
+    }
+    function createProject(source,context) {
+      const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.2.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      assert(validateProject(project).ok); return project;
+    }
+    // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
+    function diff(before,after,path=[],patch=[]) {
+      if (JSON.stringify(before) === JSON.stringify(after)) return patch;
+      if (Array.isArray(before) && Array.isArray(after)) {
+        const shared = Math.min(before.length,after.length);
+        for (let i=0;i<shared;i++) diff(before[i],after[i],path.concat(i),patch);
+        if (before.length !== after.length) patch.push({path:path.slice(),index:shared,before:clone(before.slice(shared)),after:clone(after.slice(shared))});
+      } else if (before && after && typeof before === 'object' && typeof after === 'object' && !Array.isArray(before) && !Array.isArray(after)) {
+        for (const key of Object.keys(before)) diff(before[key],after[key],path.concat(key),patch);
+      } else patch.push({path:path.slice(),before:clone(before),after:clone(after)});
+      return patch;
+    }
+    function applyPatch(project,patch,backwards=false) {
+      try {
+        const next = clone(project), changes = backwards ? [...patch].reverse() : patch;
+        for (const change of changes) {
+          assert(Array.isArray(change.path) && change.path.length > 0 && change.path.every(k => !['__proto__','constructor','prototype'].includes(k)));
+          const expected = backwards ? change.after : change.before, replacement = backwards ? change.before : change.after;
+          if (change.index !== undefined) {
+            let target = next; for (const key of change.path) target = target[key];
+            assert(JSON.stringify(target.slice(change.index)) === JSON.stringify(expected),'HISTORY_CONFLICT'); target.splice(change.index,expected.length,...clone(replacement));
+          } else {
+            let target = next; for (const key of change.path.slice(0,-1)) target = target[key]; const key = change.path.at(-1);
+            assert(JSON.stringify(target[key]) === JSON.stringify(expected),'HISTORY_CONFLICT'); target[key] = clone(replacement);
+          }
+        }
+        assert(validateProject(next).ok); return {ok:true,project:next};
+      } catch (error) { return fail(error.code || 'HISTORY_CONFLICT'); }
+    }
+    function createHistory({maxBytes=16*1024*1024}={}) {
+      const undo = [], redo = [];
+      const used = () => [...undo,...redo].reduce((sum,item) => sum+item.bytes,0);
+      function travel(from,to,project,backwards) {
+        if (!from.length) return fail('HISTORY_EMPTY');
+        const item = from.at(-1), result = applyPatch(project,item.patch,backwards);
+        if (result.ok) { from.pop(); to.push(item); } return result;
+      }
+      return Object.freeze({
+        push(patch) { if (!patch.length) return; redo.length=0; const item={patch:clone(patch),bytes:bytesOf(patch)}; undo.push(item); while (undo.length > 100 || used() > Math.min(maxBytes,16*1024*1024)) undo.shift(); },
+        undo: project => travel(undo,redo,project,true), redo: project => travel(redo,undo,project,false),
+        get undoCount() { return undo.length; }, get redoCount() { return redo.length; }, get bytes() { return used(); }
       });
-
-      window.addEventListener('pagehide', () => {
-        blobUrls.forEach(url => URL.revokeObjectURL(url));
-        blobUrls.clear();
-      });
-
-      const translations = {
-        ja: {
-          brandMeta: '単一HTML・ローカル処理・GitHub Pages',
-          helpTitle: '使い方と注意事項', close: '閉じる',
-          helpBasicsTitle: '基本操作',
-          helpStep1: '作業領域へテキストを入力します。内容は入力のたびに端末内へ保存されます。',
-          helpStep2: '出力ファイル名を必要に応じて変更し、「コピー」または「テキスト保存」で入力内容を取り出せます。',
-          helpStep3: '「サンプルに戻す」や「消去」の直後は、トーストの「元に戻す」から取り消せます。',
-          helpPrivacyTitle: 'プライバシー',
-          helpPrivacyBody: '入力内容と操作はブラウザー内で処理され、このアプリから外部へ送信されません。必要なコードと依存ファイルも配布用HTMLに内包されます。',
-          helpNotesTitle: '注意事項',
-          helpNoteStorage: 'ブラウザーのサイトデータを削除すると、端末内に保存した入力内容も消える場合があります。必要な内容はファイルとして保存してください。',
-          helpNoteBrowser: '一部の機能はブラウザーの制限や端末性能の影響を受けます。重要な成果物は保存後に内容を確認してください。',
-          helpNoteTemplate: 'この画面はスターターの例です。新しいアプリを作る際は、機能と一緒にこのヘルプも実際の操作へ書き換えます。',
-          helpOffline: '配布物は dist/index.html ひとつです。ローカルで直接開くことも、GitHub Pagesで公開することもできます。',
-          introTitle: '単一HTMLアプリのスターター',
-          lead: 'PDF Organizerと同じ、固定依存・完全内包・実行時通信なしの構成から、新しいブラウザーアプリを作れます。',
-          localBadge: '実行時通信なし',
-          workspaceTitle: 'スターター作業領域',
-          workspaceBody: '入力内容はこのブラウザー内だけに保存され、このアプリから送信されません。',
-          characters: '文字', words: '単語', lines: '行', editorLabel: 'テキスト入力',
-          copy: 'コピー', download: 'テキスト保存', sample: 'サンプルに戻す', clear: '消去', savedLocally: '端末内に保存済み', outputFilename: '出力ファイル名', outputFilenameHint: '拡張子は自動で .txt が付きます', undo: '元に戻す', undone: '元に戻しました',
-          confirmTitle: '確認', confirmAction: '実行する', cancel: 'キャンセル',
-          guaranteesTitle: 'テンプレートの基本保証',
-          guaranteesBody: 'アプリ仕様で明示的に変更しない限り、この制約を維持します。',
-          card1Title: '配布物はひとつ', card1Body: 'リリース成果物は dist/index.html。直接開くことも、静的サイトとして公開することもできます。',
-          card2Title: '依存を固定して内包', card2Body: 'npmの外部素材はバージョンとtarball hashを固定し、検証してからHTMLへ内包します。',
-          card3Title: '実行時通信なし', card3Body: 'Content Security Policyで実行時通信を遮断し、ユーザーデータをページ内に保ちます。',
-          card4Title: 'LLM向けの作業契約', card4Body: 'AGENTS.mdとAPP_SPEC.mdで、実装方針、受入条件、完了報告を安定して伝えます。',
-          buildInfo: 'ビルド情報', appVersion: 'アプリバージョン', builtAt: '生成日時', dependencies: '内包依存数',
-          footer: '完全内包HTMLとして生成', copied: 'コピーしました', copyFailed: 'コピーできませんでした', downloaded: 'テキストを保存しました', cleared: '入力を消去しました', restored: 'サンプルを復元しました'
-        },
-        en: {
-          brandMeta: 'Single file · Local-first · GitHub Pages',
-          helpTitle: 'How to use & notes', close: 'Close',
-          helpBasicsTitle: 'Basics',
-          helpStep1: 'Enter text in the workspace. The content is saved locally as you type.',
-          helpStep2: 'Change the output filename if needed, then use Copy or Download text.',
-          helpStep3: 'After Restore sample or Clear, use Undo in the toast to reverse the change.',
-          helpPrivacyTitle: 'Privacy',
-          helpPrivacyBody: 'Your content and actions are processed in the browser and are not sent outside by this app. Required code and dependencies are embedded in the distributable HTML.',
-          helpNotesTitle: 'Notes',
-          helpNoteStorage: 'Clearing browser site data may also remove content saved locally. Download anything important as a file.',
-          helpNoteBrowser: 'Some features are affected by browser restrictions and device performance. Review important output after saving it.',
-          helpNoteTemplate: 'This screen is a starter example. When building a new app, update this help together with the real features and workflow.',
-          helpOffline: 'The deliverable is one dist/index.html file. It can open locally or be published with GitHub Pages.',
-          introTitle: 'Single HTML App Starter',
-          lead: 'Build a new browser app from the same pinned-dependency, fully embedded, no-runtime-network foundation used by PDF Organizer.',
-          localBadge: 'No runtime network',
-          workspaceTitle: 'Starter workspace',
-          workspaceBody: 'Text stays in this browser. It is never sent by this app.',
-          characters: 'Characters', words: 'Words', lines: 'Lines', editorLabel: 'Text editor',
-          copy: 'Copy', download: 'Download text', sample: 'Restore sample', clear: 'Clear', savedLocally: 'Saved locally', outputFilename: 'Output filename', outputFilenameHint: 'The .txt extension is added automatically', undo: 'Undo', undone: 'Restored',
-          confirmTitle: 'Confirm', confirmAction: 'Continue', cancel: 'Cancel',
-          guaranteesTitle: 'Template guarantees',
-          guaranteesBody: 'Keep these constraints unless the product specification explicitly changes them.',
-          card1Title: 'One deliverable', card1Body: 'The release artifact is dist/index.html. It opens directly and can be hosted as a static page.',
-          card2Title: 'Pinned dependencies', card2Body: 'Third-party npm assets are version-pinned, hashed, and embedded during the build.',
-          card3Title: 'No runtime network', card3Body: 'Content Security Policy blocks runtime connections. User data stays inside the page.',
-          card4Title: 'LLM-ready workflow', card4Body: 'AGENTS.md and APP_SPEC.md give coding agents a stable contract, acceptance criteria, and handoff format.',
-          buildInfo: 'Build information', appVersion: 'App version', builtAt: 'Built at', dependencies: 'Embedded dependencies',
-          footer: 'Generated as one self-contained HTML file', copied: 'Copied', copyFailed: 'Could not copy', downloaded: 'Text downloaded', cleared: 'Text cleared', restored: 'Sample restored'
+    }
+    function applyCommand(project,command,context) {
+      try {
+        const supported = ['startCycle','markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','renamePhase','updateProjectMeta','editNote'];
+        assert(command && supported.includes(command.type),'UNKNOWN_COMMAND'); assert(validateProject(project).ok);
+        const next = clone(project), type = command.type;
+        const at = command.timeUs;
+        if (['startCycle','markBoundary','finishCycle','closeIncomplete','moveBoundary'].includes(type)) assert(integer(at,0,next.source.durationUs),'INVALID_TIME');
+        let cycle = null;
+        if (['markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','editNote'].includes(type)) { cycle = next.cycles.find(c => c.id === command.cycleId); assert(cycle,'INVALID_TARGET'); }
+        const id = () => context.makeId();
+        function addStep(c) {
+          assert(next.phases.length < 50,'PHASE_LIMIT');
+          const phase = {id:id(),label:(next.settings.language === 'ja' ? '工程' : 'Step ')+(next.phases.length+1),kind:'operation',archived:false};
+          next.phases.push(phase);
+          const occurrence = {id:id(),phaseId:phase.id,planned:true,resolution:'pending',note:''}; c.occurrences.push(occurrence);
+          c.cursor = {kind:'phase',occurrenceId:occurrence.id,note:''};
         }
-      };
-
-      const storageKeys = {
-        text: `${APP_CONFIG.slug}:starter-text`,
-        language: `${APP_CONFIG.slug}:language`
-      };
-      const sampleText = {
-        ja: 'この領域はサンプルです。\n\n新しいアプリを作るときは APP_SPEC.md に目的と受入条件を書き、LLMに AGENTS.md から読むよう指示してください。',
-        en: 'This workspace is a sample.\n\nFor a new app, describe the goal and acceptance criteria in APP_SPEC.md, then tell the LLM to start with AGENTS.md.'
-      };
-
-      const $ = selector => document.querySelector(selector);
-      const editor = $('#editor');
-      const outputFilename = $('#outputFilename');
-      let language = readStorage(storageKeys.language) || detectLanguage();
-
-      // Reusable Promise-based confirmation API. Canonical source: components/confirm-dialog.html.
-      const AppConfirm = (() => {
-        const dialog = $('#appConfirmDialog');
-        const title = $('#appConfirmTitle');
-        const message = $('#appConfirmMessage');
-        const closeButton = $('#appConfirmClose');
-        const cancelButton = $('#appConfirmCancel');
-        const okButton = $('#appConfirmOk');
-        let resolver = null;
-        let restoreFocus = null;
-
-        function finish(result) {
-          if (!dialog.open) return;
-          const currentResolver = resolver;
-          resolver = null;
-          dialog.close();
-          if (restoreFocus instanceof HTMLElement && restoreFocus.isConnected) restoreFocus.focus({ preventScroll: true });
-          restoreFocus = null;
-          if (currentResolver) currentResolver(result);
+        if (type === 'startCycle') {
+          assert(command.procedureId === null && next.cycles.length === 0,'FIRST_CYCLE_ONLY');
+          assert(at < next.source.durationUs,'INVALID_TIME');
+          cycle = {id:id(),procedureId:null,status:'open',boundaries:[{id:id(),timeUs:at}],spans:[],occurrences:[],cursor:null,excluded:false,exclusionReason:'',note:''};
+          next.cycles.push(cycle); addStep(cycle);
+        } else if (['markBoundary','finishCycle','closeIncomplete'].includes(type)) {
+          assert(cycle.status === 'open' || (type === 'finishCycle' && cycle.status === 'incomplete'),'CYCLE_CLOSED');
+          const last = cycle.boundaries.at(-1).timeUs;
+          assert(at >= last && (type !== 'markBoundary' || at > last),'BOUNDARY_ORDER');
+          assert(cycle.cursor && cycle.cursor.kind === 'phase','INVALID_TARGET');
+          const occurrence = cycle.occurrences.find(o => o.id === cycle.cursor.occurrenceId);
+          if (at > last) {
+            cycle.spans.push({id:id(),kind:'phase',occurrenceId:occurrence.id,note:cycle.cursor.note}); cycle.boundaries.push({id:id(),timeUs:at});
+            if (type !== 'closeIncomplete') occurrence.resolution = 'measured';
+          }
+          if (type === 'markBoundary') { assert(cycle.procedureId === null,'END_REQUIRED'); addStep(cycle); }
+          if (type === 'closeIncomplete') cycle.status='incomplete';
+          if (type === 'finishCycle') {
+            assert(cycle.spans.length > 0 && cycle.occurrences.every(o => o.resolution !== 'pending'),'UNRESOLVED');
+            if (cycle.procedureId === null) {
+              const procedure = {id:id(),label:next.settings.language === 'ja' ? '手順1' : 'Procedure 1',phaseIds:cycle.occurrences.map(o => o.phaseId),startCondition:'',endCondition:'',createdAt:context.nowIso()};
+              next.procedures.push(procedure); cycle.procedureId=procedure.id; next.settings.selectedProcedureId=procedure.id;
+            }
+            cycle.status='complete'; cycle.cursor=null;
+          }
+        } else if (type === 'resumeCycle') {
+          assert(cycle.status !== 'complete' && !next.cycles.some(c => c.id !== cycle.id && c.status === 'open'),'CYCLE_CLOSED'); cycle.status='open';
+        } else if (type === 'moveBoundary') {
+          const index = cycle.boundaries.findIndex(b => b.id === command.boundaryId); assert(index >= 0,'INVALID_TARGET');
+          assert((index === 0 || at > cycle.boundaries[index-1].timeUs) && (index === cycle.boundaries.length-1 || at < cycle.boundaries[index+1].timeUs),'BOUNDARY_ORDER'); cycle.boundaries[index].timeUs=at;
+        } else if (type === 'renamePhase') {
+          const phase = next.phases.find(p => p.id === command.phaseId); assert(phase,'INVALID_TARGET'); assert(typeof command.label === 'string','TEXT_LIMIT');
+          const label = command.label.trim(); assert(text(label,80),'TEXT_LIMIT'); if (label) phase.label=label;
+        } else if (type === 'updateProjectMeta') {
+          assert(text(command.title,160) && text(command.note,4000),'TEXT_LIMIT'); next.title=command.title; next.note=command.note;
+        } else if (type === 'editNote') {
+          assert(text(command.note,1000),'TEXT_LIMIT');
+          const target = command.targetType === 'cycle' ? (cycle.id === command.targetId ? cycle : null) : command.targetType === 'span' ? cycle.spans.find(s => s.id === command.targetId) : command.targetType === 'occurrence' ? cycle.occurrences.find(o => o.id === command.targetId) : null;
+          assert(target,'INVALID_TARGET'); target.note=command.note;
         }
+        if (JSON.stringify(project) !== JSON.stringify(next)) next.updatedAt=context.nowIso();
+        const validation = validateProject(next); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
+        return {ok:true,project:next,undoPatch:diff(project,next)};
+      } catch (error) { return fail(error.code || 'INVALID_PROJECT'); }
+    }
+    function serializeProject(project,appVersion) {
+      const output = clone(project); output.appVersion=appVersion;
+      const validation = validateProject(output); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
+      // Compact output keeps the exported UTF-8 byte budget identical to validation.
+      return JSON.stringify(validation.value);
+    }
+    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,createProject,validateProject,applyCommand,createHistory,serializeProject});
+  })();
+  // TSD:CORE:END
 
-        function ask({ title: heading, message: body, confirmLabel, cancelLabel, tone = 'default' } = {}) {
-          if (dialog.open) finish(false);
-          title.textContent = heading || translate('confirmTitle');
-          message.textContent = body || '';
-          cancelButton.textContent = cancelLabel || translate('cancel');
-          okButton.textContent = confirmLabel || translate('confirmAction');
-          okButton.classList.toggle('danger', tone === 'danger');
-          okButton.classList.toggle('primary', tone !== 'danger');
-          restoreFocus = document.activeElement;
-          return new Promise(resolve => {
-            resolver = resolve;
-            dialog.showModal();
-            requestAnimationFrame(() => cancelButton.focus({ preventScroll: true }));
-          });
-        }
-
-        closeButton.addEventListener('click', () => finish(false));
-        cancelButton.addEventListener('click', () => finish(false));
-        okButton.addEventListener('click', () => finish(true));
-        dialog.addEventListener('cancel', event => { event.preventDefault(); finish(false); });
-        dialog.addEventListener('click', event => {
-          const rect = dialog.getBoundingClientRect();
-          const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
-          if (outside) finish(false);
+  // TSD:MEDIA:BEGIN
+  // Candidate elements/listeners are separate from the current source. Source identity and
+  // generation/seek/play counters prevent late asynchronous results changing current state.
+  class MediaController {
+    constructor(host,onChange) {
+      this.host = host; this.onChange = onChange;
+      this.generation = 0; this.seekSequence = 0; this.playSequence = 0;
+      this.active = null; this.pending = null; this.pendingSeek = null; this.state = 'empty';
+    }
+    get video() { return this.active?.video || null; }
+    get source() { return this.active?.candidate.source || null; }
+    notify(event) { this.onChange?.(this,event); }
+    failure(code) { return Object.assign(new Error(code),{code}); }
+    release(item) {
+      if (!item || item.released) return;
+      item.released = true; item.cleanup?.(); item.events?.abort();
+      item.video.pause(); item.video.removeAttribute('src'); item.video.load();
+      URL.revokeObjectURL(item.candidate.url);
+    }
+    cancelSeek() {
+      this.seekSequence++;
+      if (this.pendingSeek) { const cancel = this.pendingSeek; this.pendingSeek = null; cancel(); }
+    }
+    cancelCandidate() {
+      this.generation++; this.playSequence++; this.cancelSeek();
+      const item = this.pending; this.pending = null;
+      if (item) { item.reject?.(this.failure('STALE')); this.release(item); }
+      this.state = this.video ? (this.video.error ? 'error' : this.video.seeking ? 'seeking' : 'ready') : 'empty';
+      this.notify();
+    }
+    async loadCandidate(file) {
+      this.cancelCandidate(); this.pause();
+      const generation = ++this.generation, check = TsdCore.validateFile(file);
+      if (!check.ok) throw this.failure(check.error.code);
+      const video = document.createElement('video');
+      video.playsInline = true; video.preload = 'auto'; video.setAttribute('playsinline','');
+      const candidate = {generation,file,url:URL.createObjectURL(file),source:null};
+      const item = {candidate,video,released:false};
+      this.pending = item; this.state = 'loading'; this.notify();
+      try {
+        await new Promise((resolve,reject) => {
+          item.reject = reject;
+          const events = new AbortController();
+          const timer = setTimeout(() => reject(this.failure('TIMEOUT')),30000);
+          item.cleanup = () => { clearTimeout(timer); events.abort(); item.reject = null; };
+          const checkReady = () => {
+            if (this.pending !== item || generation !== this.generation) return reject(this.failure('STALE'));
+            if (video.readyState < 1) return;
+            const result = TsdCore.validateMetadata({duration:video.duration,width:video.videoWidth,height:video.videoHeight});
+            if (!result.ok) return reject(this.failure(result.error.code));
+            if (video.readyState < 2 || video.seekable.length === 0 || video.seeking) return;
+            candidate.source = {name:file.name,size:file.size,lastModified:file.lastModified,durationUs:result.value,width:video.videoWidth,height:video.videoHeight};
+            resolve();
+          };
+          for (const event of ['loadedmetadata','loadeddata','canplay','progress','durationchange']) video.addEventListener(event,checkReady,{signal:events.signal});
+          video.addEventListener('error',() => reject(this.failure('UNSUPPORTED')),{signal:events.signal});
+          video.src = candidate.url; video.load();
         });
-
-        return Object.freeze({ ask });
-      })();
-      window.AppConfirm = AppConfirm;
-
-      function readStorage(key) {
-        try { return localStorage.getItem(key); } catch { return null; }
+        item.cleanup();
+        if (this.pending !== item || generation !== this.generation) throw this.failure('STALE');
+        return candidate;
+      } catch (error) {
+        if (this.pending === item) { this.pending = null; this.state = this.video ? (this.video.error ? 'error' : this.video.seeking ? 'seeking' : 'ready') : 'empty'; this.notify(); }
+        this.release(item); throw error;
       }
-      function writeStorage(key, value) {
-        try { localStorage.setItem(key, value); } catch { /* Storage may be unavailable in private contexts. */ }
+    }
+    commitCandidate(candidate) {
+      const item = this.pending;
+      if (!item || item.candidate !== candidate || candidate.generation !== this.generation) throw this.failure('STALE');
+      if (item.video.error || item.video.readyState < 2) { this.cancelCandidate(); throw this.failure('UNSUPPORTED'); }
+      const old = this.active;
+      this.cancelSeek(); this.playSequence++;
+      this.active = item; this.pending = null; this.state = 'ready';
+      const events = new AbortController(); item.events = events;
+      for (const event of ['timeupdate','play','pause','ended','ratechange','volumechange','seeking','seeked','error']) {
+        item.video.addEventListener(event,() => {
+          if (this.active !== item || this.pending) return;
+          if (item.video.error) this.state = 'error';
+          else if (!this.pendingSeek) this.state = item.video.seeking ? 'seeking' : 'ready';
+          this.notify(event);
+        },{signal:events.signal});
       }
-      function detectLanguage() {
-        if (APP_CONFIG.defaultLanguage === 'ja' || APP_CONFIG.defaultLanguage === 'en') return APP_CONFIG.defaultLanguage;
-        return (navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : 'en';
-      }
-      function translate(key) { return translations[language]?.[key] ?? translations.en[key] ?? key; }
-
-      // Reusable toast / Undo API. Canonical source: components/toast.html.
-      const AppToast = (() => {
-        const root = $('#appToast');
-        const message = $('#appToastMessage');
-        const action = $('#appToastAction');
-        let timer = 0;
-        let actionHandler = null;
-        function dismiss() {
-          clearTimeout(timer);
-          timer = 0;
-          root.classList.remove('show');
-          actionHandler = null;
-        }
-        function show({ message: text = '', actionLabel = '', onAction = null, duration = 3200, tone = 'default' } = {}) {
-          clearTimeout(timer);
-          message.textContent = String(text);
-          root.dataset.tone = tone;
-          actionHandler = typeof onAction === 'function' ? onAction : null;
-          action.textContent = actionLabel || '';
-          action.hidden = !actionHandler || !actionLabel;
-          root.classList.add('show');
-          if (duration > 0) timer = window.setTimeout(dismiss, duration);
-          return Object.freeze({ dismiss });
-        }
-        action.addEventListener('click', () => {
-          const handler = actionHandler;
-          dismiss();
-          if (handler) handler();
-        });
-        return Object.freeze({ show, dismiss });
-      })();
-      window.AppToast = AppToast;
-      function showToast(message, options = {}) { AppToast.show({ message, ...options }); }
-      function applyLanguage() {
-        document.documentElement.lang = language;
-        document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = translate(element.dataset.i18n); });
-        document.querySelectorAll('[data-i18n-title]').forEach(element => { element.title = translate(element.dataset.i18nTitle); });
-        document.querySelectorAll('[data-i18n-aria-label]').forEach(element => { element.setAttribute('aria-label', translate(element.dataset.i18nAriaLabel)); });
-        $('#languageButton').textContent = language === 'ja' ? 'EN' : '日本語';
-        $('#languageButton').setAttribute('aria-label', language === 'ja' ? '英語に切り替え' : 'Switch to Japanese');
-        document.title = language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name;
-        $('#brandName').textContent = language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name;
-        $('#footerName').textContent = language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name;
-        if (!editor.value) editor.value = sampleText[language];
-        updateStats();
-      }
-      function updateStats() {
-        const value = editor.value;
-        const words = value.trim() ? (value.match(/[\p{L}\p{N}]+(?:['’_-][\p{L}\p{N}]+)*/gu) || []).length : 0;
-        $('#characterCount').textContent = new Intl.NumberFormat(language).format([...value].length);
-        $('#wordCount').textContent = new Intl.NumberFormat(language).format(words);
-        $('#lineCount').textContent = new Intl.NumberFormat(language).format(value ? value.split(/\r?\n/).length : 0);
-        $('#saveStatus').textContent = translate('savedLocally');
-      }
-      function saveText() {
-        writeStorage(storageKeys.text, editor.value);
-        updateStats();
-      }
-      async function copyText() {
-        try {
-          await navigator.clipboard.writeText(editor.value);
-          showToast(translate('copied'));
-        } catch {
-          editor.select();
-          const ok = document.execCommand('copy');
-          showToast(translate(ok ? 'copied' : 'copyFailed'));
-        }
-      }
-      function normalizedFilenameBase() {
-        const fallback = APP_CONFIG.slug || 'text';
-        const cleaned = outputFilename.value.trim().replace(/[\\/:*?"<>|\u0000-\u001f]/g, '-').replace(/\.+$/g, '').trim();
-        let base = cleaned.replace(/\.txt$/i, '') || fallback;
-        if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(base)) base = `${base}-file`;
-        if (!cleaned) outputFilename.value = fallback;
-        return base.slice(0, 120);
-      }
-      function downloadText() {
-        const url = URL.createObjectURL(new Blob([editor.value], { type: 'text/plain;charset=utf-8' }));
-        const anchor = document.createElement('a');
-        const filenameBase = normalizedFilenameBase();
-        outputFilename.value = filenameBase;
-        anchor.href = url;
-        anchor.download = `${filenameBase}.txt`;
-        anchor.click();
-        URL.revokeObjectURL(url);
-        showToast(translate('downloaded'), { tone: 'success' });
-      }
-
-      $('#languageButton').addEventListener('click', () => {
-        language = language === 'ja' ? 'en' : 'ja';
-        writeStorage(storageKeys.language, language);
-        applyLanguage();
+      this.host.replaceChildren(item.video); this.release(old); this.notify();
+    }
+    captureTime() {
+      if (document.hidden) return {ok:false,error:{code:'BACKGROUND',messageKey:'BACKGROUND'}};
+      if (!this.video || this.pending || this.state !== 'ready' || this.video.seeking || this.video.error || this.video.readyState < 2) return {ok:false,error:{code:'NOT_READY',messageKey:'NOT_READY'}};
+      const result = TsdCore.toTimeUs(this.video.currentTime);
+      if (result.ok && result.value > this.source.durationUs) return {ok:false,error:{code:'INVALID_TIME',messageKey:'INVALID_TIME'}};
+      return result;
+    }
+    pause() { this.playSequence++; if (this.active) { this.active.wantPlaying = false; this.video.pause(); } }
+    async play() {
+      const position = this.captureTime(); if (!position.ok) throw this.failure(position.error.code);
+      const item = this.active, generation = this.generation, sequence = ++this.playSequence;
+      item.wantPlaying = true;
+      try { await item.video.play(); }
+      catch { if (this.active === item && generation === this.generation && sequence === this.playSequence) throw this.failure('PLAY_FAILED'); }
+      if (this.active !== item || !item.wantPlaying || document.hidden) item.video.pause();
+    }
+    seekTo(timeUs) {
+      if (!Number.isSafeInteger(timeUs) || timeUs < 0 || !this.video || timeUs > this.source.durationUs) return Promise.reject(this.failure('INVALID_TIME'));
+      if (this.pending || this.video.error || document.hidden) return Promise.reject(this.failure('NOT_READY'));
+      this.pause(); this.cancelSeek();
+      const item = this.active, generation = this.generation, sequence = this.seekSequence, video = item.video;
+      return new Promise((resolve,reject) => {
+        const events = new AbortController();
+        const cleanup = () => { clearTimeout(timer); events.abort(); if (sequence === this.seekSequence) this.pendingSeek = null; };
+        const done = error => {
+          cleanup();
+          if (this.active !== item || this.generation !== generation || sequence !== this.seekSequence) { reject(this.failure('STALE')); return; }
+          this.state = video.error ? 'error' : video.seeking ? 'seeking' : 'ready'; this.notify();
+          if (error) reject(error); else resolve({generation,requestedUs:timeUs,actualUs:TsdCore.toTimeUs(video.currentTime).value});
+        };
+        const timer = setTimeout(() => done(this.failure('SEEK_FAILED')),8000);
+        this.pendingSeek = () => { cleanup(); reject(this.failure('STALE')); };
+        video.addEventListener('seeked',() => { if (!video.seeking) done(); },{signal:events.signal});
+        video.addEventListener('error',() => done(this.failure('SEEK_FAILED')),{signal:events.signal});
+        this.state = 'seeking'; this.notify();
+        try { if (Math.abs(video.currentTime - timeUs / 1000000) < .0000005 && !video.seeking) done(); else video.currentTime = timeUs / 1000000; }
+        catch { done(this.failure('SEEK_FAILED')); }
       });
-      const helpDialog = $('#helpDialog');
-      $('#helpButton').addEventListener('click', () => helpDialog.showModal());
-      $('#closeHelpButton').addEventListener('click', () => helpDialog.close());
-      helpDialog.addEventListener('click', event => {
-        const rect = helpDialog.getBoundingClientRect();
-        const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
-        if (outside) helpDialog.close();
-      });
-      editor.addEventListener('input', saveText);
-      outputFilename.addEventListener('blur', () => { outputFilename.value = normalizedFilenameBase(); });
-      $('#copyButton').addEventListener('click', copyText);
-      $('#downloadButton').addEventListener('click', downloadText);
-      $('#sampleButton').addEventListener('click', () => {
-        const before = editor.value;
-        editor.value = sampleText[language];
-        saveText();
-        showToast(translate('restored'), { actionLabel: translate('undo'), onAction: () => { editor.value = before; saveText(); editor.focus(); showToast(translate('undone')); } });
-      });
-      $('#clearButton').addEventListener('click', () => {
-        if (!editor.value) return;
-        const before = editor.value;
-        editor.value = '';
-        saveText();
-        editor.focus();
-        showToast(translate('cleared'), {
-          actionLabel: translate('undo'),
-          onAction: () => { editor.value = before; saveText(); editor.focus(); showToast(translate('undone')); },
-          duration: 5000
-        });
-      });
+    }
+    dispose() {
+      this.cancelCandidate(); this.cancelSeek(); this.playSequence++;
+      const old = this.active; this.active = null; this.release(old);
+      this.host.replaceChildren(); this.state = 'empty'; this.notify();
+    }
+  }
+  // TSD:MEDIA:END
 
-      editor.value = readStorage(storageKeys.text) || sampleText[language];
-      outputFilename.value = APP_CONFIG.slug || 'text';
-      $('#versionBadge').textContent = `v${APP_CONFIG.version}`;
-      $('#buildVersion').textContent = APP_CONFIG.version;
-      $('#builtAt').textContent = BUILD_MANIFEST.generatedAtUtc || '—';
-      $('#dependencyCount').textContent = String(BUILD_MANIFEST.dependencies?.length || 0);
-      applyLanguage();
-    })();
-  </script>
+  // UI / CONTROLLER. Analysis stays in memory until the user exports JSON.
+  let project = null, history = TsdCore.createHistory(), selectedBoundaryId = null;
+  let suspended = false, projectRevision = 0, attachedSource = null, savedSnapshot = null;
+  let errorCode = '', displayedSource = null;
+  const media = new MediaController($('#videoHost'),onMediaChange);
+  const commandContext = {makeId:() => 'id-'+[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join(''),nowIso:() => new Date().toISOString(),get language() { return language; }};
+  function setError(error) {
+    if (error?.code === 'STALE') return;
+    errorCode = translations.en[error?.code] ? error.code : 'UNSUPPORTED';
+    $('#errorMessage').textContent = translate(errorCode); $('#errorMessage').hidden = false;
+  }
+  function clearError() { errorCode = ''; $('#errorMessage').hidden = true; }
+  function formatTime(seconds) {
+    const tenths = Math.max(0,Math.round((Number.isFinite(seconds) ? seconds : 0) * 10));
+    const hours = Math.floor(tenths / 36000), minutes = Math.floor(tenths / 600) % 60, rest = Math.floor(tenths / 10) % 60;
+    return `${hours ? String(hours).padStart(2,'0') + ':' : ''}${String(minutes).padStart(2,'0')}:${String(rest).padStart(2,'0')}.${tenths % 10}`;
+  }
+  function exactSeconds(timeUs) { return (timeUs / 1000000).toFixed(6).replace(/\.?0+$/,'') || '0'; }
+  function durationText(timeUs) { return timeUs > 0 && timeUs < 50000 ? translate('underTenth') : `${(timeUs/1000000).toFixed(1)} ${translate('secondsUnit')}`; }
+  function formatBytes(size) {
+    const unit = size >= 1024 ** 3 ? 'GiB' : size >= 1024 ** 2 ? 'MiB' : 'KiB';
+    const divisor = unit === 'GiB' ? 1024 ** 3 : unit === 'MiB' ? 1024 ** 2 : 1024;
+    return `${(size / divisor).toLocaleString(language,{maximumFractionDigits:1})} ${unit}`;
+  }
+  function cycleNow() { return project?.cycles[0] || null; }
+  function onMediaChange(controller,event) {
+    renderMedia(controller);
+    const cycle = cycleNow();
+    if (event === 'ended' && cycle?.status === 'open' && attachedSource === controller.source && !document.hidden) {
+      const time = controller.captureTime();
+      if (time.ok && execute({type:'closeIncomplete',cycleId:cycle.id,timeUs:time.value})) {
+        AppToast.show({message:translate('endReached'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});
+      }
+    }
+  }
+  function renderMedia(controller) {
+    const source = controller.source, video = controller.video;
+    const ready = Boolean(source) && controller.state === 'ready' && !controller.pending;
+    document.body.classList.toggle('has-source',Boolean(source));
+    const status = $('#mediaStatus'), text = translate(controller.state);
+    status.dataset.state = controller.state; if (status.textContent !== text) status.textContent = text;
+    $('#loadingNotice').hidden = !controller.pending;
+    $('#emptyView').hidden = Boolean(source); $('#videoHost').hidden = !source;
+    $('#sourceInfo').hidden = !source; $('#noSource').hidden = Boolean(source);
+    for (const element of document.querySelectorAll('#playButton, #playbackRate, #volume, #muteButton, [data-seek]')) element.disabled = !ready;
+    $('#seekBar').disabled = !source || Boolean(controller.pending) || controller.state === 'error';
+    if (source) {
+      $('#sourceName').textContent = source.name; $('#sourceName').title = source.name;
+      $('#sourceDuration').textContent = formatTime(source.durationUs / 1000000);
+      $('#sourceDimensions').textContent = `${source.width} × ${source.height} px`;
+      $('#sourceSize').textContent = formatBytes(source.size); $('#largeVideoHint').hidden = source.size < 1024 ** 3;
+      $('#seekBar').max = String(source.durationUs / 1000000); $('#seekBar').value = String(video.currentTime);
+      $('#seekBar').setAttribute('aria-valuetext',formatTime(video.currentTime));
+      $('#position').textContent = formatTime(video.currentTime); $('#duration').textContent = formatTime(source.durationUs / 1000000);
+      $('#playbackRate').value = String(video.playbackRate); $('#volume').value = String(video.volume);
+      $('#muteButton').textContent = translate(video.muted ? 'unmute' : 'mute'); $('#muteButton').setAttribute('aria-pressed',String(video.muted));
+      if (displayedSource !== source) { displayedSource = source; outputFilename.value = TsdCore.sanitizeFilename(source.name.replace(/\.[^.]+$/,'') + '-time-study','.tsd.json').slice(0,-9); }
+    }
+    const playing = Boolean(video && !video.paused);
+    $('#playLabel').textContent = translate(playing ? 'pause' : 'play');
+    $('#playIcon').setAttribute('d',playing ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'm8 4 12 8-12 8z');
+    if (controller.state === 'error' && !errorCode) setError({code:'UNSUPPORTED'});
+    renderMeasurementControls();
+  }
+  function renderMeasurementControls() {
+    const cycle = cycleNow(), position = media.captureTime();
+    const active = cycle?.status === 'open' && !suspended;
+    const after = active && position.ok && position.value > cycle.boundaries.at(-1).timeUs;
+    $('#startCycleButton').hidden = Boolean(cycle);
+    $('#startCycleButton').disabled = !project || !position.ok || position.value >= project.source.durationUs;
+    $('#markBoundaryButton').hidden = !active; $('#markBoundaryButton').disabled = !after || project.phases.length >= 50;
+    $('#finishCycleButton').hidden = !active; $('#finishCycleButton').disabled = !after;
+    $('#closeIncompleteButton').hidden = !active; $('#closeIncompleteButton').disabled = !position.ok || position.value < (cycle?.boundaries.at(-1).timeUs ?? 0);
+    $('#resumeCycleButton').hidden = !cycle || cycle.status === 'complete' || (active && !suspended);
+    $('#resumeCycleButton').disabled = !position.ok;
+    const occurrence = cycle?.cursor && cycle.occurrences.find(o=>o.id===cycle.cursor.occurrenceId);
+    $('#currentStep').textContent = occurrence ? project.phases.find(p=>p.id===occurrence.phaseId)?.label || '' : '';
+    let hint = !project ? 'choosePrompt' : !cycle ? 'firstHint' : cycle.status === 'complete' ? 'completeHint' : suspended ? 'suspendedHint' : cycle.status === 'incomplete' ? 'incompleteHint' : !position.ok ? position.error.code : !after ? 'BOUNDARY_ORDER' : 'markHint';
+    if (active && project.phases.length >= 50 && after) hint='PHASE_LIMIT';
+    $('#measurementHint').textContent = translate(hint);
+    $('#boundaryFromVideoButton').disabled = !position.ok || !cycle;
+    $('#boundaryToVideoButton').disabled = !position.ok || !cycle;
+  }
+  function execute(command,{quiet=false}={}) {
+    if (!project) return false;
+    const result = TsdCore.applyCommand(project,command,commandContext);
+    if (!result.ok) { if (!quiet) setError(result.error); return false; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++;
+    if (['startCycle','markBoundary','finishCycle','closeIncomplete'].includes(command.type)) selectedBoundaryId=cycleNow().boundaries.at(-1).id;
+    if (result.undoPatch.length) $('#saveStatus').textContent='';
+    renderProject(); return true;
+  }
+  function runMeasurement(type) {
+    const position = media.captureTime(); if (!position.ok) { setError(position.error); return; }
+    if (suspended && type !== 'startCycle') return;
+    clearError();
+    const cycle = cycleNow();
+    if (execute({type,timeUs:position.value,cycleId:cycle?.id,procedureId:null})) {
+      if (type === 'finishCycle' || type === 'closeIncomplete') media.pause();
+      if (type === 'finishCycle') selectPage('review');
+    }
+  }
+  async function resumeMeasurement() {
+    const cycle = cycleNow(); if (!cycle) return;
+    const revision = projectRevision, identity = project.projectId;
+    try {
+      await media.seekTo(cycle.boundaries.at(-1).timeUs);
+      if (revision !== projectRevision || identity !== project?.projectId) return;
+      if (execute({type:'resumeCycle',cycleId:cycle.id})) { suspended=false; $('#backgroundNotice').hidden=true; renderMeasurementControls(); }
+    } catch (error) { setError(error); }
+  }
+  function travelHistory(direction) {
+    if (!project) return;
+    media.pause(); const result = history[direction](project);
+    if (!result.ok) { setError(result.error); return; }
+    AppToast.dismiss(); project=result.project; projectRevision++; suspended=false; clearError();
+    $('#saveStatus').textContent=''; $('#boundaryError').hidden=true; renderProject();
+  }
+  function syncInput(input,value) {
+    if (document.activeElement !== input && !input.validationMessage) input.value=value;
+  }
+  function commitInput(input,command) {
+    input.setCustomValidity(''); input.removeAttribute('aria-invalid');
+    if (!project) return;
+    const result = TsdCore.applyCommand(project,command,commandContext);
+    if (!result.ok) { input.setCustomValidity(translate(result.error.code)); input.setAttribute('aria-invalid','true'); setError(result.error); return; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; clearError(); $('#saveStatus').textContent=''; renderProject();
+  }
+  function element(tag,className='',content='') { const node=document.createElement(tag); node.className=className; node.textContent=content; return node; }
+  function renderProject() {
+    const cycle = cycleNow();
+    $('#cycleState').textContent = translate(!cycle ? 'emptyRecord' : cycle.status+'Record');
+    $('#cycleDuration').textContent = cycle ? durationText(cycle.boundaries.at(-1).timeUs-cycle.boundaries[0].timeUs) : '—';
+    $('#reviewCycleStatus').textContent = cycle ? `${$('#cycleState').textContent} · ${$('#cycleDuration').textContent}` : '';
+    $('#recordHint').textContent = translate(cycle?.status === 'complete' ? 'recordComplete' : 'recordedOnly');
+    $('#undoButton').disabled = history.undoCount===0; $('#redoButton').disabled=history.redoCount===0;
+    $('#undoMeasureButton').disabled=history.undoCount===0; $('#redoMeasureButton').disabled=history.redoCount===0;
+    $('#measureHistory').hidden=!cycle && history.redoCount===0;
+    $('#saveAnalysisButton').disabled=!project;
+    $('#projectTitle').disabled=!project; $('#projectNote').disabled=!project; $('#cycleNote').disabled=!cycle;
+    syncInput($('#projectTitle'),project?.title || ''); syncInput($('#projectNote'),project?.note || ''); syncInput($('#cycleNote'),cycle?.note || '');
+    const list=$('#phaseList'), wanted=new Set();
+    for (const [index,occurrence] of (cycle?.occurrences || []).entries()) {
+      wanted.add(occurrence.id);
+      let row=[...list.children].find(r=>r.dataset.occurrenceId===occurrence.id);
+      if (!row) {
+        row=element('div','phase-row'); row.dataset.occurrenceId=occurrence.id;
+        const line=element('div','phase-line'), input=element('input','phase-name'), duration=element('span','phase-duration'); input.type='text'; input.autocomplete='off';
+        input.addEventListener('change',()=>commitInput(input,{type:'renamePhase',phaseId:occurrence.phaseId,label:input.value}));
+        line.append(input,duration); row.append(line);
+        const details=element('details','notes-details'), summary=element('summary'), label=element('label','field'), note=element('textarea','phase-note'); note.rows=2;
+        const labelText=element('span'); label.append(labelText,note); details.append(summary,label); row.append(details);
+        note.addEventListener('change',()=>commitInput(note,{type:'editNote',targetType:'occurrence',cycleId:cycle.id,targetId:occurrence.id,note:note.value}));
+      }
+      if (list.children[index] !== row) list.insertBefore(row,list.children[index] || null);
+      const phase=project.phases.find(p=>p.id===occurrence.phaseId), input=row.querySelector('.phase-name');
+      input.setAttribute('aria-label',`${translate('stepLabel')} ${index+1}`); syncInput(input,phase.label);
+      let timeUs=0; cycle.spans.forEach((span,i)=>{if(span.occurrenceId===occurrence.id && span.kind==='phase') timeUs+=cycle.boundaries[i+1].timeUs-cycle.boundaries[i].timeUs;});
+      row.querySelector('.phase-duration').textContent=occurrence.resolution==='measured' ? durationText(timeUs) : `${timeUs ? durationText(timeUs)+' · ' : ''}${translate('incompleteRecord')}`;
+      row.querySelector('summary').textContent=translate('stepNote'); row.querySelector('label span').textContent=translate('stepNote'); syncInput(row.querySelector('textarea'),occurrence.note);
+    }
+    for (const row of [...list.children]) if (!wanted.has(row.dataset.occurrenceId)) row.remove();
+    renderBoundaryEditor(); renderMeasurementControls();
+  }
+  function selectedBoundary() {
+    const cycle=cycleNow(); if (!cycle) return null;
+    let index=cycle.boundaries.findIndex(b=>b.id===selectedBoundaryId); if(index<0) index=cycle.boundaries.length-1;
+    return {cycle,index,boundary:cycle.boundaries[index]};
+  }
+  function renderBoundaryEditor() {
+    const selected=selectedBoundary(), select=$('#boundarySelect');
+    $('#reviewEmpty').hidden=Boolean(selected); $('#boundaryEditor').hidden=!selected;
+    if (!selected) { select.replaceChildren(); return; }
+    const {cycle,index,boundary}=selected; selectedBoundaryId=boundary.id;
+    const options=cycle.boundaries.map((b,i)=>{const option=element('option','',`${i===0 ? translate('startLabel') : i===cycle.boundaries.length-1 ? translate('endLabel') : translate('boundaryLabel')+' '+i} · ${exactSeconds(b.timeUs)} ${translate('secondsUnit')}`); option.value=b.id; return option;});
+    select.replaceChildren(...options); select.value=boundary.id;
+    $('#boundaryTime').value=exactSeconds(boundary.timeUs);
+    const min=index===0 ? 0 : cycle.boundaries[index-1].timeUs+1;
+    const max=index===cycle.boundaries.length-1 ? project.source.durationUs : cycle.boundaries[index+1].timeUs-1;
+    $('#boundarySlider').min=String(min); $('#boundarySlider').max=String(max); $('#boundarySlider').value=String(boundary.timeUs);
+    $('#boundarySlider').disabled=min>=max; $('#boundarySlider').setAttribute('aria-valuetext',`${exactSeconds(boundary.timeUs)} ${translate('secondsUnit')}`);
+    // Last boundary has no following span. Do not silently edit the previous span's note.
+    const span=cycle.spans[index]; $('#spanNote').disabled=!span;
+    $('#spanNote').dataset.spanId=span?.id || ''; $('#spanNoteLabel').textContent=span ? `${exactSeconds(boundary.timeUs)}–${exactSeconds(cycle.boundaries[index+1].timeUs)} ${translate('secondsUnit')}` : '—';
+    syncInput($('#spanNote'),span?.note || '');
+  }
+  function moveSelectedBoundary(timeResult) {
+    const selected=selectedBoundary(); if(!selected) return;
+    const result=timeResult.ok ? TsdCore.applyCommand(project,{type:'moveBoundary',cycleId:selected.cycle.id,boundaryId:selected.boundary.id,timeUs:timeResult.value},commandContext) : timeResult;
+    if(!result.ok) { $('#boundaryError').textContent=translate(result.error.code); $('#boundaryError').hidden=false; $('#boundaryTime').setAttribute('aria-invalid','true'); return; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; $('#boundaryError').hidden=true; $('#boundaryTime').removeAttribute('aria-invalid'); $('#saveStatus').textContent=''; renderProject();
+    if(result.undoPatch.length) AppToast.show({message:translate('boundaryApplied'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});
+  }
+  function selectPage(page) {
+    if (!['measure','review','results'].includes(page)) return;
+    document.body.dataset.currentPage=page;
+    document.querySelectorAll('[data-screen]').forEach(node=>node.classList.toggle('is-mobile-active',node.dataset.screen===page));
+    document.querySelectorAll('[data-page]').forEach(node=>{if(node.dataset.page===page) node.setAttribute('aria-current','page'); else node.removeAttribute('aria-current');});
+    if(page!=='measure') media.pause();
+    if (matchMedia('(max-width:600px)').matches) window.scrollTo({top:0,behavior:'instant'});
+  }
+  async function chooseFile(file) {
+    AppConfirm.cancel(); clearError();
+    try {
+      const candidate=await media.loadCandidate(file);
+      if(media.source) {
+        const accepted=await AppConfirm.ask({message:`${translate('replaceMessage')}\n\n${candidate.source.name}`});
+        if(candidate.generation!==media.generation) return;
+        if(!accepted) {media.cancelCandidate();return;}
+      }
+      const next=TsdCore.createProject(candidate.source,commandContext);
+      media.commitCandidate(candidate);
+      project=next; attachedSource=media.source; projectRevision++; history=TsdCore.createHistory(); selectedBoundaryId=null; suspended=false; savedSnapshot=null;
+      document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
+      $('#boundaryError').hidden=true; $('#saveStatus').textContent=''; $('#backgroundNotice').hidden=true; AppToast.dismiss();
+      renderProject(); selectPage('measure');
+    } catch(error) { setError(error); }
+  }
+  function seekBy(delta) {
+    if(!media.source) return;
+    const target=Math.max(0,Math.min(media.source.durationUs,Math.round((media.video.currentTime+delta)*1000000)));
+    media.seekTo(target).catch(setError);
+  }
+  function saveAnalysis() {
+    if(!project) return;
+    const invalid=[...document.querySelectorAll('input,textarea')].find(input=>!input.checkValidity());
+    if(invalid) { setError({code:'TEXT_LIMIT'}); invalid.reportValidity(); return; }
+    let url=null;
+    try {
+      outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);
+      project.settings.outputBaseName=outputFilename.value; project.settings.language=language;
+      const text=TsdCore.serializeProject(project,APP_CONFIG.version);
+      const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+      if(blob.size>10*1024*1024) throw Object.assign(new Error('SAVE_LIMIT'),{code:'SAVE_LIMIT'});
+      url=URL.createObjectURL(blob); const link=element('a'); link.href=url; link.download=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json');
+      document.body.append(link); try {link.click();} finally {link.remove();}
+      savedSnapshot=JSON.stringify(project); $('#saveStatus').textContent=translate('downloadStarted');
+    } catch(error) { $('#saveStatus').textContent=translate('saveFailed'); setError({code:typeof error.code==='string' && translations.en[error.code] ? error.code : 'saveFailed'}); }
+    finally { if(url) setTimeout(()=>URL.revokeObjectURL(url),30000); }
+  }
+  function applyLanguage() {
+    AppToast.dismiss(); document.documentElement.lang=language;
+    document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=translate(node.dataset.i18n);});
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(node=>{node.setAttribute('aria-label',translate(node.dataset.i18nAriaLabel));});
+    $('#languageButton').textContent=language==='ja' ? 'EN' : '日本語';
+    $('#languageButton').setAttribute('aria-label',language==='ja' ? '英語に切り替え' : 'Switch to Japanese');
+    document.title=language==='ja' ? 'Time Study Desk / 動画作業分析' : 'Time Study Desk / Video work analysis';
+    if(project) project.settings.language=language;
+    if(errorCode) $('#errorMessage').textContent=translate(errorCode);
+    renderMedia(media); renderProject();
+  }
+  $('#chooseVideoButton').addEventListener('click',()=>$('#videoInput').click());
+  $('#replaceVideoButton').addEventListener('click',()=>$('#videoInput').click());
+  $('#videoInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1) chooseFile(files[0]);else if(files.length) setError({code:'MULTIPLE_FILES'});});
+  $('#cancelLoadButton').addEventListener('click',()=>{AppConfirm.cancel();media.cancelCandidate();clearError();});
+  $('#playButton').addEventListener('click',()=>{clearError();if(media.video?.paused) media.play().catch(setError);else media.pause();});
+  $('#seekBar').addEventListener('change',event=>media.seekTo(Math.round(Number(event.target.value)*1000000)).catch(setError));
+  document.querySelectorAll('[data-seek]').forEach(button=>button.addEventListener('click',()=>seekBy(Number(button.dataset.seek))));
+  $('#playbackRate').addEventListener('change',event=>{if(media.video) media.video.playbackRate=Number(event.target.value);});
+  $('#muteButton').addEventListener('click',()=>{if(media.video) media.video.muted=!media.video.muted;});
+  $('#volume').addEventListener('input',event=>{if(media.video) media.video.volume=Number(event.target.value);});
+  $('#playerRegion').addEventListener('keydown',event=>{
+    if(event.target!==event.currentTarget || event.ctrlKey || event.metaKey || event.altKey || ![' ','ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault();if(event.repeat) return;
+    if(event.key===' ') {if(media.video?.paused) media.play().catch(setError);else media.pause();}
+    else seekBy((event.key==='ArrowRight'?1:-1)*(event.shiftKey?1:.1));
+  });
+  for(const [selector,type] of [['#startCycleButton','startCycle'],['#markBoundaryButton','markBoundary'],['#finishCycleButton','finishCycle'],['#closeIncompleteButton','closeIncomplete']]) {
+    $(selector).addEventListener('click',()=>runMeasurement(type));
+    $(selector).addEventListener('keydown',event=>{if(event.repeat && [' ','Enter'].includes(event.key)) event.preventDefault();});
+  }
+  $('#resumeCycleButton').addEventListener('click',resumeMeasurement);
+  for(const selector of ['#undoButton','#undoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('undo'));
+  for(const selector of ['#redoButton','#redoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('redo'));
+  document.addEventListener('keydown',event=>{
+    if(!(event.ctrlKey||event.metaKey) || event.altKey || event.key.toLowerCase()!=='z' || event.repeat || event.target.closest('input,textarea,[contenteditable="true"],dialog[open]')) return;
+    event.preventDefault(); const direction=event.shiftKey?'redo':'undo'; if(history[direction+'Count']) travelHistory(direction);
+  });
+  $('#boundarySelect').addEventListener('change',event=>{selectedBoundaryId=event.target.value;$('#boundaryError').hidden=true;renderBoundaryEditor();});
+  $('#applyBoundaryButton').addEventListener('click',()=>moveSelectedBoundary(TsdCore.parseTimeInput($('#boundaryTime').value)));
+  $('#boundaryTime').addEventListener('keydown',event=>{if(event.key==='Enter') {event.preventDefault();moveSelectedBoundary(TsdCore.parseTimeInput(event.target.value));}});
+  $('#boundaryFromVideoButton').addEventListener('click',()=>moveSelectedBoundary(media.captureTime()));
+  $('#boundaryToVideoButton').addEventListener('click',()=>{const selected=selectedBoundary();if(selected) media.seekTo(selected.boundary.timeUs).catch(setError);});
+  $('#boundarySlider').addEventListener('input',event=>{$('#boundaryTime').value=exactSeconds(Number(event.target.value));});
+  $('#boundarySlider').addEventListener('change',event=>moveSelectedBoundary({ok:true,value:Number(event.target.value)}));
+  $('#projectTitle').addEventListener('change',event=>commitInput(event.target,{type:'updateProjectMeta',title:event.target.value,note:$('#projectNote').value}));
+  $('#projectNote').addEventListener('change',event=>commitInput(event.target,{type:'updateProjectMeta',title:$('#projectTitle').value,note:event.target.value}));
+  $('#cycleNote').addEventListener('change',event=>{const c=cycleNow();if(c) commitInput(event.target,{type:'editNote',targetType:'cycle',cycleId:c.id,targetId:c.id,note:event.target.value});});
+  $('#spanNote').addEventListener('change',event=>{const c=cycleNow();if(c && event.target.dataset.spanId) commitInput(event.target,{type:'editNote',targetType:'span',cycleId:c.id,targetId:event.target.dataset.spanId,note:event.target.value});});
+  $('#saveAnalysisButton').addEventListener('click',saveAnalysis);
+  outputFilename.addEventListener('blur',()=>{outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);});
+  document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>selectPage(button.dataset.page)));
+  $('#languageButton').addEventListener('click',()=>{language=language==='ja'?'en':'ja';try{localStorage.setItem('time-study-desk:language',language);}catch{/* Session-only setting. */}applyLanguage();});
+  const helpDialog=$('#helpDialog');
+  $('#helpButton').addEventListener('click',()=>{media.pause();helpDialog.showModal();});
+  $('#closeHelpButton').addEventListener('click',()=>helpDialog.close());
+  helpDialog.addEventListener('close',()=>$('#helpButton').focus({preventScroll:true}));
+  helpDialog.addEventListener('click',event=>{const r=helpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)helpDialog.close();});
+  document.addEventListener('dragover',event=>{if(!event.dataTransfer.types.includes('Files'))return;event.preventDefault();$('#dropZone').classList.add('drag-over');});
+  document.addEventListener('dragleave',event=>{if(!event.relatedTarget)$('#dropZone').classList.remove('drag-over');});
+  document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1)chooseFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){media.pause();if(media.source)$('#backgroundNotice').hidden=false;if(cycleNow()?.status==='open')suspended=true;}renderMeasurementControls();});
+  window.addEventListener('beforeunload',event=>{if(project && (project.cycles.length||project.title||project.note) && JSON.stringify(project)!==savedSnapshot){event.preventDefault();event.returnValue='';}});
+  // Preserve File/Blob references in the back-forward cache, but never autoplay on return.
+  window.addEventListener('pagehide',event=>{media.pause();if(!event.persisted)media.dispose();});
+  $('#versionBadge').textContent=`v${APP_CONFIG.version}`;
+  $('#buildVersion').textContent=APP_CONFIG.version;
+  $('#builtAt').textContent=BUILD_MANIFEST.generatedAtUtc||'—';
+  $('#dependencyCount').textContent=String(BUILD_MANIFEST.dependencies?.length||0);
+  applyLanguage();
+
+})();
+</script>
 </body>
 </html>

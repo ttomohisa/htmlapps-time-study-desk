@@ -1,0 +1,58 @@
+name: Time Study Desk app tests
+on:
+  push:
+    branches: ["feat/time-study-desk-v1"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: time-study-tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  app-tests:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install locked development-only tools
+        run: npm ci
+      - name: Install Chromium for testing only
+        run: npx playwright install chromium
+      - name: PowerShell syntax and encoding
+        shell: powershell
+        run: .\scripts\check-powershell-syntax.ps1
+      - name: Build and verify both HTML variants
+        shell: pwsh
+        run: ./scripts/check-repository.ps1
+      - name: Unit tests of actual source
+        run: npm run test:unit
+      - name: Generated HTML direct-file browser acceptance tests
+        run: npm run test:e2e -- --project=chromium
+      - name: Archive tested source
+        if: always()
+        shell: pwsh
+        run: git archive --format=zip HEAD -o source-snapshot.zip
+      - name: Record environment
+        if: always()
+        shell: pwsh
+        run: |
+          @('OS: ' + [System.Environment]::OSVersion.VersionString, 'PowerShell: ' + $PSVersionTable.PSVersion.ToString(), 'Node: ' + (node --version), 'Playwright: ' + (npx playwright --version)) | Out-File -Encoding utf8 environment.txt
+      - name: Upload source and build evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: time-study-evidence-${{ github.sha }}
+          path: |
+            source-snapshot.zip
+            environment.txt
+            time-study-desk.html
+            dist/
+            test-results/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: error

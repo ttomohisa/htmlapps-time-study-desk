@@ -1,7 +1,12 @@
+dist/
 .cache/
-dist/*
-!dist/.gitkeep
-*.tmp
-*.part
+*.log
 .DS_Store
 Thumbs.db
+node_modules/
+test-results/
+playwright-report/
+source-snapshot.zip
+test-tooling.zip
+environment.txt
+.superpowers/
