@@ -19,12 +19,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-      - name: Install exact development tools and create initial lock
-        shell: pwsh
-        run: |
-          if (Test-Path package-lock.json) { npm ci } else { npm install }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Compress-Archive -Path node_modules,package-lock.json -DestinationPath test-tooling.zip
+      - name: Install locked development-only tools
+        run: npm ci
       - name: Install Chromium for testing only
         run: npx playwright install chromium
       - name: PowerShell syntax and encoding
@@ -33,15 +29,19 @@ jobs:
       - name: Build and verify both HTML variants
         shell: pwsh
         run: ./scripts/check-repository.ps1
-      - name: Browser acceptance tests
-        run: npm run test:e2e -- --project=chromium
-      - name: Foundation unit tests
-        if: always()
+      - name: Unit tests of actual source
         run: npm run test:unit
+      - name: Generated HTML direct-file browser acceptance tests
+        run: npm run test:e2e -- --project=chromium
       - name: Archive tested source
         if: always()
         shell: pwsh
         run: git archive --format=zip HEAD -o source-snapshot.zip
+      - name: Record environment
+        if: always()
+        shell: pwsh
+        run: |
+          @('OS: ' + [System.Environment]::OSVersion.VersionString, 'PowerShell: ' + $PSVersionTable.PSVersion.ToString(), 'Node: ' + (node --version), 'Playwright: ' + (npx playwright --version)) | Out-File -Encoding utf8 environment.txt
       - name: Upload source and build evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -49,10 +49,10 @@ jobs:
           name: time-study-evidence-${{ github.sha }}
           path: |
             source-snapshot.zip
-            test-tooling.zip
-            package-lock.json
+            environment.txt
+            time-study-desk.html
             dist/
             test-results/
             playwright-report/
-          retention-days: 7
+          retention-days: 14
           if-no-files-found: error
