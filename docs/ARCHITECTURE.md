@@ -4,7 +4,7 @@
 
 The application keeps its editable source in `src/index.template.html`. `TSD:CORE:BEGIN/END` bounds the DOM-free schema, commands, shared boundaries, difference history and JSON export used by the real unit tests. `TSD:MEDIA` owns candidate File/Blob lifecycles, generation/seek/play guards and the video time capture. UI code connects those layers without reading wall time for measurements.
 
-v0.5.0 exports and imports schema-1 JSON, can reconnect a compatible original local video, and adds browser-local analysis recovery. Statistics/CSV remain later plan milestones. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
+v0.6.0 retains schema-1 import/reconnect and browser-local recovery, and adds one pure summary pipeline used by result counts, tables, statistics and the SVG chart. Result/evidence selection is transient UI state; statistics and video ranges are derived rather than serialized. CSV remains a later plan milestone. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
 
 `TSD:STORAGE` owns IndexedDB capability probing, recovery snapshots, revision-checked writes and app-specific clear. It never receives video bytes. UI/controller code schedules 750 ms / 5 s autosave work, stops on conflict, and keeps manual export independent. Import uses the DOM-free CORE validator before replacing runtime state; MEDIA only receives a reconnect candidate after project metadata checks and explicit confirmation.
 

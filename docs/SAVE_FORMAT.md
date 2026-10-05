@@ -1,6 +1,6 @@
 # Time Study Desk analysis JSON — schema 1
 
-The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.5.0 exporter/importer and browser-local recovery behavior.
+The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.6.0 exporter/importer, browser-local recovery and derived-results behavior.
 
 ## Envelope
 
@@ -9,7 +9,7 @@ UTF-8 compact JSON, extension `.tsd.json`:
 ```text
 format: "time-study-desk"
 schemaVersion: 1
-appVersion: "0.5.0"
+appVersion: "0.6.0"
 projectId, createdAt, updatedAt, title, note
 source: { name, size, lastModified, durationUs, width, height }
 phases: []
@@ -36,7 +36,7 @@ Validation builds a fresh allow-listed JSON object. Commands commit only validat
 
 ## Export, import and source reconnection
 
-v0.5.0 can reopen schema-1 `.tsd.json`. It checks the raw file size before reading, then parses and validates the full allow-listed object. Malformed JSON, unsupported schema versions, unknown fields, invalid references/states, or values beyond the existing limits reject the whole import and leave the current analysis unchanged. Import never executes embedded text or treats JSON as HTML.
+v0.6.0 can reopen schema-1 `.tsd.json`. It checks the raw file size before reading, then parses and validates the full allow-listed object. Malformed JSON, unsupported schema versions, unknown fields, invalid references/states, or values beyond the existing limits reject the whole import and leave the current analysis unchanged. Import never executes embedded text or treats JSON as HTML.
 
 A successful import opens detached from video. Measurement and evidence seeking remain unavailable until the source is explicitly reconnected. The app compares saved metadata against the candidate: size and dimensions must match, duration difference must be at most 100,000 µs, and the candidate must reach every recorded boundary. Filename/mtime changes are warnings. A metadata match is not proof of identity and always requires confirmation. Reconnection never autoplays or rewrites saved times.
 
@@ -49,6 +49,14 @@ When enabled and available, IndexedDB database `time-study-desk` stores one anal
 Each stored project has a monotonically increasing revision. `save(project, expectedRevision)` checks the expected revision in the same transaction; a mismatch returns a conflict and does not overwrite the newer snapshot. A success status is shown only after transaction completion. Storage unavailable/quota/conflict states remain visible while manual JSON export remains usable.
 
 The restore card never automatically replaces a new session's state. Browser-data deletion clears only this app's stores. Pending timers are invalidated and any in-flight save is awaited before clear so an older queued write cannot recreate deleted recovery data. `file://` storage behavior is not assumed; the app probes the environment and falls back to manual JSON saving when persistence is unavailable.
+
+## v0.6.0 derived results
+
+The file schema is unchanged. Counts, means, medians, minima/maxima, phase denominators, cycle table values, chart geometry and evidence selections are derived from validated `cycles`, `boundaries`, `spans`, `occurrences`, `phases` and `procedures`; these derived values are **not serialized**.
+
+A summary is scoped to one procedure. Overall statistics include only complete, non-excluded cycles. Phase statistics use their own subset of those cycles where the phase value is fully determined. Not-performed, unobserved, pending/incomplete and not-in-procedure states remain states rather than zero values. A reason is required when a complete cycle is manually excluded, and the row remains saved.
+
+Evidence navigation stores no extra media payload. It derives exact interval start/end times from saved integer boundaries. Aggregate phase evidence may contain multiple constituent phase segments around interruption/rework; the UI exposes those segments rather than implying one continuous clip. Selecting a result never autoplays.
 
 ## v0.3.0 repeated-cycle behavior
 

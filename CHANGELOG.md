@@ -2,6 +2,15 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.6.0 — 2026-10-06 — Results / Review (development)
+
+- Add a single pure `summarize(project, procedureId)` engine for count-aware cycle totals and phase statistics. Complete/included cycles form the overall population; each phase keeps its own denominator.
+- Preserve not-performed, unobserved, incomplete, out-of-procedure and manually excluded states instead of treating them as zero. Manual cycle exclusion requires a reason and remains reversible.
+- Add cycle elapsed mean/median/min/max, recorded-phase/interruption/unobserved means, phase means with n, a zero-origin SVG bar chart, and a step × cycle time table.
+- Add numeric evidence links. Selecting a cycle total, phase value or exception range opens Review at the exact interval and seeks without autoplay. Split/rework phase evidence exposes each constituent segment; explicit range playback stops near the saved end.
+- Keep results readable when the original video is detached. The video can be reconnected using the existing v0.5 checks before evidence playback.
+- Add F1–F5 fixture statistics/invariant coverage plus result/evidence browser tests. CSV export remains v0.7.0 work.
+
 ## 0.5.0 — 2026-10-06 — Save / Resume (development)
 
 - Reopen `.tsd.json` only after a 10 MiB pre-check, JSON parsing and strict schema-1 validation. Invalid, future-version or corrupt files leave the current analysis unchanged.
