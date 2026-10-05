@@ -4,9 +4,11 @@
 
 The application keeps its editable source in `src/index.template.html`. `TSD:CORE:BEGIN/END` bounds the DOM-free schema, commands, shared boundaries, difference history and JSON export used by the real unit tests. `TSD:MEDIA` owns candidate File/Blob lifecycles, generation/seek/play guards and the video time capture. UI code connects those layers without reading wall time for measurements.
 
-v0.3.0 keeps analysis in memory and exports schema-1 JSON manually. IndexedDB/import/statistics/CSV are later plan milestones, not present implementations. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
+v0.4.0 keeps analysis in memory and exports schema-1 JSON manually. IndexedDB/import/statistics/CSV are later plan milestones, not present implementations. The adapted confirmation, toast and mobile page-switch patterns stay inline; the generic template asset helpers are retained but no runtime assets are configured. The app does not use the template WebRTC component.
 
 Repeated measurement keeps an active recording cycle separate from the selected review cycle. Procedure editing builds an in-memory draft and commits one validated new procedure, never mutating historical order/conditions. Cycle numbers and gaps are derived from chronological boundaries.
+
+Exception/review commands operate on the same boundary arrays. Evidence helpers derive known-phase, interruption and unobserved time; assignment edits revalidate resolutions without guessing missing work. The neutral incomplete cursor is not a timed span. New controls are inline and use the existing confirmation/Undo patterns.
 
 The following sections describe the inherited build/component infrastructure, not additional app features.
 

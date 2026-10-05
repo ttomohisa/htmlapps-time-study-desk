@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.3.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.4.0 is a development build, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -10,15 +10,21 @@ The app CSP allows inline application code/styles and local media Blob URLs; `co
 
 ## Analysis data
 
-Only the language preference is persisted automatically in v0.3.0. Analysis stays in memory until an explicit `.tsd.json` download. The file contains the selected video's metadata, step definitions, boundaries, notes and display settings. It contains no video bytes, local absolute path, File/DOM object, Blob URL or history. A download handoff does not prove a disk write. Local analysis files can contain sensitive names and notes and are not encrypted by this app.
+Only the language preference is persisted automatically in v0.4.0. Analysis stays in memory until an explicit `.tsd.json` download. The file contains the selected video's metadata, step definitions, boundaries, notes and display settings. It contains no video bytes, local absolute path, File/DOM object, Blob URL or history. A download handoff does not prove a disk write. Local analysis files can contain sensitive names and notes and are not encrypted by this app.
 
-Schema validation checks allowed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields are errors. The importer is **not exposed in v0.3.0**; future import must validate before replacing state.
+Schema validation checks allowed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields are errors. The importer is **not exposed in v0.4.0**; future import must validate before replacing state.
 
 Procedure order and conditions are immutable snapshots; old cycles keep their original references. The selected review cycle does not receive recording or video-end commands for another cycle. Procedure drafts are not applied until validated and saved.
 
 Commands are atomic: validation failure leaves the previous model unchanged. Undo uses validated differences, not permanent duplicated project snapshots. Replacement cancellation and loading failures preserve the previous analysis. Video-end observation is incomplete until explicitly resolved. Never label partly observed time as a complete step value.
 
 User strings go into text nodes or form values, not `innerHTML`. Names resembling HTML remain literal text. Filenames are sanitized before downloads; fixed extensions do not allow directory writes. CSV formula handling is a later requirement and is not claimed implemented here.
+
+## Interval editing
+
+Interruptions and unobserved intervals retain explicit kinds and times. A step not performed has a state but no invented zero-length work span. Reassignment and merging conserve the recorded time range and revalidate affected occurrence states. Losing complete evidence makes a step pending; it is never automatically changed to not performed. Editing a live assignment suspends recording. An explicit review finish is required after incomplete observations are resolved.
+
+A merge that changes assignments or notes is confirmed and guarded by project identity/revision, so an old confirmation cannot apply to a replacement analysis. Reversible deletion removes only the selected cycle, not the source video or phase/procedure definitions. No-op assignment offers no Undo for earlier work.
 
 ## Verification
 

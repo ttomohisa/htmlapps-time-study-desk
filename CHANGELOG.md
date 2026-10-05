@@ -2,6 +2,16 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.4.0 — 2026-10-06 — Exceptions / Editing (development)
+
+- Record and resume interruptions/unobserved intervals with shared integer boundaries. Preserve known portions and the same step occurrence across an interruption.
+- Distinguish not performed from zero seconds. Keep video-end and final-skip observations incomplete until explicitly resolved and finished.
+- Add step-state review, interval splitting, adjacent merging, reassignment, one-cycle extras/rework, and cycle deletion with Undo.
+- Conserve total time and revalidate evidence after edits. Orphaned or reinterpreted evidence becomes pending instead of silently inventing completeness.
+- Confirm changes when merging different assignments/notes; guard stale confirmations. Preserve old procedures and schema-1 saved data.
+- Add Japanese/English compact exception controls and scrollable review panels. Fix no-op assignment offering an unrelated Undo and report interval-note limits accurately.
+- Expand unit and generated-HTML workflow/privacy tests. JSON import, autosave, statistics and CSV remain later milestones.
+
 ## 0.3.0 — 2026-10-05 — Repeat / Procedure (development)
 
 - Repeat an existing procedure without re-entering names. Start and finish each cycle explicitly; the final step uses Finish rather than creating another step or cycle.

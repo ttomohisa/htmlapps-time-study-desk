@@ -1,64 +1,44 @@
-# QA results — v0.3.0 Repeat / Procedure
+# QA results — v0.4.0 Exceptions / Editing
 
-## Current milestone — 2026-10-05
+## Source and scope — 2026-10-06
 
-Scope: T05–T06. The user merged PR #1; live GitHub main was checked as `379afb5cd4a22157a69082deb407669bfb905e80`, tree `22926b86a13bd0bc7c77738300305c8eb506e900`. The entire extracted source snapshot was re-indexed with Git and its tree matched that main tree exactly. Work takes place in a separate disposable feature-branch checkout. Git transport cannot resolve github.com in the local environment; connector writes are used for the new PR.
+T07–T08 of the approved plan, based on live merged main `edea5a805714b98e06e70b8398f9969103700500` (PR #2), tree `c687d55fb6eecbccbcabbe9cbf3203547d0eebf7`. The source snapshot was checked against that complete Git tree, including tracked `dist/.gitkeep` and repository newline normalization. Changes were made in a disposable feature-branch checkout, not on main.
 
-### Local verification
+The schema, time representation, privacy boundary and future release milestones are unchanged. Previous v0.2/v0.3 results are in their commits and PRs; they are not evidence that a new revision passes.
 
-- Node 22.16.0 / Linux: baseline **26 unit tests passed**; T05 tests first failed at the old first-cycle-only guard, T06 tests at unsupported commands/missing helper. Current full suite: **38 tests passed**, zero skipped.
-- Actual Chromium with Python Playwright, supplemental in-memory HTML rendering: three cycles, separate gaps, boundary edits, Undo/Redo, actual JSON downloads, historical procedure/condition preservation, shared phase renaming, predefined names and draft cancellation passed.
-- Reviewed cycle and recording cycle remain separate: playing to the video end while reviewing an earlier record leaves the earlier record complete and closes only the recording cycle as incomplete.
-- A successful video replacement originally left an old procedure draft open. The failing regression was reproduced; successful replacement now retires that draft. Cancelled replacement preserves the draft and analysis.
-- At 320×740 a maximum-length current phase name originally pushed the primary action below navigation. A failing geometric regression was reproduced; the compact measurement label now keeps the primary control above the tabs. Its complete text remains in the title/accessibility text and the editable review fields.
-- Japanese/English at 320/360/390/430/768/1360 px, long conditions and scrollable procedure dialogs were checked. Phone primary controls were geometrically checked above the bottom tabs.
-- Repeated measurement, procedure editing and JSON download: zero observed HTTP requests, network API attempts, CSP violations or page errors in the supplemental test. Canonical tests cover both generated variants in CI.
+## Local tests actually run
 
-Supplemental rendering substitutes the source placeholders and uses `page.setContent`; it is **not the canonical PowerShell build, direct-file navigation or self-extraction evidence**. The local browser policy blocks file navigation and local PowerShell is unavailable. The existing Windows workflow must be checked at the final revision; its result and artifact IDs are recorded in the new PR rather than inferred from this file.
+Environment: Linux, Node 22.16.0; supplementary Python Playwright with Chromium 144.0.7559.96.
 
-### Design rulings / review
+- Baseline: 38 unit tests passed before changes.
+- New exception/interval tests failed for missing commands before implementation. Current full unit suite: **54 passing, zero failed/skipped**.
+- Covered F1's split occurrence (5 seconds work + 15 interruption + 5 work), F2's not-performed step without zero time, F3's known 4 seconds plus 5 unobserved, all-kind video-end incomplete state, explicit same-boundary completion, and exception Undo.
+- Covered split/merge conservation, reassignment without silently resolving orphan evidence, explicit state validation, one-cycle rework preserving the procedure, cycle deletion/Undo, invalid IDs/times/adjacency, and the interval-note limit.
+- Supplementary real-browser UI: actual local video selection, interruption/unobserved capture, final skip, video end during interruption, explicit resolution/finish, splitting, merging, reassignment, added occurrence, deletion/Undo, and actual JSON download passed.
+- Japanese/English advanced review at 320/390/768/1360 px had no page-width overflow in the supplementary checks. Existing full width/primary-control regressions remain in the canonical browser suite.
+- The additional exception/edit/save workflow produced zero observed HTTP requests, network API attempts, CSP violations or page errors in the supplementary check.
+- Source self-review found that a no-op assignment offered Undo for an earlier command. A public-UI failing test reproduced it; Undo is now offered only for a nonempty edit patch. An overlong interval note's misleading error code was likewise reproduced and corrected.
+- `git diff --check` passed. The original v0.2.0 saved-data fixture is unchanged and still validates.
 
-The approved specification and schema 1 are unchanged. `changeProcedure` accepts a null base only for the first predefined procedure before any observations; multiline phase creation plus that first procedure form one atomic Undo operation. Structural Undo does not include display settings and repairs a selected-procedure reference only when its target disappeared. Classification/archive changes do not delete historical phase definitions or observations.
+Supplementary rendering substitutes source placeholders and uses `page.setContent`. It is **not** a canonical PowerShell build, direct `file://` startup or self-extraction test. Local PowerShell is unavailable and direct-file navigation is blocked by the execution environment. These limits were not bypassed.
 
-No subagent/independent reviewer is available in this session; review is a source self-review plus automated/supplemental tests. The canonical old tests are retained; the current app-version expectation changes to 0.3.0 while the original v0.2.0 JSON fixture stays unchanged.
+## Canonical CI evidence
 
-### Remaining gates
+The unchanged Windows app workflow builds the readable and self-extracting HTML with the repository's PowerShell pipeline, runs all unit/browser tests, and captures actual screenshots. The final PR records its precise run, tested SHA, results and artifact hashes after completion. Do not infer CI success for a later HEAD from this document.
 
-Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS interaction, real large media, screen readers and release-scale performance remain unverified. Interruptions, not-performed/unobserved editing, split/merge, JSON import/reconnection, autosave, aggregate statistics and CSV remain later milestones. No merge, tag/release publication or Browser Kitty site change is performed.
+New generated-HTML tests cover both variants for exception capture, interval editing and privacy. Existing video lifecycle, repeat/procedure, download, locale, layout and CSP tests remain enabled. The current browser-version assertion is 0.4.0; the old schema-1 fixture retains its original appVersion.
 
----
+## Recorded implementation decisions
 
-## Historical v0.2.0 evidence
+- A final skipped/resolved occurrence does not invent a zero-second span or auto-complete the cycle. The existing schema-1 cursor may be neutral `unobserved/null` at the last boundary until explicit completion; this is not a timed interval or an inferred missing duration. Resume is disabled for this neutral cursor.
+- Reviewing live occurrence states, assignments or inserting an extra occurrence suspends that recording. Reassignment which removes complete evidence makes an occurrence pending. It never silently changes it to not-performed or measured.
+- Interval merging preserves the time range. Different assignments/notes require confirmation, guarded by project identity/revision. Undo restores the original boundaries and records.
+- Known parts of an unobserved occurrence remain recorded but do not masquerade as the entire measured step. Unknown spans can be assigned to no step without deleting their duration.
+- The plan's video-end browser cases are included in `exceptions.spec.mjs` instead of a separate `media-end.spec.mjs`; the behavior is tested, not omitted.
+- Review in this session is self-review with tests, not independent review or user acceptance.
 
+## Remaining gates
 
-This records the local implementation check on 2026-10-05. The associated GitHub Actions run and Draft PR #1 carry the current commit's Windows build/browser evidence; do not infer a new HEAD's CI state from this static file.
+Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS interaction, actual large video files, screen readers, soft-keyboard behavior and release-scale performance remain unverified. Viewport emulation is not real-device file-picker/download evidence.
 
-## Local evidence
-
-Base: existing `feat/time-study-desk-v1`, upstream `b3278a74a6f0206122479a97fabb1fa2870ce087`. The exact source snapshot from run 37283275475 was used because the local environment cannot resolve GitHub for git transport. The latest template main was rechecked as `cb908779682fa315ccd0f1eb58549f6c208f36f0`; no template pipeline replacement was made.
-
-- Node 22.16.0 on Linux: original 12 unit tests passed before edits. New tests failed before implementation. The updated full unit suite has **26 passing tests**.
-- Pure tests cover first-cycle boundaries, no fifth step, integer time, atomic rejection, unfinished video-end state, phase-count limit, reversible shared-boundary edits, note/name limits, 100-operation/byte-limited differences, schema/ID/reference/state validation, exact decimal entry, signed source modification timestamps, and a valid near-limit analysis whose actual exported file must fit the same 10 MiB budget.
-- Supplementary real Chromium rendering with Python Playwright: actual video input, four marks, shared-boundary edits, Undo/Redo, invalid move protection, literal HTML-like names, actual JSON download and filename, unfinished export, failed/cancelled replacement, video-end incomplete export, and Japanese/English layouts at 320/360/390/430/768/1360 px passed.
-- A 320×740 top-of-page primary-button check initially reproduced a button behind the bottom tabs. Compact loaded-video layout and nearby controls fixed it; the regression is in the browser tests.
-- Supplementary rendering injects a substituted source HTML into a page. It is **not** the canonical PowerShell build, direct-file startup or self-extracting validation. A test harness string-evaluation attempt hit the app's CSP; the harness was corrected to use locator assertions, without changing CSP.
-
-A simulated hidden/visible transition exposed a disabled resume control on return. Both transition directions now refresh the capture guards; the regression checks explicit seek-back and no autoplay. This simulation is not an actual phone background-switch test.
-
-## Canonical workflow
-
-The existing `Time Study Desk app tests` workflow runs Windows PowerShell syntax checks, the PowerShell repository/build verification, actual-source unit tests, and generated readable/self-extracting HTML tests through `file://` in Chromium. Its artifact contains the source snapshot, generated files, environment, HTML report and screenshots. These results are separate from supplementary Linux rendering and must be checked at the final code revision.
-
-The browser suite adds first-measurement, save, cancellation, incomplete-end and phone controls regressions. Existing source lifecycle, empty/corrupt/audio files, code injection, network API attempt/CSP, localization and layout tests remain enabled.
-
-## Scope and rulings
-
-T03–T04 implement v0.2.0, not later releases. Minimal close-incomplete/resume behavior is brought forward from T07 so a v0.2.0 export cannot silently invent completion at video end or on page return. Interruption, unobserved/not-performed handling and rich interval reassignment still belong to v0.4.0. Schema 1 and the supplied timing/aggregation rules are unchanged.
-
-The supplied specification and plan are incorporated as the design baseline. Their creation-time statements are historical; this document and the commit's CI/PR record report implementation status. README/security text now describes the app instead of the starter. Review is an in-session self-review, not an independent reviewer or user acceptance test.
-
-## Not verified / not implemented
-
-Android/iPhone real hardware, macOS Safari, Edge, Firefox, published HTTPS hosting, actual large videos and screen-reader user testing remain unverified. Phone-size emulation and numeric upper-limit tests do not prove those paths. Mandatory real-device checks remain gates for v1.0.0.
-
-Repeated cycles/procedure changes, exceptions, import/reconnection, autosave/conflicts, aggregate statistics and CSV are **not implemented in v0.2.0**. No release/tag, merge, or Browser Kitty site change is part of this milestone.
+Analysis import/original-video reconnection/autosave remain v0.5.0; aggregate statistics v0.6.0; CSV v0.7.0. Their interfaces or schema fields do not mean they are implemented. No merge, release/tag publication or Browser Kitty site modification is part of this milestone.
