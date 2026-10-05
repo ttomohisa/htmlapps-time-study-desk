@@ -1,6 +1,6 @@
 # Time Study Desk analysis JSON — schema 1
 
-The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.3.0 exporter; it does not imply the import UI exists.
+The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.4.0 exporter; it does not imply the import UI exists.
 
 ## Envelope
 
@@ -9,7 +9,7 @@ UTF-8 compact JSON, extension `.tsd.json`:
 ```text
 format: "time-study-desk"
 schemaVersion: 1
-appVersion: "0.3.0"
+appVersion: "0.4.0"
 projectId, createdAt, updatedAt, title, note
 source: { name, size, lastModified, durationUs, width, height }
 phases: []
@@ -36,7 +36,7 @@ Validation builds a fresh allow-listed JSON object. Commands commit only validat
 
 ## Export versus resume
 
-v0.3.0 supports manual export, including work in progress, but **cannot reopen a saved file**. Import, original-video comparison/reconnection and autosave remain v0.5.0 work. Keep the original video separately; its metadata in JSON does not prove identity. A future successful import must never autoplay or start recording automatically.
+v0.4.0 supports manual export, including work in progress, but **cannot reopen a saved file**. Import, original-video comparison/reconnection and autosave remain v0.5.0 work. Keep the original video separately; its metadata in JSON does not prove identity. A future successful import must never autoplay or start recording automatically.
 
 Save filenames are editable and sanitized, with `.tsd.json` fixed by the app. The success notice says the download was started, not that disk persistence was verified. No upload is performed.
 
@@ -47,3 +47,16 @@ New cycles copy a procedure's phase-ID order into new planned occurrences, retai
 Each observation has explicit start/end boundaries. Chronological numbers and between-cycle gaps are derived, not persisted, and gaps are not added to a cycle's duration. Overlapping observations and concurrent open cycles are rejected. Review selection never changes the recording target.
 
 Initial multiline names are one atomic creation operation. Display language and selected procedure are not part of history; Undo repairs a selected-procedure reference only if its target no longer exists. All existing schema-1 invariants and the v0.2.0 fixture are retained. Import remains a later milestone.
+
+
+## v0.4.0 exceptions and review
+
+No field or schema version changed. Span kinds are `phase`, `interruption` and `unobserved`; occurrence states are `pending`, `measured`, `not-performed` and `unobserved`. Interrupted work resumes the same occurrence. Partially observed work keeps its known phase spans, with `resolution: unobserved`, rather than claiming a full measured duration.
+
+Not-performed occurrences have no phase/unobserved spans and no invented zero-time boundary. Skipping the final occurrence keeps the cycle incomplete until explicit finish. When all occurrences are resolved but finish has not been confirmed, the existing schema-1 cursor can be neutral `{kind:"unobserved",occurrenceId:null,note:""}` at the last confirmed boundary. This cursor is not a timed span; it is not included in the breakdown and cannot be resumed as an inferred step.
+
+`closeIncomplete` records the observed continuation using its actual kind, including interruption/unobserved. Explicit state review can then resolve remaining occurrences and finish at the same final boundary. It does not add a zero-duration span. An unknown span may be unassigned (`occurrenceId: null`); affected occurrences still require their own explicit review.
+
+Split and merge retain the overall range. Reassignment that removes evidence does not guess a replacement state: a measured occurrence with no phase evidence, or one whose last unobserved evidence was reinterpreted, becomes pending. Completed cycles with unresolved occurrences become incomplete. Reviewing live assignments/states suspends that cycle; recording never continues invisibly.
+
+One-cycle extra/rework occurrences use `planned: false`; the procedure's planned phase sequence remains unchanged. Deleting a cycle preserves phase/procedure definitions. All of these changes are reversible using the existing bounded difference history. History is still not serialized.

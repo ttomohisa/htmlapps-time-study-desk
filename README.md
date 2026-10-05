@@ -4,7 +4,7 @@
 
 Measure repeated work cycles in one local video, edit their step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
 
-**v0.3.0 — development build.** Measure repeated cycles with shared step names and preserve earlier records when changing procedures. It can save `.tsd.json`, but **cannot reopen those files yet**. Interruption/missing-observation editing, analysis import, autosave, statistics and CSV are later milestones. It is not a v1.0 release.
+**v0.4.0 — development build.** Measure repeated cycles with shared step names and preserve earlier records when changing procedures. It can save `.tsd.json`, but **cannot reopen those files yet**. Analysis import, autosave, statistics and CSV are later milestones. It is not a v1.0 release.
 
 ## Screenshot
 
@@ -16,6 +16,10 @@ The app tests capture the actual Japanese, English and phone-width UI in `test-r
 - Mark the first cycle with temporary step names, or enter known names on separate lines before measuring. Start each later cycle explicitly with the chosen procedure. The main action becomes Finish on the final step; the app never starts the next cycle automatically.
 - Keep a chronological cycle list with per-cycle durations and separate gaps. Select any earlier cycle for review without redirecting current recording into it.
 - Rename shared steps across all cycles. Changing the step order or start/end conditions creates a new procedure; earlier cycles keep the old procedure. Registered steps can be classified or removed from new choices without deleting earlier observations.
+- Record interruptions and unobserved intervals separately. Returning from an interruption continues the same step occurrence; partially observed steps keep their known portions without pretending to be fully measured.
+- Mark a step **Not performed** only when it has no recorded work or unobserved time. This is a state, not a zero-second measurement. Skipping the last step does not automatically complete the cycle.
+- Split intervals, merge adjacent intervals, change assignments and add a one-cycle extra step or rework occurrence. Total time is conserved; different assignments/notes require confirmation before merging. Earlier procedures remain unchanged.
+- Resolve an incomplete step explicitly in Review, then finish at the last confirmed boundary. Removing a step's recorded evidence makes it pending, not silently not-performed. Delete a cycle with Undo; original video and step definitions remain.
 - Shared boundary editing by entering seconds, using the current video position or moving a slider. Adjacent durations change together. Invalid or non-increasing boundaries are rejected without changing the analysis.
 - Rename steps and edit analysis, cycle, occurrence and interval notes. Undo/Redo retains up to 100 operations or 16 MiB of differences, whichever is reached first.
 - Manually save versioned analysis JSON, including unfinished records and the last confirmed boundary. The video is not included. Failed or cancelled video replacement preserves the previous analysis.
@@ -30,6 +34,14 @@ The filename is editable; the extension is fixed. A “Download started” messa
 At the video end the recording cycle becomes **Incomplete**, never automatically Complete, even when an older cycle is selected for review. Undo to correct the boundary and finish explicitly, or save the unfinished record. Returning from a hidden page requires an explicit resume from the last confirmed boundary; it does not invent a timed interruption.
 
 An incomplete repeated cycle can be left as-is while preparing the next cycle; it remains in the saved analysis. Resuming an earlier incomplete cycle is disabled while another cycle is open. A new cycle or boundary edit cannot overlap an existing observation.
+
+### Exceptions and review
+
+During measurement, expand **More recording options** to mark an interruption, an unobserved interval or a step not performed. End an interruption/unobserved interval with **Resume step**. The recording menu is not the player's pause control.
+
+In **Review**, expand **Split, merge and assign intervals**. Choose the interval and its assignment before applying a change. A split uses a video time strictly inside that interval. A merge keeps the selected assignment and note; confirm when that changes the adjoining record. Split first, add an extra occurrence, then assign the relevant span when recording one-cycle rework.
+
+Each step's **Review occurrence state** control lets you confirm measured, not performed or unobserved, or leave it unresolved. Invalid combinations (such as measured with an unobserved span) are rejected. Editing live assignments suspends that cycle. Once every step is resolved and a positive interval exists, **Mark this cycle complete** explicitly completes it without inventing extra time.
 
 ## Privacy and limits
 
@@ -80,7 +92,7 @@ Unit tests extract the real `TSD:CORE` block, not a copy of its implementation. 
 
 ## Save format and project status
 
-[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected by the validator rather than silently discarded. Import UI is not implemented in v0.3.0.
+[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected by the validator rather than silently discarded. Import UI is not implemented in v0.4.0.
 
 This work does not publish a release, merge the PR, or add the app to the Browser Kitty site. The user merges the PR.
 

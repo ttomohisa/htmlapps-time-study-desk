@@ -4,7 +4,8 @@ Time Study Desk / Video work analysis
 Read README.md or README.ja.md for the current development scope.
 Read AGENTS.md, APP_SPEC.md, and the plan under docs/superpowers/plans/ before editing.
 
-v0.3.0 measures repeated cycles, preserves procedure changes, and exports analysis JSON.
+v0.4.0 records interruptions/missing observations and supports reversible interval editing.
+Repeated cycles, preserved procedures and manual analysis JSON export are retained.
 It does not import saved analyses, calculate statistics, or autosave yet.
 
 Edit src/index.template.html, not generated HTML.
