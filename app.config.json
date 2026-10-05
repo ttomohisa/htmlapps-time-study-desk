@@ -1,26 +1,17 @@
 {
   "$schema": "./schemas/app-config.schema.json",
-  "name": "Single HTML App Starter",
-  "nameJa": "単一HTMLアプリ スターター",
-  "slug": "single-html-app-starter",
-  "version": "1.3.0",
-  "description": "A reusable starter for privacy-friendly, fully self-contained browser apps.",
-  "descriptionJa": "プライバシーに配慮した完全内包型ブラウザーアプリの再利用テンプレートです。",
+  "name": "Time Study Desk",
+  "nameJa": "動画作業分析",
+  "slug": "time-study-desk",
+  "version": "0.1.0",
+  "description": "Review a local work video. Development foundation for step-by-step time studies.",
+  "descriptionJa": "作業動画を端末内で確認する、工程別の時間分析に向けた開発版です。",
   "defaultLanguage": "auto",
-  "repository": {
-    "owner": "OWNER",
-    "name": "single-html-app-template"
-  },
+  "repository": { "owner": "ttomohisa", "name": "htmlapps-time-study-desk" },
   "build": {
     "output": "dist/index.html",
     "blockRuntimeNetwork": true,
-    "selfExtract": {
-      "enabled": true,
-      "output": "dist/index.self-extract.html"
-    },
-    "sizeBudget": {
-      "readableWarningMb": 25,
-      "selfExtractWarningMb": 12
-    }
+    "selfExtract": { "enabled": true, "output": "dist/index.self-extract.html" },
+    "sizeBudget": { "readableWarningMb": 2, "selfExtractWarningMb": 1 }
   }
 }
