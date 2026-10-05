@@ -1,4 +1,35 @@
-# QA results — v0.2.0 First Measurement
+# QA results — v0.3.0 Repeat / Procedure
+
+## Current milestone — 2026-10-05
+
+Scope: T05–T06. The user merged PR #1; live GitHub main was checked as `379afb5cd4a22157a69082deb407669bfb905e80`, tree `22926b86a13bd0bc7c77738300305c8eb506e900`. The entire extracted source snapshot was re-indexed with Git and its tree matched that main tree exactly. Work takes place in a separate disposable feature-branch checkout. Git transport cannot resolve github.com in the local environment; connector writes are used for the new PR.
+
+### Local verification
+
+- Node 22.16.0 / Linux: baseline **26 unit tests passed**; T05 tests first failed at the old first-cycle-only guard, T06 tests at unsupported commands/missing helper. Current full suite: **38 tests passed**, zero skipped.
+- Actual Chromium with Python Playwright, supplemental in-memory HTML rendering: three cycles, separate gaps, boundary edits, Undo/Redo, actual JSON downloads, historical procedure/condition preservation, shared phase renaming, predefined names and draft cancellation passed.
+- Reviewed cycle and recording cycle remain separate: playing to the video end while reviewing an earlier record leaves the earlier record complete and closes only the recording cycle as incomplete.
+- A successful video replacement originally left an old procedure draft open. The failing regression was reproduced; successful replacement now retires that draft. Cancelled replacement preserves the draft and analysis.
+- At 320×740 a maximum-length current phase name originally pushed the primary action below navigation. A failing geometric regression was reproduced; the compact measurement label now keeps the primary control above the tabs. Its complete text remains in the title/accessibility text and the editable review fields.
+- Japanese/English at 320/360/390/430/768/1360 px, long conditions and scrollable procedure dialogs were checked. Phone primary controls were geometrically checked above the bottom tabs.
+- Repeated measurement, procedure editing and JSON download: zero observed HTTP requests, network API attempts, CSP violations or page errors in the supplemental test. Canonical tests cover both generated variants in CI.
+
+Supplemental rendering substitutes the source placeholders and uses `page.setContent`; it is **not the canonical PowerShell build, direct-file navigation or self-extraction evidence**. The local browser policy blocks file navigation and local PowerShell is unavailable. The existing Windows workflow must be checked at the final revision; its result and artifact IDs are recorded in the new PR rather than inferred from this file.
+
+### Design rulings / review
+
+The approved specification and schema 1 are unchanged. `changeProcedure` accepts a null base only for the first predefined procedure before any observations; multiline phase creation plus that first procedure form one atomic Undo operation. Structural Undo does not include display settings and repairs a selected-procedure reference only when its target disappeared. Classification/archive changes do not delete historical phase definitions or observations.
+
+No subagent/independent reviewer is available in this session; review is a source self-review plus automated/supplemental tests. The canonical old tests are retained; the current app-version expectation changes to 0.3.0 while the original v0.2.0 JSON fixture stays unchanged.
+
+### Remaining gates
+
+Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS interaction, real large media, screen readers and release-scale performance remain unverified. Interruptions, not-performed/unobserved editing, split/merge, JSON import/reconnection, autosave, aggregate statistics and CSV remain later milestones. No merge, tag/release publication or Browser Kitty site change is performed.
+
+---
+
+## Historical v0.2.0 evidence
+
 
 This records the local implementation check on 2026-10-05. The associated GitHub Actions run and Draft PR #1 carry the current commit's Windows build/browser evidence; do not infer a new HEAD's CI state from this static file.
 

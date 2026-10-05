@@ -106,7 +106,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 .measurement { background:#f3f8f5; }
 .section-heading { display:flex; gap:8px; justify-content:space-between; align-items:baseline; flex-wrap:wrap; margin-bottom:12px; }
 .section-heading h2 { font-size:15px; margin:0; }
-.current-step { color:var(--accent); overflow-wrap:anywhere; }
+.current-step { color:var(--accent); display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .measure-actions,.review-actions,.history-actions { display:flex; gap:8px; flex-wrap:wrap; }
 .measure-actions .button { flex:1; } .review-actions .button { flex:1; min-height:44px; font-size:12px; padding:8px; }
 .text-button { border:0; background:transparent; color:var(--accent); min-height:44px; padding:6px 0; text-align:left; font-size:12px; }
@@ -162,14 +162,48 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
  .workspace-switch { display:none; }
 }
 @media(max-height:500px) { .has-source #videoHost video { height:30dvh; min-height:80px; } }
+
+/* Repeated-cycle review and immutable procedure editing. */
+.measure-context { margin:4px 0 10px; color:var(--muted); font-size:12px; }
+.measure-context span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cycle-row { width:100%; min-width:0; text-align:left; padding:10px; min-height:54px; margin:4px 0; border:1px solid var(--line); background:var(--surface); border-radius:9px; }
+.cycle-row[aria-current="true"] { border-color:var(--accent); background:var(--accent-soft); }
+.cycle-row strong,.cycle-row span { display:block; overflow-wrap:anywhere; }
+.cycle-row span,.gap-note { font-size:12px; color:var(--muted); }
+.gap-note { margin:7px 0 4px; }
+#cycleList { max-height:340px; overflow:auto; overscroll-behavior:contain; }
+#cycleSelect { width:100%; }
+#procedureDialog { width:min(680px,calc(100% - 24px)); }
+.procedure-order-row { display:flex; gap:6px; align-items:center; border-bottom:1px solid var(--line); padding:7px 0; }
+.procedure-order-label { flex:1; min-width:0; overflow-wrap:anywhere; font-size:13px; }
+.procedure-order-row .icon-button { flex:none; }
+.procedure-add { display:flex; gap:8px; align-items:end; margin:12px 0; }
+.procedure-add .field { flex:1; margin:0; }
+.procedure-conditions { white-space:pre-wrap; overflow-wrap:anywhere; }
+.procedure-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+.procedure-buttons .button { flex:1; font-size:12px; }
+.phase-library-row { border-bottom:1px solid var(--line); padding:10px 0; }
+.phase-options { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; margin-top:6px; }
+.phase-options label { display:flex; align-items:center; gap:6px; min-height:44px; }
+.phase-options input[type=checkbox] { width:20px; height:20px; }
+.dialog-footer { padding:12px 18px calc(12px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); display:flex; gap:8px; flex:none; }
+.dialog-footer .button { flex:1; }
+@media(max-width:600px) {
+ .has-source #videoHost video { height:min(22dvh,190px); min-height:90px; }
+ .measure-context { margin:3px 0 7px; font-size:11px; }
+ .measurement .section-heading { margin-bottom:5px; }
+ #procedureDialog { max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+ .procedure-order-row { gap:3px; } .procedure-order-row .icon-button { min-width:44px; }
+ .dialog-footer { padding-inline:10px; } .dialog-footer .button { padding:8px; font-size:12px; }
+}
 </style>
 </head>
 <body data-current-page="measure">
-<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.2.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.3.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
 <main class="main">
 <section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">動画作業分析</h1><p data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">動画をアップロードしません</span></div></section>
 <!-- APP:BEGIN Time Study Desk First Measurement -->
-<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 動画再生基盤</span><span data-i18n="versionLimit">この版では工程の計測・集計・分析保存はまだ利用できません。</span></div>
+<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 反復計測・手順管理</span><span data-i18n="versionLimit">複数回の計測・手順の変更・分析保存ができます。再読込は後続版です。</span></div>
 <div id="errorMessage" class="notice error" role="alert" hidden></div>
 <div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
 <div id="backgroundNotice" class="notice" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
@@ -177,12 +211,14 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 <div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
 <details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
   <div class="section-heading"><h2 id="measureTitle" data-i18n="measureTitle">最初の一回を計測</h2><strong id="currentStep" class="current-step"></strong></div>
-  <div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
+  <p class="measure-context"><span id="measureProcedure"></span><span id="nextStep"></span></p><div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
+  <button id="predefineButton" class="text-button" type="button" data-i18n="predefine" disabled>工程名を先に入力</button><button id="prepareNextCycleButton" class="text-button" type="button" data-i18n="leaveIncomplete" hidden>未完了のまま次の回へ</button>
   <div class="history-actions" id="measureHistory" hidden><button class="button" id="undoMeasureButton" type="button" data-i18n="undo" disabled>取り消す</button><button class="button" id="redoMeasureButton" type="button" data-i18n="redo" disabled>やり直す</button></div>
   <p id="measurementHint" class="small-note"></p><button id="closeIncompleteButton" type="button" class="text-button" data-i18n="closeIncomplete" hidden>この位置まで記録して中断</button>
 </div>
 <div class="review-editor app-mobile-page" data-screen="review" id="reviewPanel" aria-labelledby="reviewTitle">
   <div class="section-heading"><h2 id="reviewTitle" data-i18n="reviewTitle">区切りを見直す</h2><span class="small-note" id="reviewCycleStatus"></span></div>
+  <label class="field" id="cycleSelectField" hidden><span data-i18n="reviewCycle">見直す回</span><select id="cycleSelect"></select></label><button id="resumeSelectedButton" class="text-button" type="button" data-i18n="resumeSelected" hidden>この未完了の回を再開</button>
   <p id="reviewEmpty" class="small-note" data-i18n="reviewEmpty">計測を始めると、ここで境界を修正できます。</p>
   <div id="boundaryEditor" hidden>
     <label class="field"><span data-i18n="selectedBoundary">修正する境界</span><select id="boundarySelect"></select></label>
@@ -197,12 +233,16 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 </section>
 <aside class="side-column">
 <section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><div class="history-actions"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
+<section class="side-card app-mobile-page" data-screen="results" id="cyclesCard"><h2 data-i18n="cyclesTitle">記録した回</h2><p class="small-note" data-i18n="gapHint">回と回の間は、どの回の作業時間にも含めません。</p><div id="cycleList"></div>
+<label class="field"><span data-i18n="nextProcedure">次の回に使う手順</span><select id="procedureSelect" disabled></select></label><p id="procedureConditions" class="small-note procedure-conditions"></p>
+<div class="procedure-buttons"><button id="editProcedureButton" class="button" type="button" data-i18n="editProcedure" disabled>工程順・条件を変更</button></div>
+<details id="phaseLibraryDetails" class="notes-details"><summary data-i18n="managePhases">工程名・分類の管理</summary><div style="padding:0 10px 12px"><p class="small-note" data-i18n="renameAllHint">工程名の訂正は、その工程を使う全回へ反映します。</p><label class="field"><span data-i18n="procedureLabel">選択手順の表示名</span><input id="procedureRename" type="text" disabled></label><div id="phaseLibrary"></div><label class="field"><span data-i18n="newPhaseLabel">新しい工程名</span><input id="newPhaseName" type="text" disabled></label><button id="createPhaseButton" class="button" type="button" data-i18n="createPhase" disabled>工程を登録</button><p class="small-note" data-i18n="createPhaseHint">登録だけでは手順は変わりません。「工程順・条件を変更」で手順に追加します。</p></div></details></section>
 <section class="side-card app-mobile-page" data-screen="results" id="analysisCard"><h2 data-i18n="analysisTitle">分析データ</h2>
 <label class="field"><span data-i18n="projectTitle">分析タイトル（任意）</span><input id="projectTitle" type="text" autocomplete="off"></label>
 <details class="notes-details"><summary data-i18n="notesTitle">分析・今回のメモ</summary><label class="field"><span data-i18n="projectNote">分析メモ</span><textarea id="projectNote" rows="3"></textarea></label><label class="field"><span data-i18n="cycleNote">今回のメモ</span><textarea id="cycleNote" rows="2" disabled></textarea></label></details>
 <label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label>
 <p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存はありません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
-<button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：同じ工程を繰り返し計測</strong><span data-i18n="nextStageBody">v0.3.0で複数回の計測を追加します。集計・CSV出力は後続版です。</span></p></section>
+<button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：中断・未観測と区間編集</strong><span data-i18n="nextStageBody">v0.4.0で中断・実施なし・未観測、区間の分割や結合を追加予定です。</span></p></section>
 <section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><button id="replaceVideoButton" type="button" class="button" style="margin-top:16px" data-i18n="replaceVideo">別の動画を選択</button></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
 <input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
 <!-- APP:END -->
@@ -220,6 +260,12 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 <h3 data-i18n="helpBasicsTitle"></h3><p data-i18n="helpBasicsBody"></p><h3 data-i18n="helpControlsTitle"></h3><p data-i18n="helpControlsBody"></p><h3 data-i18n="helpPrivacyTitle"></h3><p data-i18n="helpPrivacyBody"></p><h3 data-i18n="helpLimitsTitle"></h3><p data-i18n="helpLimitsBody"></p><h3 data-i18n="helpRecoveryTitle"></h3><p data-i18n="helpRecoveryBody"></p><p class="dialog-note" data-i18n="helpOffline"></p>
 <!-- APP:HELP:END -->
 </div></dialog>
+<dialog id="procedureDialog" aria-labelledby="procedureDialogTitle"><div class="dialog-header"><h2 id="procedureDialogTitle" data-i18n="procedureDialogTitle">次の回の手順</h2><button id="closeProcedureButton" type="button" class="icon-button" data-i18n-aria-label="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-body">
+<p class="dialog-note" data-i18n="procedureChangeHint">保存すると別の手順を作ります。過去の回の工程順・条件は変わりません。</p><label class="field"><span data-i18n="procedureLabel">手順の名前</span><input id="procedureDraftName" type="text" autocomplete="off"></label>
+<div id="presetNamesPanel"><label class="field"><span data-i18n="presetNames">工程名を一行ずつ入力</span><textarea id="presetNames" rows="5"></textarea></label></div>
+<div id="procedureOrderPanel"><h3 data-i18n="phaseOrder">工程の順番</h3><div id="procedureOrder"></div><div class="procedure-add"><label class="field"><span data-i18n="addPhase">追加する工程</span><select id="addPhaseSelect"></select></label><button id="addPhaseButton" class="button" type="button" data-i18n="add">追加</button></div></div>
+<label class="field"><span data-i18n="startCondition">開始の判定条件（任意）</span><textarea id="startCondition" rows="2"></textarea></label><label class="field"><span data-i18n="endCondition">終了の判定条件（任意）</span><textarea id="endCondition" rows="2"></textarea></label><p class="small-note" data-i18n="conditionHint">同じ判定条件で各回の開始・終了を記録してください。</p><p id="procedureError" role="alert" class="field-error" hidden></p>
+</div><div class="dialog-footer"><button id="cancelProcedureButton" type="button" class="button" data-i18n="cancel">キャンセル</button><button id="saveProcedureButton" type="button" class="button primary" data-i18n="saveProcedure">新しい手順として保存</button></div></dialog>
 <script>
 (() => {
   'use strict';
@@ -270,13 +316,13 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   // I18N
   const translations = {
     ja: {
-      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 最初の一回", versionLimit:"一回の計測・修正・分析保存ができます。再読込は後続版です。",
+      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 反復計測・手順管理", versionLimit:"複数回の計測・手順の変更・分析保存ができます。再読込は後続版です。",
       playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
-      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:"この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。", savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存はありません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：同じ工程を繰り返し計測", nextStageBody:"v0.3.0で複数回の計測を追加します。統計・CSV出力は後続版です。",
+      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:"この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。", savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存はありません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：中断・未観測と区間編集", nextStageBody:"中断・実施なし・未観測、区間の分割や結合はv0.4.0で追加予定です。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
       confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
-      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.2.0では一回の作業を計測できます。開始位置で「ここから開始」、工程が変わる位置で「ここで区切る」、最後に「この回を終了」を押します。工程名は後から変えられます。複数回の計測、統計、分析の再読込、CSV、自動保存はまだありません。",
+      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.3.0では同じ手順で複数回を計測できます。初回は「ここから開始」→「ここで区切る」→「この回を終了」。次回は開始位置を選んで明示的に開始し、最後の工程では主ボタンが終了に変わります。回間時間は別表示です。工程名の訂正は全回へ反映され、順番・開始終了条件の変更は別の手順を作ります。統計、分析の再読込、CSV、自動保存はまだありません。",
       helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。",
       helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動でJSON保存し、動画は含めません。ブラウザ内へ自動保存するのは言語設定だけです。ページを閉じると未保存の分析を失います。元動画は変更・削除しません。",
       helpLimitsTitle:'形式・時間・精度', helpLimitsBody:'8 GiB以下、長さが正の有限値で24時間以下、映像とシーク可能な位置を持つ動画が対象です。拡張子だけで再生対応を保証しません。音声のみ、破損、未対応コーデックは扱えません。通常速度で撮影された動画を前提とし、スロー撮影・タイムラプス・編集で変更した速度から実時間を復元しません。動画内時刻はブラウザの精度に依存し、フレーム単位の精度は保証しません。',
@@ -286,7 +332,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       tabMeasure:"計測",
       tabReview:"見直す",
       tabResults:"結果",
-      measureTitle:"最初の一回を計測",
+      measureTitle:"作業を計測",
       startCycle:"ここから開始",
       markBoundary:"ここで区切る",
       finishCycle:"この回を終了",
@@ -306,7 +352,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       recordTitle:"今回の記録",
       undo:"取り消す",
       redo:"やり直す",
-      renameHint:"工程名は後から変更できます。名前の変更も取り消せます。",
+      renameHint:"工程名の訂正は全回へ反映します。取り消しもできます。",
       projectTitle:"分析タイトル（任意）",
       notesTitle:"分析・今回のメモ",
       projectNote:"分析メモ",
@@ -322,7 +368,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       incompleteRecord:"未完了",
       firstHint:"開始位置へ移動して「ここから開始」を押してください。",
       markHint:"工程が変わる位置で区切ります。最後は「この回を終了」。",
-      completeHint:"計測が終わりました。工程名・境界を見直し、分析データを保存できます。",
+      completeHint:"この回は終了しました。見直すか、計測画面で次の回を始められます。",
       incompleteHint:"終了は未確定です。続きから再開するか、取り消して境界を修正してください。",
       suspendedHint:"最後の確定境界から再開して、未確定の続きを見直してください。",
       recordedOnly:"表示は確定した区間の合計です。未確定の続きは含みません。",
@@ -342,21 +388,73 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       UNRESOLVED:"未確定の工程があります。取り消して境界を修正するか、未完了として保存してください。",
       FIRST_CYCLE_ONLY:"この版で計測できるのは最初の一回です。",
       PHASE_LIMIT:"工程は50個までです。この回を終了するか、前の区切りを取り消してください。",
-      TEXT_LIMIT:"文字数が上限を超えています。工程名80、タイトル160、区間・回のメモ1000、分析メモ4000文字以内にしてください。",
+      TEXT_LIMIT:"文字数が上限を超えています。工程・手順名80、タイトル160、条件・区間・回のメモ1000、分析メモ4000文字以内にしてください。",
       SAVE_LIMIT:"分析データの保存上限を超えるため、変更しませんでした。現在の記録を保存してください。",
       HISTORY_CONFLICT:"取り消し対象と現在のデータが一致しません。記録は変更していません。",
       HISTORY_EMPTY:"取り消す操作がありません。",
       UNKNOWN_COMMAND:"この操作はまだ利用できません。",
-      END_REQUIRED:"最後の工程は「この回を終了」で確定してください。"
+      END_REQUIRED:"最後の工程は「この回を終了」で確定してください。",
+      nextCycle:"次の回をここから開始",
+      predefine:"工程名を先に入力",
+      leaveIncomplete:"未完了のまま次の回へ",
+      reviewCycle:"見直す回",
+      resumeSelected:"この未完了の回を再開",
+      cyclesTitle:"記録した回",
+      gapHint:"回と回の間は、どの回の作業時間にも含めません。",
+      nextProcedure:"次の回に使う手順",
+      editProcedure:"工程順・条件を変更",
+      managePhases:"工程名・分類の管理",
+      renameAllHint:"工程名の訂正は、その工程を使う全回へ反映します。",
+      procedureLabel:"手順の名前",
+      newPhaseLabel:"新しい工程名",
+      createPhase:"工程を登録",
+      createPhaseHint:"登録だけでは手順は変わりません。「工程順・条件を変更」で手順に追加します。",
+      procedureDialogTitle:"次の回の手順",
+      procedureChangeHint:"保存すると別の手順を作ります。過去の回の工程順・条件は変わりません。",
+      presetNames:"工程名を一行ずつ入力",
+      phaseOrder:"工程の順番",
+      addPhase:"追加する工程",
+      add:"追加",
+      startCondition:"開始の判定条件（任意）",
+      endCondition:"終了の判定条件（任意）",
+      conditionHint:"同じ判定条件で各回の開始・終了を記録してください。",
+      saveProcedure:"新しい手順として保存",
+      nextBoundary:"ここで次の工程へ",
+      cycleN:"{n}回目",
+      measureN:"{n}回目を計測",
+      nextStepName:"次：{name}",
+      lastStep:"最後の工程です",
+      firstProcedure:"初回の工程を作成中",
+      procedureN:"手順{n}",
+      procedureShort:"{name} · {n}工程",
+      gapBefore:"前の回との間：{time}",
+      emptyCycles:"まだ記録がありません。動画の開始位置で計測を始めてください。",
+      moveUp:"上へ",
+      moveDown:"下へ",
+      remove:"外す",
+      operation:"通常の作業",
+      plannedWait:"通常の待ち",
+      archived:"新規選択から外す",
+      noCondition:"開始・終了条件は未入力です。各回で同じ条件を使ってください。",
+      startConditionValue:"開始：{value}",
+      endConditionValue:"終了：{value}",
+      repeatHint:"次の工程へ進み、最後の工程でこの回を終了します。",
+      readyNextHint:"開始位置を確認して、次の回を明示的に開始してください。",
+      CYCLE_OVERLAP:"他の回の記録と重なる位置には記録できません。位置を見直してください。",
+      OPEN_CYCLE:"計測中の回を終了するか、未完了として中断してください。",
+      CYCLE_LIMIT:"観測回は1,000回までです。現在の分析を保存してください。",
+      PROCEDURE_LIMIT:"手順は20個までです。現在の分析を保存してください。",
+      INVALID_PROCEDURE:"有効な工程を1〜50個選んでください。新規選択から外した工程は追加できません。",
+      STALE_EDIT:"編集中に分析が変更されました。閉じてから手順を開き直してください。"
     },
     en: {
-      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · First measurement", versionLimit:"Measure, edit and save one cycle. Import is planned for a later version.",
+      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · Repeat & procedures", versionLimit:"Measure repeated cycles, change procedures and save analysis. Import follows later.",
       playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
-      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:"This version cannot reopen saved analysis files. Import and resume are planned for v0.5.0.", savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. There is no autosave.", saveAnalysis:'Save analysis', nextStage:"Next stage: repeat the same steps", nextStageBody:"Multiple cycles are planned for v0.3.0. Statistics and CSV follow in later versions.",
+      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:"This version cannot reopen saved analysis files. Import and resume are planned for v0.5.0.", savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. There is no autosave.", saveAnalysis:'Save analysis', nextStage:"Next stage: exceptions and interval editing", nextStageBody:"Interruptions, steps not performed, missing observations and interval split/merge are planned for v0.4.0.",
       buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
       confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
-      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.2.0 measures one work cycle. Choose its starting position and select Start cycle here. Mark a boundary at each step change, then Finish cycle here. Name the steps afterwards. Repeated cycles, statistics, analysis import, CSV and autosave are not available yet.",
+      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.3.0 measures repeated cycles with the same procedure. Mark the first cycle, then explicitly start each later cycle. The main button changes to Finish for the last step. Time between cycles is shown separately. Renaming steps applies to all cycles; changing order or start/end conditions creates a separate procedure and preserves earlier records. Statistics, analysis import, CSV and autosave are not available yet.",
       helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping.",
       helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Manually save analysis as JSON; it does not include video. Only the language setting is automatically persisted. Closing this page loses unsaved analysis. Original videos are never modified or deleted.",
       helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
@@ -366,7 +464,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       tabMeasure:"Measure",
       tabReview:"Review",
       tabResults:"Results",
-      measureTitle:"Measure the first cycle",
+      measureTitle:"Measure work",
       startCycle:"Start cycle here",
       markBoundary:"Mark boundary",
       finishCycle:"Finish cycle here",
@@ -386,7 +484,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       recordTitle:"This cycle",
       undo:"Undo",
       redo:"Redo",
-      renameHint:"Rename steps after measuring. Renaming can also be undone.",
+      renameHint:"Renaming a step applies to all cycles. You can undo it.",
       projectTitle:"Analysis title (optional)",
       notesTitle:"Analysis and cycle notes",
       projectNote:"Analysis note",
@@ -402,7 +500,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       incompleteRecord:"Incomplete",
       firstHint:"Seek to the starting position and select Start cycle here.",
       markHint:"Mark each step change. For the final step, select Finish cycle here.",
-      completeHint:"Cycle finished. Review the names and boundaries, then save your analysis.",
+      completeHint:"This cycle is finished. Review it, or start the next one from Measure.",
       incompleteHint:"The end is not confirmed. Resume or undo to correct the boundaries.",
       suspendedHint:"Resume from the last confirmed boundary to review the unfinished part.",
       recordedOnly:"Only confirmed spans are totaled. The unfinished continuation is not included.",
@@ -422,12 +520,64 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       UNRESOLVED:"A step is still unresolved. Undo to correct the boundaries, or save as incomplete.",
       FIRST_CYCLE_ONLY:"This version measures only the first cycle.",
       PHASE_LIMIT:"Up to 50 steps are supported. Finish this cycle or undo a boundary.",
-      TEXT_LIMIT:"Text is too long. Limits: step name 80, title 160, span/cycle note 1000, analysis note 4000 characters.",
+      TEXT_LIMIT:"Text is too long. Limits: step/procedure name 80, title 160, conditions/span/cycle notes 1000, analysis note 4000 characters.",
       SAVE_LIMIT:"This change would exceed the analysis save limit. Save your existing records.",
       HISTORY_CONFLICT:"The current data does not match the history entry. Nothing was changed.",
       HISTORY_EMPTY:"There is no operation to undo.",
       UNKNOWN_COMMAND:"This operation is not available yet.",
-      END_REQUIRED:"Use Finish cycle here for the last step."
+      END_REQUIRED:"Use Finish cycle here for the last step.",
+      nextCycle:"Start next cycle here",
+      predefine:"Enter step names first",
+      leaveIncomplete:"Leave incomplete and prepare next cycle",
+      reviewCycle:"Cycle to review",
+      resumeSelected:"Resume this incomplete cycle",
+      cyclesTitle:"Recorded cycles",
+      gapHint:"Time between cycles is not added to either cycle's work time.",
+      nextProcedure:"Procedure for the next cycle",
+      editProcedure:"Change order / conditions",
+      managePhases:"Manage step names and types",
+      renameAllHint:"Correcting a step name updates every cycle that uses that step.",
+      procedureLabel:"Procedure name",
+      newPhaseLabel:"New step name",
+      createPhase:"Register step",
+      createPhaseHint:"Registration does not change a procedure. Use Change order / conditions to add the step.",
+      procedureDialogTitle:"Procedure for the next cycle",
+      procedureChangeHint:"Saving creates a separate procedure. Previous cycles keep their original order and conditions.",
+      presetNames:"Enter one step name per line",
+      phaseOrder:"Step order",
+      addPhase:"Step to add",
+      add:"Add",
+      startCondition:"Start condition (optional)",
+      endCondition:"End condition (optional)",
+      conditionHint:"Use the same start and end conditions for every cycle.",
+      saveProcedure:"Save as new procedure",
+      nextBoundary:"Next step here",
+      cycleN:"Cycle {n}",
+      measureN:"Measure cycle {n}",
+      nextStepName:"Next: {name}",
+      lastStep:"Final step",
+      firstProcedure:"Defining the first procedure",
+      procedureN:"Procedure {n}",
+      procedureShort:"{name} · {n} steps",
+      gapBefore:"Gap before this cycle: {time}",
+      emptyCycles:"No cycles recorded yet. Seek to the starting position and begin measuring.",
+      moveUp:"Move up",
+      moveDown:"Move down",
+      remove:"Remove",
+      operation:"Operation",
+      plannedWait:"Planned wait",
+      archived:"Hide from new selections",
+      noCondition:"No conditions entered. Use the same start and end conditions for every cycle.",
+      startConditionValue:"Start: {value}",
+      endConditionValue:"End: {value}",
+      repeatHint:"Move to the next step, then finish the cycle at the final step.",
+      readyNextHint:"Check the starting position, then explicitly start the next cycle.",
+      CYCLE_OVERLAP:"This position overlaps another recorded cycle. Review the position.",
+      OPEN_CYCLE:"Finish or suspend the current cycle before starting another.",
+      CYCLE_LIMIT:"Up to 1,000 cycles are supported. Save your existing analysis.",
+      PROCEDURE_LIMIT:"Up to 20 procedures are supported. Save your existing analysis.",
+      INVALID_PROCEDURE:"Choose 1–50 valid steps. Archived steps cannot be newly added.",
+      STALE_EDIT:"The analysis changed while this editor was open. Close and reopen the procedure editor."
     }
   };
   const $ = selector => document.querySelector(selector);
@@ -608,7 +758,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
           }
         }
         assert(openCount <= 1 && spanCount <= 10000 && freeCount <= 1);
-        ranges.sort((a,b) => a[0]-b[0]); for (let i=1;i<ranges.length;i++) assert(ranges[i][0] >= ranges[i-1][1]);
+        ranges.sort((a,b) => a[0]-b[0]); for (let i=1;i<ranges.length;i++) assert(ranges[i][0] >= ranges[i-1][1] && ranges[i][0] !== ranges[i-1][0],'CYCLE_OVERLAP');
         path = '$.settings'; fields(value.settings,'language selectedProcedureId outputBaseName');
         assert(['ja','en'].includes(value.settings.language) && (value.settings.selectedProcedureId === null || procedures.has(value.settings.selectedProcedureId)) && text(value.settings.outputBaseName,180,true));
         // Every field has been allow-listed. Reconstruct the JSON object, never retain a caller's object.
@@ -617,12 +767,12 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     function createProject(source,context) {
       const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
-      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.2.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.3.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
       assert(validateProject(project).ok); return project;
     }
     // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
     function diff(before,after,path=[],patch=[]) {
-      if (JSON.stringify(before) === JSON.stringify(after)) return patch;
+      if (path[0] === 'settings' || JSON.stringify(before) === JSON.stringify(after)) return patch;
       if (Array.isArray(before) && Array.isArray(after)) {
         const shared = Math.min(before.length,after.length);
         for (let i=0;i<shared;i++) diff(before[i],after[i],path.concat(i),patch);
@@ -646,6 +796,8 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
             assert(JSON.stringify(target[key]) === JSON.stringify(expected),'HISTORY_CONFLICT'); target[key] = clone(replacement);
           }
         }
+        // Display selection is not an undoable edit; repair a reference only if its target disappeared.
+        if (!next.procedures.some(p => p.id === next.settings.selectedProcedureId)) next.settings.selectedProcedureId = next.procedures.at(-1)?.id || null;
         assert(validateProject(next).ok); return {ok:true,project:next};
       } catch (error) { return fail(error.code || 'HISTORY_CONFLICT'); }
     }
@@ -665,7 +817,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     function applyCommand(project,command,context) {
       try {
-        const supported = ['startCycle','markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','renamePhase','updateProjectMeta','editNote'];
+        const supported = ['startCycle','markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','renamePhase','updateProjectMeta','editNote','createPhase','updatePhaseMeta','renameProcedure','changeProcedure'];
         assert(command && supported.includes(command.type),'UNKNOWN_COMMAND'); assert(validateProject(project).ok);
         const next = clone(project), type = command.type;
         const at = command.timeUs;
@@ -681,10 +833,18 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
           c.cursor = {kind:'phase',occurrenceId:occurrence.id,note:''};
         }
         if (type === 'startCycle') {
-          assert(command.procedureId === null && next.cycles.length === 0,'FIRST_CYCLE_ONLY');
+          assert(!next.cycles.some(c => c.status === 'open'),'OPEN_CYCLE');
+          assert(next.cycles.length < 1000,'CYCLE_LIMIT');
+          const procedure = command.procedureId === null ? null : next.procedures.find(p => p.id === command.procedureId);
+          assert(procedure || (command.procedureId === null && next.cycles.length === 0 && next.procedures.length === 0),'INVALID_TARGET');
+          assert(!next.cycles.some(c => at === c.boundaries[0].timeUs || (at > c.boundaries[0].timeUs && at < c.boundaries.at(-1).timeUs)),'CYCLE_OVERLAP');
           assert(at < next.source.durationUs,'INVALID_TIME');
-          cycle = {id:id(),procedureId:null,status:'open',boundaries:[{id:id(),timeUs:at}],spans:[],occurrences:[],cursor:null,excluded:false,exclusionReason:'',note:''};
-          next.cycles.push(cycle); addStep(cycle);
+          cycle = {id:id(),procedureId:procedure?.id || null,status:'open',boundaries:[{id:id(),timeUs:at}],spans:[],occurrences:[],cursor:null,excluded:false,exclusionReason:'',note:''};
+          next.cycles.push(cycle);
+          if (procedure) {
+            cycle.occurrences = procedure.phaseIds.map(phaseId => ({id:id(),phaseId,planned:true,resolution:'pending',note:''}));
+            cycle.cursor = {kind:'phase',occurrenceId:cycle.occurrences[0].id,note:''};
+          } else addStep(cycle);
         } else if (['markBoundary','finishCycle','closeIncomplete'].includes(type)) {
           assert(cycle.status === 'open' || (type === 'finishCycle' && cycle.status === 'incomplete'),'CYCLE_CLOSED');
           const last = cycle.boundaries.at(-1).timeUs;
@@ -695,7 +855,14 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
             cycle.spans.push({id:id(),kind:'phase',occurrenceId:occurrence.id,note:cycle.cursor.note}); cycle.boundaries.push({id:id(),timeUs:at});
             if (type !== 'closeIncomplete') occurrence.resolution = 'measured';
           }
-          if (type === 'markBoundary') { assert(cycle.procedureId === null,'END_REQUIRED'); addStep(cycle); }
+          if (type === 'markBoundary') {
+            if (cycle.procedureId === null) addStep(cycle);
+            else {
+              const following = cycle.occurrences[cycle.occurrences.indexOf(occurrence)+1];
+              assert(following,'END_REQUIRED');
+              cycle.cursor = {kind:'phase',occurrenceId:following.id,note:''};
+            }
+          }
           if (type === 'closeIncomplete') cycle.status='incomplete';
           if (type === 'finishCycle') {
             assert(cycle.spans.length > 0 && cycle.occurrences.every(o => o.resolution !== 'pending'),'UNRESOLVED');
@@ -710,6 +877,31 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
         } else if (type === 'moveBoundary') {
           const index = cycle.boundaries.findIndex(b => b.id === command.boundaryId); assert(index >= 0,'INVALID_TARGET');
           assert((index === 0 || at > cycle.boundaries[index-1].timeUs) && (index === cycle.boundaries.length-1 || at < cycle.boundaries[index+1].timeUs),'BOUNDARY_ORDER'); cycle.boundaries[index].timeUs=at;
+        } else if (type === 'createPhase') {
+          assert(next.phases.length < 50,'PHASE_LIMIT');
+          assert(typeof command.label === 'string' && text(command.label.trim(),80,true),'TEXT_LIMIT');
+          assert(['operation','planned-wait'].includes(command.kind),'INVALID_TARGET');
+          next.phases.push({id:id(),label:command.label.trim(),kind:command.kind,archived:false});
+        } else if (type === 'updatePhaseMeta') {
+          const phase = next.phases.find(p => p.id === command.phaseId); assert(phase,'INVALID_TARGET');
+          assert(['operation','planned-wait'].includes(command.kind) && typeof command.archived === 'boolean','INVALID_TARGET');
+          phase.kind=command.kind; phase.archived=command.archived;
+        } else if (type === 'renameProcedure') {
+          const procedure = next.procedures.find(p => p.id === command.procedureId); assert(procedure,'INVALID_TARGET');
+          assert(typeof command.label === 'string' && text(command.label.trim(),80),'TEXT_LIMIT');
+          if (command.label.trim()) procedure.label=command.label.trim();
+        } else if (type === 'changeProcedure') {
+          assert(next.procedures.length < 20,'PROCEDURE_LIMIT');
+          const base = next.procedures.find(p => p.id === command.baseProcedureId);
+          assert(base || (command.baseProcedureId === null && next.procedures.length === 0 && next.cycles.length === 0),'INVALID_TARGET');
+          assert(typeof command.label === 'string' && text(command.label.trim(),80,true) && text(command.startCondition,1000) && text(command.endCondition,1000),'TEXT_LIMIT');
+          assert(Array.isArray(command.phaseIds) && command.phaseIds.length > 0 && command.phaseIds.length <= 50,'INVALID_PROCEDURE');
+          assert(command.phaseIds.every(phaseId => {
+            const phase = next.phases.find(p => p.id === phaseId);
+            return phase && (!phase.archived || base?.phaseIds.includes(phaseId));
+          }),'INVALID_PROCEDURE');
+          const procedure = {id:id(),label:command.label.trim(),phaseIds:[...command.phaseIds],startCondition:command.startCondition,endCondition:command.endCondition,createdAt:context.nowIso()};
+          next.procedures.push(procedure); next.settings.selectedProcedureId=procedure.id;
         } else if (type === 'renamePhase') {
           const phase = next.phases.find(p => p.id === command.phaseId); assert(phase,'INVALID_TARGET'); assert(typeof command.label === 'string','TEXT_LIMIT');
           const label = command.label.trim(); assert(text(label,80),'TEXT_LIMIT'); if (label) phase.label=label;
@@ -725,13 +917,36 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
         return {ok:true,project:next,undoPatch:diff(project,next)};
       } catch (error) { return fail(error.code || 'INVALID_PROJECT'); }
     }
+    // First-time names create one transaction and one history entry, never a partial procedure.
+    function createNamedProcedure(project,options,context) {
+      try {
+        assert(project.cycles.length === 0 && project.procedures.length === 0,'INVALID_TARGET');
+        assert(Array.isArray(options.labels) && options.labels.length > 0 && options.labels.length <= 50,'INVALID_PROCEDURE');
+        let next=project; const phaseIds=[];
+        for (const label of options.labels) {
+          const result=applyCommand(next,{type:'createPhase',label,kind:'operation'},context);
+          assert(result.ok,result.error?.code); next=result.project; phaseIds.push(next.phases.at(-1).id);
+        }
+        const result=applyCommand(next,{type:'changeProcedure',baseProcedureId:null,label:options.label,phaseIds,startCondition:options.startCondition,endCondition:options.endCondition},context);
+        assert(result.ok,result.error?.code);
+        return {ok:true,project:result.project,undoPatch:diff(project,result.project)};
+      } catch (error) { return fail(error.code || 'INVALID_PROJECT'); }
+    }
+    // Review rows are derived, never persisted or included as time in a cycle.
+    function listCycles(project) {
+      const ordered = [...project.cycles].sort((a,b) => a.boundaries[0].timeUs-b.boundaries[0].timeUs);
+      return ordered.map((cycle,index) => ({id:cycle.id,number:index+1,procedureId:cycle.procedureId,status:cycle.status,
+        startUs:cycle.boundaries[0].timeUs,endUs:cycle.boundaries.at(-1).timeUs,
+        elapsedUs:cycle.boundaries.at(-1).timeUs-cycle.boundaries[0].timeUs,
+        gapBeforeUs:index ? cycle.boundaries[0].timeUs-ordered[index-1].boundaries.at(-1).timeUs : null}));
+    }
     function serializeProject(project,appVersion) {
       const output = clone(project); output.appVersion=appVersion;
       const validation = validateProject(output); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
       // Compact output keeps the exported UTF-8 byte budget identical to validation.
       return JSON.stringify(validation.value);
     }
-    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,createProject,validateProject,applyCommand,createHistory,serializeProject});
+    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,createProject,validateProject,applyCommand,createHistory,listCycles,createNamedProcedure,serializeProject});
   })();
   // TSD:CORE:END
 
@@ -868,6 +1083,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 
   // UI / CONTROLLER. Analysis stays in memory until the user exports JSON.
   let project = null, history = TsdCore.createHistory(), selectedBoundaryId = null;
+  let selectedCycleId = null, recordingCycleId = null, procedureDraft = null;
   let suspended = false, projectRevision = 0, attachedSource = null, savedSnapshot = null;
   let errorCode = '', displayedSource = null;
   const media = new MediaController($('#videoHost'),onMediaChange);
@@ -890,10 +1106,15 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     const divisor = unit === 'GiB' ? 1024 ** 3 : unit === 'MiB' ? 1024 ** 2 : 1024;
     return `${(size / divisor).toLocaleString(language,{maximumFractionDigits:1})} ${unit}`;
   }
-  function cycleNow() { return project?.cycles[0] || null; }
+  function message(key,values={}) { return translate(key).replace(/\{(\w+)\}/g,(_,name)=>String(values[name] ?? '')); }
+  function cycleNow() { return project?.cycles.find(c=>c.id===selectedCycleId) || project?.cycles.at(-1) || null; }
+  function activeCycle() { return project?.cycles.find(c=>c.status==='open') || null; }
+  function measurementCycle() { return activeCycle() || project?.cycles.find(c=>c.id===recordingCycleId && c.status==='incomplete') || null; }
+  function nextProcedure() { return project?.procedures.find(p=>p.id===project.settings.selectedProcedureId) || project?.procedures.at(-1) || null; }
+  function isLastRepeatedStep(cycle) { return Boolean(cycle?.procedureId && cycle.cursor?.occurrenceId===cycle.occurrences.at(-1)?.id); }
   function onMediaChange(controller,event) {
     renderMedia(controller);
-    const cycle = cycleNow();
+    const cycle = activeCycle();
     if (event === 'ended' && cycle?.status === 'open' && attachedSource === controller.source && !document.hidden) {
       const time = controller.captureTime();
       if (time.ok && execute({type:'closeIncomplete',cycleId:cycle.id,timeUs:time.value})) {
@@ -931,30 +1152,49 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     renderMeasurementControls();
   }
   function renderMeasurementControls() {
-    const cycle = cycleNow(), position = media.captureTime();
-    const active = cycle?.status === 'open' && !suspended;
-    const after = active && position.ok && position.value > cycle.boundaries.at(-1).timeUs;
-    $('#startCycleButton').hidden = Boolean(cycle);
-    $('#startCycleButton').disabled = !project || !position.ok || position.value >= project.source.durationUs;
-    $('#markBoundaryButton').hidden = !active; $('#markBoundaryButton').disabled = !after || project.phases.length >= 50;
-    $('#finishCycleButton').hidden = !active; $('#finishCycleButton').disabled = !after;
-    $('#closeIncompleteButton').hidden = !active; $('#closeIncompleteButton').disabled = !position.ok || position.value < (cycle?.boundaries.at(-1).timeUs ?? 0);
-    $('#resumeCycleButton').hidden = !cycle || cycle.status === 'complete' || (active && !suspended);
-    $('#resumeCycleButton').disabled = !position.ok;
-    const occurrence = cycle?.cursor && cycle.occurrences.find(o=>o.id===cycle.cursor.occurrenceId);
-    $('#currentStep').textContent = occurrence ? project.phases.find(p=>p.id===occurrence.phaseId)?.label || '' : '';
-    let hint = !project ? 'choosePrompt' : !cycle ? 'firstHint' : cycle.status === 'complete' ? 'completeHint' : suspended ? 'suspendedHint' : cycle.status === 'incomplete' ? 'incompleteHint' : !position.ok ? position.error.code : !after ? 'BOUNDARY_ORDER' : 'markHint';
-    if (active && project.phases.length >= 50 && after) hint='PHASE_LIMIT';
-    $('#measurementHint').textContent = translate(hint);
-    $('#boundaryFromVideoButton').disabled = !position.ok || !cycle;
-    $('#boundaryToVideoButton').disabled = !position.ok || !cycle;
+    const cycle=measurementCycle(), position=media.captureTime(), ready=Boolean(project && position.ok);
+    const active=cycle?.status==='open' && !suspended, after=active && ready && position.value>cycle.boundaries.at(-1).timeUs;
+    const rows=project ? TsdCore.listCycles(project) : [], number=cycle ? rows.find(r=>r.id===cycle.id)?.number : (project?.cycles.length || 0)+1;
+    const procedure=cycle ? project.procedures.find(p=>p.id===cycle.procedureId) : nextProcedure();
+    const overlap=ready && project.cycles.some(c=>position.value===c.boundaries[0].timeUs || (position.value>c.boundaries[0].timeUs && position.value<c.boundaries.at(-1).timeUs));
+    $('#measureTitle').textContent=message('measureN',{n:number});
+    $('#startCycleButton').hidden=Boolean(cycle);
+    $('#startCycleButton').textContent=translate(project?.cycles.length ? 'nextCycle':'startCycle');
+    $('#startCycleButton').disabled=!ready || overlap || project.cycles.length>=1000 || position.value>=project.source.durationUs;
+    $('#markBoundaryButton').hidden=!active;
+    $('#markBoundaryButton').textContent=translate(cycle?.procedureId ? (isLastRepeatedStep(cycle)?'finishCycle':'nextBoundary'):'markBoundary');
+    $('#markBoundaryButton').disabled=!after || (!cycle?.procedureId && project.phases.length>=50);
+    $('#finishCycleButton').hidden=!active || Boolean(cycle?.procedureId); $('#finishCycleButton').disabled=!after;
+    $('#closeIncompleteButton').hidden=!active; $('#closeIncompleteButton').disabled=!ready || position.value<(cycle?.boundaries.at(-1).timeUs ?? 0);
+    $('#resumeCycleButton').hidden=!cycle || (active && !suspended); $('#resumeCycleButton').disabled=!ready;
+    $('#prepareNextCycleButton').hidden=cycle?.status!=='incomplete' || !cycle.procedureId;
+    $('#predefineButton').hidden=Boolean(project?.cycles.length || project?.procedures.length); $('#predefineButton').disabled=!project;
+    const occurrence=cycle?.occurrences.find(o=>o.id===cycle.cursor?.occurrenceId);
+    const phase=occurrence ? project.phases.find(p=>p.id===occurrence.phaseId) : null;
+    $('#currentStep').textContent=phase?.label || ''; $('#currentStep').title=phase?.label || '';
+    const following=occurrence && cycle.occurrences[cycle.occurrences.indexOf(occurrence)+1];
+    $('#nextStep').textContent=following ? message('nextStepName',{name:project.phases.find(p=>p.id===following.phaseId)?.label}) : cycle?.procedureId ? translate('lastStep') : '';
+    $('#nextStep').title=$('#nextStep').textContent;
+    $('#measureProcedure').textContent=procedure ? message('procedureShort',{name:procedure.label,n:procedure.phaseIds.length}) : translate('firstProcedure');
+    $('#measureProcedure').title=$('#measureProcedure').textContent;
+    let hint=!project ? 'choosePrompt' : !cycle ? (overlap?'CYCLE_OVERLAP':project.cycles.length?'readyNextHint':'firstHint') : suspended?'suspendedHint':cycle.status==='incomplete'?'incompleteHint':!ready?position.error.code:!after?'BOUNDARY_ORDER':cycle.procedureId?'repeatHint':'markHint';
+    if(active && !cycle.procedureId && project.phases.length>=50 && after) hint='PHASE_LIMIT';
+    $('#measurementHint').textContent=translate(hint);
+    $('#boundaryFromVideoButton').disabled=!ready || !cycleNow(); $('#boundaryToVideoButton').disabled=!ready || !cycleNow();
+    const reviewed=cycleNow();
+    $('#resumeSelectedButton').hidden=reviewed?.status!=='incomplete';
+    $('#resumeSelectedButton').disabled=!ready || Boolean(activeCycle());
   }
   function execute(command,{quiet=false}={}) {
     if (!project) return false;
     const result = TsdCore.applyCommand(project,command,commandContext);
     if (!result.ok) { if (!quiet) setError(result.error); return false; }
     AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++;
-    if (['startCycle','markBoundary','finishCycle','closeIncomplete'].includes(command.type)) selectedBoundaryId=cycleNow().boundaries.at(-1).id;
+    if (['startCycle','markBoundary','finishCycle','closeIncomplete','resumeCycle'].includes(command.type)) {
+      selectedCycleId=command.type==='startCycle' ? project.cycles.at(-1).id : command.cycleId;
+      recordingCycleId=command.type==='finishCycle' ? null : selectedCycleId;
+      selectedBoundaryId=cycleNow().boundaries.at(-1).id;
+    }
     if (result.undoPatch.length) $('#saveStatus').textContent='';
     renderProject(); return true;
   }
@@ -962,19 +1202,20 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     const position = media.captureTime(); if (!position.ok) { setError(position.error); return; }
     if (suspended && type !== 'startCycle') return;
     clearError();
-    const cycle = cycleNow();
-    if (execute({type,timeUs:position.value,cycleId:cycle?.id,procedureId:null})) {
+    const cycle=measurementCycle();
+    if (type==='markBoundary' && isLastRepeatedStep(cycle)) type='finishCycle';
+    if (execute({type,timeUs:position.value,cycleId:cycle?.id,procedureId:nextProcedure()?.id || null})) {
       if (type === 'finishCycle' || type === 'closeIncomplete') media.pause();
       if (type === 'finishCycle') selectPage('review');
     }
   }
-  async function resumeMeasurement() {
-    const cycle = cycleNow(); if (!cycle) return;
+  async function resumeMeasurement(cycle=measurementCycle()) {
+    if (!cycle) return;
     const revision = projectRevision, identity = project.projectId;
     try {
       await media.seekTo(cycle.boundaries.at(-1).timeUs);
       if (revision !== projectRevision || identity !== project?.projectId) return;
-      if (execute({type:'resumeCycle',cycleId:cycle.id})) { suspended=false; $('#backgroundNotice').hidden=true; renderMeasurementControls(); }
+      if (execute({type:'resumeCycle',cycleId:cycle.id})) { suspended=false; $('#backgroundNotice').hidden=true; selectPage('measure'); renderMeasurementControls(); }
     } catch (error) { setError(error); }
   }
   function travelHistory(direction) {
@@ -982,6 +1223,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     media.pause(); const result = history[direction](project);
     if (!result.ok) { setError(result.error); return; }
     AppToast.dismiss(); project=result.project; projectRevision++; suspended=false; clearError();
+    recordingCycleId=activeCycle()?.id || null; if(recordingCycleId) selectedCycleId=recordingCycleId;
     $('#saveStatus').textContent=''; $('#boundaryError').hidden=true; renderProject();
   }
   function syncInput(input,value) {
@@ -997,6 +1239,8 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   function element(tag,className='',content='') { const node=document.createElement(tag); node.className=className; node.textContent=content; return node; }
   function renderProject() {
     const cycle = cycleNow();
+    selectedCycleId=cycle?.id || null;
+    renderCycleList(); renderProcedures();
     $('#cycleState').textContent = translate(!cycle ? 'emptyRecord' : cycle.status+'Record');
     $('#cycleDuration').textContent = cycle ? durationText(cycle.boundaries.at(-1).timeUs-cycle.boundaries[0].timeUs) : '—';
     $('#reviewCycleStatus').textContent = cycle ? `${$('#cycleState').textContent} · ${$('#cycleDuration').textContent}` : '';
@@ -1030,6 +1274,128 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     for (const row of [...list.children]) if (!wanted.has(row.dataset.occurrenceId)) row.remove();
     renderBoundaryEditor(); renderMeasurementControls();
   }
+  function selectReviewCycle(id) {
+    if (!project?.cycles.some(c=>c.id===id)) return;
+    const invalid=[...document.querySelectorAll('#recordCard input,#recordCard textarea,#analysisCard input,#analysisCard textarea')].find(input=>!input.checkValidity());
+    if(invalid) { $('#cycleSelect').value=cycleNow()?.id || ''; setError({code:'TEXT_LIMIT'}); return; }
+    media.pause(); selectedCycleId=id; selectedBoundaryId=null;
+    $('#boundaryError').hidden=true; $('#boundaryTime').removeAttribute('aria-invalid'); renderProject();
+  }
+  function renderCycleList() {
+    const rows=project ? TsdCore.listCycles(project) : [], select=$('#cycleSelect'), list=$('#cycleList');
+    $('#cycleSelectField').hidden=!rows.length;
+    select.replaceChildren(...rows.map(row=>{const option=element('option','',`${message('cycleN',{n:row.number})} · ${translate(row.status+'Record')} · ${exactSeconds(row.startUs)}–${exactSeconds(row.endUs)} ${translate('secondsUnit')}`);option.value=row.id;return option;}));
+    select.value=cycleNow()?.id || '';
+    list.replaceChildren();
+    if(!rows.length) list.append(element('p','small-note',translate('emptyCycles')));
+    for(const row of rows) {
+      if(row.gapBeforeUs!==null) list.append(element('p','gap-note',message('gapBefore',{time:durationText(row.gapBeforeUs)})));
+      const procedure=project.procedures.find(p=>p.id===row.procedureId);
+      const button=element('button','cycle-row');button.type='button';button.dataset.cycleId=row.id;
+      button.setAttribute('aria-current',String(row.id===cycleNow()?.id));
+      button.append(element('strong','',`${message('cycleN',{n:row.number})} · ${durationText(row.elapsedUs)} · ${translate(row.status+'Record')}`));
+      button.append(element('span','',`${procedure?.label || translate('firstProcedure')} · ${exactSeconds(row.startUs)}–${exactSeconds(row.endUs)} ${translate('secondsUnit')}`));
+      button.addEventListener('click',()=>{selectReviewCycle(row.id);selectPage('review');});list.append(button);
+    }
+  }
+  function conditionText(procedure) {
+    if(!procedure) return '';
+    const lines=[];
+    if(procedure.startCondition) lines.push(message('startConditionValue',{value:procedure.startCondition}));
+    if(procedure.endCondition) lines.push(message('endConditionValue',{value:procedure.endCondition}));
+    return lines.join('\n') || translate('noCondition');
+  }
+  function renderProcedures() {
+    const procedures=project?.procedures || [], procedure=nextProcedure(), select=$('#procedureSelect');
+    select.replaceChildren(...procedures.map(p=>{const option=element('option','',p.label);option.value=p.id;return option;}));
+    select.value=procedure?.id || '';select.disabled=!procedures.length;
+    $('#procedureConditions').textContent=conditionText(procedure);
+    $('#editProcedureButton').disabled=!procedure || procedures.length>=20;
+    $('#procedureRename').disabled=!procedure;syncInput($('#procedureRename'),procedure?.label || '');
+    $('#createPhaseButton').disabled=!project || project.phases.length>=50;$('#newPhaseName').disabled=!project;
+    const list=$('#phaseLibrary'), wanted=new Set();
+    for(const [index,phase] of (project?.phases || []).entries()) {
+      wanted.add(phase.id);let row=[...list.children].find(n=>n.dataset.phaseId===phase.id);
+      if(!row) {
+        row=element('div','phase-library-row');row.dataset.phaseId=phase.id;
+        const name=element('input','phase-name');name.type='text';
+        name.addEventListener('change',()=>commitInput(name,{type:'renamePhase',phaseId:phase.id,label:name.value}));
+        const options=element('div','phase-options'),kind=element('select'),archiveLabel=element('label'),archive=element('input'),archiveText=element('span');archive.type='checkbox';
+        kind.addEventListener('change',()=>{const now=project.phases.find(p=>p.id===phase.id);execute({type:'updatePhaseMeta',phaseId:phase.id,kind:kind.value,archived:now.archived});});
+        archive.addEventListener('change',()=>{const now=project.phases.find(p=>p.id===phase.id);if(!execute({type:'updatePhaseMeta',phaseId:phase.id,kind:now.kind,archived:archive.checked}))archive.checked=now.archived;});
+        archiveLabel.append(archive,archiveText);options.append(kind,archiveLabel);row.append(name,options);list.append(row);
+      }
+      const input=row.querySelector('.phase-name');input.setAttribute('aria-label',`${translate('stepLabel')} ${index+1}`);syncInput(input,phase.label);
+      const kind=row.querySelector('select');kind.setAttribute('aria-label',`${translate('managePhases')} ${index+1}`);
+      kind.replaceChildren(...['operation','planned-wait'].map(value=>{const option=element('option','',translate(value==='operation'?'operation':'plannedWait'));option.value=value;return option;}));kind.value=phase.kind;
+      row.querySelector('input[type=checkbox]').checked=phase.archived;row.querySelector('label span').textContent=translate('archived');
+    }
+    for(const row of [...list.children]) if(!wanted.has(row.dataset.phaseId))row.remove();
+  }
+  function orderAction(action,label,path) {
+    const button=element('button','icon-button');button.type='button';button.dataset.action=action;button.setAttribute('aria-label',label);
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','2');svg.setAttribute('aria-hidden','true');
+    const shape=document.createElementNS(svg.namespaceURI,'path');shape.setAttribute('d',path);svg.append(shape);button.append(svg);return button;
+  }
+  function renderProcedureDraft() {
+    if(!procedureDraft) return;
+    const list=$('#procedureOrder');list.replaceChildren();
+    for(const [index,id] of procedureDraft.phaseIds.entries()) {
+      const phase=project.phases.find(p=>p.id===id),row=element('div','procedure-order-row');
+      row.append(element('span','procedure-order-label',`${index+1}. ${phase.label}`));
+      for(const [action,label,path] of [['up','moveUp','m6 14 6-6 6 6'],['down','moveDown','m6 10 6 6 6-6'],['remove','remove','M6 6l12 12M18 6 6 18']]) {
+        const button=orderAction(action,`${translate(label)}: ${phase.label}`,path);
+        button.disabled=action==='up' ? index===0 : action==='down' ? index===procedureDraft.phaseIds.length-1 : false;
+        button.addEventListener('click',()=>{
+          if(action==='remove')procedureDraft.phaseIds.splice(index,1);
+          else {const other=index+(action==='up'?-1:1);[procedureDraft.phaseIds[index],procedureDraft.phaseIds[other]]=[procedureDraft.phaseIds[other],procedureDraft.phaseIds[index]];}
+          renderProcedureDraft();
+          const items=$('#procedureOrder').children,focus=items[Math.min(index,items.length-1)]?.querySelector('button:not(:disabled)');
+          (focus || $('#addPhaseButton')).focus({preventScroll:true});
+        });row.append(button);
+      }
+      list.append(row);
+    }
+    const available=project.phases.filter(p=>!p.archived),select=$('#addPhaseSelect'),value=select.value;
+    select.replaceChildren(...available.map(p=>{const option=element('option','',p.label);option.value=p.id;return option;}));
+    if(available.some(p=>p.id===value))select.value=value;
+    $('#addPhaseButton').disabled=!available.length || procedureDraft.phaseIds.length>=50;
+  }
+  function openProcedureEditor(predefined=false) {
+    if(!project || (predefined && (project.cycles.length || project.procedures.length))) return;
+    const base=predefined ? null : nextProcedure();if(!predefined && !base)return;
+    media.pause();
+    procedureDraft={baseId:base?.id || null,phaseIds:[...(base?.phaseIds || [])],projectId:project.projectId,revision:projectRevision,focus:document.activeElement,predefined};
+    $('#procedureDraftName').value=message('procedureN',{n:project.procedures.length+1});
+    $('#startCondition').value=base?.startCondition || '';$('#endCondition').value=base?.endCondition || '';$('#presetNames').value='';
+    $('#presetNamesPanel').hidden=!predefined;$('#procedureOrderPanel').hidden=predefined;$('#procedureError').hidden=true;
+    renderProcedureDraft();$('#procedureDialog').showModal();$('#procedureDraftName').focus();
+  }
+  function saveProcedureDraft() {
+    if(!procedureDraft || !project) return;
+    let result;
+    if(procedureDraft.projectId!==project.projectId || procedureDraft.revision!==projectRevision)result={ok:false,error:{code:'STALE_EDIT'}};
+    else {
+      const options={label:$('#procedureDraftName').value,startCondition:$('#startCondition').value,endCondition:$('#endCondition').value};
+      result=procedureDraft.predefined ? TsdCore.createNamedProcedure(project,{...options,labels:$('#presetNames').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean)},commandContext) : TsdCore.applyCommand(project,{type:'changeProcedure',baseProcedureId:procedureDraft.baseId,phaseIds:procedureDraft.phaseIds,...options},commandContext);
+    }
+    if(!result.ok){$('#procedureError').textContent=translate(result.error.code);$('#procedureError').hidden=false;return;}
+    project=result.project;history.push(result.undoPatch);projectRevision++;AppToast.dismiss();$('#saveStatus').textContent='';clearError();
+    $('#procedureDialog').close();renderProject();
+  }
+  $('#cycleSelect').addEventListener('change',event=>selectReviewCycle(event.target.value));
+  $('#procedureSelect').addEventListener('change',event=>{
+    if(project?.procedures.some(p=>p.id===event.target.value)){project.settings.selectedProcedureId=event.target.value;projectRevision++;renderProcedures();renderMeasurementControls();}
+  });
+  $('#procedureRename').addEventListener('change',event=>{const procedure=nextProcedure();if(procedure)commitInput(event.target,{type:'renameProcedure',procedureId:procedure.id,label:event.target.value});});
+  $('#createPhaseButton').addEventListener('click',()=>{if(execute({type:'createPhase',label:$('#newPhaseName').value,kind:'operation'}))$('#newPhaseName').value='';});
+  $('#predefineButton').addEventListener('click',()=>openProcedureEditor(true));
+  $('#editProcedureButton').addEventListener('click',()=>openProcedureEditor());
+  $('#saveProcedureButton').addEventListener('click',saveProcedureDraft);
+  $('#addPhaseButton').addEventListener('click',()=>{if(procedureDraft && $('#addPhaseSelect').value){procedureDraft.phaseIds.push($('#addPhaseSelect').value);renderProcedureDraft();}});
+  for(const selector of ['#cancelProcedureButton','#closeProcedureButton'])$(selector).addEventListener('click',()=>$('#procedureDialog').close());
+  $('#procedureDialog').addEventListener('close',()=>{const focus=procedureDraft?.focus;procedureDraft=null;if(focus?.isConnected)focus.focus({preventScroll:true});});
+  $('#procedureDialog').addEventListener('click',event=>{const r=event.currentTarget.getBoundingClientRect();if(event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom)event.currentTarget.close();});
   function selectedBoundary() {
     const cycle=cycleNow(); if (!cycle) return null;
     let index=cycle.boundaries.findIndex(b=>b.id===selectedBoundaryId); if(index<0) index=cycle.boundaries.length-1;
@@ -1078,7 +1444,8 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       }
       const next=TsdCore.createProject(candidate.source,commandContext);
       media.commitCandidate(candidate);
-      project=next; attachedSource=media.source; projectRevision++; history=TsdCore.createHistory(); selectedBoundaryId=null; suspended=false; savedSnapshot=null;
+      if ($('#procedureDialog').open) $('#procedureDialog').close();
+      project=next; attachedSource=media.source; projectRevision++; history=TsdCore.createHistory(); selectedBoundaryId=null; selectedCycleId=null; recordingCycleId=null; suspended=false; savedSnapshot=null;
       document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
       $('#boundaryError').hidden=true; $('#saveStatus').textContent=''; $('#backgroundNotice').hidden=true; AppToast.dismiss();
       renderProject(); selectPage('measure');
@@ -1137,7 +1504,9 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     $(selector).addEventListener('click',()=>runMeasurement(type));
     $(selector).addEventListener('keydown',event=>{if(event.repeat && [' ','Enter'].includes(event.key)) event.preventDefault();});
   }
-  $('#resumeCycleButton').addEventListener('click',resumeMeasurement);
+  $('#resumeCycleButton').addEventListener('click',()=>resumeMeasurement());
+  $('#resumeSelectedButton').addEventListener('click',()=>resumeMeasurement(cycleNow()));
+  $('#prepareNextCycleButton').addEventListener('click',()=>{recordingCycleId=null;suspended=false;renderMeasurementControls();});
   for(const selector of ['#undoButton','#undoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('undo'));
   for(const selector of ['#redoButton','#redoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('redo'));
   document.addEventListener('keydown',event=>{
@@ -1167,7 +1536,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   document.addEventListener('dragover',event=>{if(!event.dataTransfer.types.includes('Files'))return;event.preventDefault();$('#dropZone').classList.add('drag-over');});
   document.addEventListener('dragleave',event=>{if(!event.relatedTarget)$('#dropZone').classList.remove('drag-over');});
   document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1)chooseFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){media.pause();if(media.source)$('#backgroundNotice').hidden=false;if(cycleNow()?.status==='open')suspended=true;}renderMeasurementControls();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){media.pause();if(media.source)$('#backgroundNotice').hidden=false;if(activeCycle())suspended=true;}renderMeasurementControls();});
   window.addEventListener('beforeunload',event=>{if(project && (project.cycles.length||project.title||project.note) && JSON.stringify(project)!==savedSnapshot){event.preventDefault();event.returnValue='';}});
   // Preserve File/Blob references in the back-forward cache, but never autoplay on return.
   window.addEventListener('pagehide',event=>{media.pause();if(!event.persisted)media.dispose();});

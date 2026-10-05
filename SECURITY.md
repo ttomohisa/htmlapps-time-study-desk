@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.2.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.3.0 is a development build, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -10,9 +10,11 @@ The app CSP allows inline application code/styles and local media Blob URLs; `co
 
 ## Analysis data
 
-Only the language preference is persisted automatically in v0.2.0. Analysis stays in memory until an explicit `.tsd.json` download. The file contains the selected video's metadata, step definitions, boundaries, notes and display settings. It contains no video bytes, local absolute path, File/DOM object, Blob URL or history. A download handoff does not prove a disk write. Local analysis files can contain sensitive names and notes and are not encrypted by this app.
+Only the language preference is persisted automatically in v0.3.0. Analysis stays in memory until an explicit `.tsd.json` download. The file contains the selected video's metadata, step definitions, boundaries, notes and display settings. It contains no video bytes, local absolute path, File/DOM object, Blob URL or history. A download handoff does not prove a disk write. Local analysis files can contain sensitive names and notes and are not encrypted by this app.
 
-Schema validation checks allowed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields are errors. The importer is **not exposed in v0.2.0**; future import must validate before replacing state.
+Schema validation checks allowed fields, primitive types, unique IDs, references, planned step order, increasing in-range integer boundaries, cycle/occurrence states, exclusion reasons, counts, Unicode-codepoint text limits, nesting and a 10 MiB UTF-8 budget. Unknown fields are errors. The importer is **not exposed in v0.3.0**; future import must validate before replacing state.
+
+Procedure order and conditions are immutable snapshots; old cycles keep their original references. The selected review cycle does not receive recording or video-end commands for another cycle. Procedure drafts are not applied until validated and saved.
 
 Commands are atomic: validation failure leaves the previous model unchanged. Undo uses validated differences, not permanent duplicated project snapshots. Replacement cancellation and loading failures preserve the previous analysis. Video-end observation is incomplete until explicitly resolved. Never label partly observed time as a complete step value.
 
