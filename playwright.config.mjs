@@ -6,6 +6,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
+  webServer: { command: 'node scripts/serve-test.mjs', url: 'http://127.0.0.1:4173/index.html', reuseExistingServer: true, timeout: 10000 },
   use: { locale: 'ja-JP', viewport: { width: 1360, height: 900 }, trace: 'retain-on-failure' },
   projects: [{ name: 'chromium', use: { browserName: 'chromium', launchOptions: process.env.TSD_CHROMIUM_PATH ? { executablePath: process.env.TSD_CHROMIUM_PATH, args: ['--no-sandbox'] } : {} } }]
 });

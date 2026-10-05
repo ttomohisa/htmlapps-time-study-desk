@@ -4,7 +4,7 @@
 
 Measure repeated work cycles in one local video, edit their step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
 
-**v0.4.0 — development build.** Measure repeated cycles with shared step names and preserve earlier records when changing procedures. It can save `.tsd.json`, but **cannot reopen those files yet**. Analysis import, autosave, statistics and CSV are later milestones. It is not a v1.0 release.
+**v0.5.0 — development build.** Measure and edit repeated cycles, reopen validated `.tsd.json`, reconnect the original local video, and autosave analysis data in the browser. Statistics and CSV are later milestones. It is not a v1.0 release.
 
 ## Screenshot
 
@@ -22,14 +22,16 @@ The app tests capture the actual Japanese, English and phone-width UI in `test-r
 - Resolve an incomplete step explicitly in Review, then finish at the last confirmed boundary. Removing a step's recorded evidence makes it pending, not silently not-performed. Delete a cycle with Undo; original video and step definitions remain.
 - Shared boundary editing by entering seconds, using the current video position or moving a slider. Adjacent durations change together. Invalid or non-increasing boundaries are rejected without changing the analysis.
 - Rename steps and edit analysis, cycle, occurrence and interval notes. Undo/Redo retains up to 100 operations or 16 MiB of differences, whichever is reached first.
-- Manually save versioned analysis JSON, including unfinished records and the last confirmed boundary. The video is not included. Failed or cancelled video replacement preserves the previous analysis.
+- Manually save and reopen versioned analysis JSON. Import validates schema, IDs, references, boundaries, text/count limits and the 10 MiB byte budget before replacing the current analysis.
+- Reconnect the original video separately. Size, dimensions and duration (within 100 ms) are checked; matching metadata never claims identity and still requires explicit confirmation. A candidate shorter than recorded evidence is rejected.
+- Autosave analysis data only to IndexedDB with a device-side on/off setting (default on). Successful transactions advance a revision; a stale tab reports a conflict instead of overwriting a newer revision. Browser-stored analysis can be restored or explicitly deleted.
 - Japanese/English, light UI and phone navigation: Measure / Review / Results. “Results” shows recorded cycles and their durations, not statistical averages.
 
 ## Usage
 
 Open a freshly built `dist/index.html` or `time-study-desk.html`, choose a video, seek to the work's starting position, and select **Start cycle here**. Select **Mark boundary** at each step change and **Finish cycle here** at the end. Return to **Measure**, seek to the next cycle's start, and select **Start next cycle here**. Use **Review** to select and correct a cycle. **Results** contains the cycle list, next-procedure selection and **Change order / conditions**. The editor changes nothing until saved; cancelling leaves the original procedure intact. Choose **Save analysis** to download a `.tsd.json` file.
 
-The filename is editable; the extension is fixed. A “Download started” message means the file was handed to the browser, not that a particular disk location was verified. Check the download yourself. There is **no autosave**, and closing this page loses unsaved work. Keep both the analysis file and its original video for later versions' resume support.
+The filename is editable; the extension is fixed. A “Download started” message means the file was handed to the browser, not that a particular disk location was verified. Check the download yourself. Autosave starts enabled when IndexedDB is actually available; it stores analysis only, never video. If storage is unavailable or full, the warning remains visible and manual JSON saving still works.
 
 At the video end the recording cycle becomes **Incomplete**, never automatically Complete, even when an older cycle is selected for review. Undo to correct the boundary and finish explicitly, or save the unfinished record. Returning from a hidden page requires an explicit resume from the last confirmed boundary; it does not invent a timed interruption.
 
@@ -43,9 +45,17 @@ In **Review**, expand **Split, merge and assign intervals**. Choose the interval
 
 Each step's **Review occurrence state** control lets you confirm measured, not performed or unobserved, or leave it unresolved. Invalid combinations (such as measured with an unobserved span) are rejected. Editing live assignments suspends that cycle. Once every step is resolved and a positive interval exists, **Mark this cycle complete** explicitly completes it without inventing extra time.
 
+### Reopen, reconnect and autosave
+
+Use **Open analysis** to select a `.tsd.json` file. The file is read locally and the current analysis is replaced only after full validation and confirmation. A reopened or restored analysis is deliberately detached from video: results, names and JSON saving remain available, while measurement and evidence seeking stay disabled.
+
+Select **Reconnect original video** to choose the source again. A matching candidate is still presented for confirmation; filename or modification-time changes are warnings, while size/dimension mismatch, more than 100 ms duration difference, or a video shorter than an existing boundary is rejected without changing the analysis. Reconnection never autoplays.
+
+Autosave is a single-analysis recovery aid, not a project library. Edits are debounced for 750 ms with a five-second maximum delay. Another tab with a newer saved revision causes a conflict and automatic writes stop; use manual JSON export to preserve the stale tab. **Delete browser analysis data** clears only this app's analysis stores, not the original video or downloaded files.
+
 ## Privacy and limits
 
-All video handling and analysis run in the browser. Videos use File references and Blob URLs rather than full JavaScript byte-array copies. No video, filename, step label or note is sent to a server. Only the language preference is stored automatically. User-triggered analysis downloads contain metadata, times and notes, but no video, local absolute path, Blob URL or undo history.
+All video handling and analysis run in the browser. Videos use File references and Blob URLs rather than full JavaScript byte-array copies. No video, filename, step label or note is sent to a server. Analysis autosave uses browser-local IndexedDB and never stores video. Language and the autosave preference are device-side settings. User-triggered JSON contains metadata, times and notes, but no video, local absolute path, Blob URL or undo history. Browser storage is not advertised as permanent or encrypted retention.
 
 The readable app uses `connect-src 'none'`, `media-src blob:` and no worker, remote font, analytics or CDN. The self-extracting loader and the expanded app are tested separately. See [SECURITY.md](SECURITY.md).
 
@@ -55,7 +65,7 @@ Times are read from the video's `currentTime` and stored as integer microseconds
 
 ## Browser checks
 
-The repository's Windows Actions workflow tests generated readable and self-extracting HTML directly through `file://` in Chromium. The exact tested revision and results belong to its associated run and PR, not a permanent “all browsers supported” claim. Local supplementary rendering is recorded separately in [QA_RESULTS](docs/QA_RESULTS.md).
+The repository's Windows Actions workflow tests generated readable and self-extracting HTML directly through `file://` in Chromium for the main standalone workflow. Persistence tests use the same generated HTML from a loopback-only development server so IndexedDB has a stable origin; the app does not require that server at runtime. `file://` storage support is feature-detected rather than promised. Exact tested revisions belong to their Actions run/PR.
 
 Android/iPhone real devices, macOS Safari, Edge, Firefox, published HTTPS hosting and large real video files remain unverified. Phone-width emulation does not verify the mobile OS file picker or download flow. The self-extracting variant requires `DecompressionStream`.
 
@@ -92,7 +102,7 @@ Unit tests extract the real `TSD:CORE` block, not a copy of its implementation. 
 
 ## Save format and project status
 
-[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected by the validator rather than silently discarded. Import UI is not implemented in v0.4.0.
+[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected rather than silently discarded. v0.5.0 imports schema 1, keeps the v0.2.0 fixture as a compatibility regression, and requires explicit original-video reconnection. Autosave also stores schema-1 analysis data only.
 
 This work does not publish a release, merge the PR, or add the app to the Browser Kitty site. The user merges the PR.
 

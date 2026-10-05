@@ -21,3 +21,5 @@ export async function measureFirstCycle(page) {
   for (const seconds of [.6,1.8,2.8]) { await seekVideo(page,seconds); await page.locator('#markBoundaryButton').click(); }
   await seekVideo(page,3.4); await page.locator('#finishCycleButton').click();
 }
+
+export async function openHttpApp(page) { await page.goto('http://127.0.0.1:4173/index.html'); await page.locator('#versionBadge').waitFor(); }

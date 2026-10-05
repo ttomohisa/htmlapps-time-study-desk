@@ -2,6 +2,16 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.5.0 — 2026-10-06 — Save / Resume (development)
+
+- Reopen `.tsd.json` only after a 10 MiB pre-check, JSON parsing and strict schema-1 validation. Invalid, future-version or corrupt files leave the current analysis unchanged.
+- Open restored/imported analysis detached from video, preserving results and edits while disabling measurement/evidence actions until the source is reconnected.
+- Reconnect a local source only after metadata compatibility checks and explicit confirmation. Filename/mtime differences are warnings; size/dimensions, >100 ms duration mismatch, or a candidate shorter than recorded evidence are rejected. Metadata matching never claims file identity.
+- Add browser-local IndexedDB autosave for analysis only, with a device-side default-on preference, 750 ms debounce / 5 s maximum delay, restore card, app-specific data deletion and honest unavailable/quota status.
+- Use monotonically increasing saved revisions. A stale tab cannot overwrite a newer revision and keeps manual JSON export available. Clearing browser data waits for in-flight work and invalidates delayed saves so data is not resurrected.
+- Preserve schemaVersion 1, the v0.2.0 compatibility fixture, video bytes outside persistent storage, the no-network runtime boundary and direct-file standalone tests. Persistence tests use the same generated HTML on a loopback-only development origin because `file://` storage is feature-detected rather than assumed.
+- Add unit and browser coverage for import/reconnect, source matching, restore, disabled/unavailable autosave, clear races and multi-tab conflicts. Statistics and CSV remain later milestones.
+
 ## 0.4.0 — 2026-10-06 — Exceptions / Editing (development)
 
 - Record and resume interruptions/unobserved intervals with shared integer boundaries. Preserve known portions and the same step occurrence across an interruption.

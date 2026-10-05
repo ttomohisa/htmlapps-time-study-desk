@@ -3,9 +3,9 @@
   "name": "Time Study Desk",
   "nameJa": "動画作業分析",
   "slug": "time-study-desk",
-  "version": "0.4.0",
-  "description": "Measure local work videos with interruptions and missing observations; review intervals and save analysis JSON.",
-  "descriptionJa": "作業動画を工程・回ごとに区切り、中断や未観測を分けて記録し、区間を修正して分析データを保存します。",
+  "version": "0.5.0",
+  "description": "Measure repeated work in a local video, reopen saved analysis, reconnect the original video and autosave analysis locally.",
+  "descriptionJa": "作業動画を工程・回ごとに記録し、保存した分析を再読込して元動画へ再接続し、分析データをブラウザ内へ自動保存します。",
   "defaultLanguage": "auto",
   "repository": {
     "owner": "ttomohisa",
