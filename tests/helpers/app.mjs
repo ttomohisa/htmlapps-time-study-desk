@@ -12,3 +12,12 @@ export async function openApp(page, variant = 'readable') {
 export async function selectFixtureVideo(page, name = 'landscape.mp4') {
   await page.locator('#videoInput').setInputFiles(resolve('tests/fixtures/media', name));
 }
+export async function seekVideo(page, seconds) {
+  await page.locator('#seekBar').evaluate((input,value) => { input.value=String(value); input.dispatchEvent(new Event('change',{bubbles:true})); },seconds);
+  await page.waitForFunction(() => document.querySelector('#mediaStatus').dataset.state === 'ready');
+}
+export async function measureFirstCycle(page) {
+  await page.locator('#startCycleButton').click();
+  for (const seconds of [.6,1.8,2.8]) { await seekVideo(page,seconds); await page.locator('#markBoundaryButton').click(); }
+  await seekVideo(page,3.4); await page.locator('#finishCycleButton').click();
+}

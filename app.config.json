@@ -3,15 +3,24 @@
   "name": "Time Study Desk",
   "nameJa": "動画作業分析",
   "slug": "time-study-desk",
-  "version": "0.1.0",
-  "description": "Review a local work video. Development foundation for step-by-step time studies.",
-  "descriptionJa": "作業動画を端末内で確認する、工程別の時間分析に向けた開発版です。",
+  "version": "0.2.0",
+  "description": "Measure one work cycle in a local video, edit shared boundaries and save analysis JSON.",
+  "descriptionJa": "動画を見ながら一回の作業を工程ごとに区切り、境界を修正して分析データを保存します。",
   "defaultLanguage": "auto",
-  "repository": { "owner": "ttomohisa", "name": "htmlapps-time-study-desk" },
+  "repository": {
+    "owner": "ttomohisa",
+    "name": "htmlapps-time-study-desk"
+  },
   "build": {
     "output": "dist/index.html",
     "blockRuntimeNetwork": true,
-    "selfExtract": { "enabled": true, "output": "dist/index.self-extract.html" },
-    "sizeBudget": { "readableWarningMb": 2, "selfExtractWarningMb": 1 }
+    "selfExtract": {
+      "enabled": true,
+      "output": "dist/index.self-extract.html"
+    },
+    "sizeBudget": {
+      "readableWarningMb": 2,
+      "selfExtractWarningMb": 1
+    }
   }
 }

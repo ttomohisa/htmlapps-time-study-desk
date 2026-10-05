@@ -1,128 +1,859 @@
-# APP_SPEC.md
+# Time Study Desk / 動画作業分析 — 正式仕様書
 
-This file is the product contract for the application created from this template. Replace the starter specification below before asking an LLM to build a new product.
+**文書版:** 1.0\
+**作成日:** 2026-10-05（Asia/Tokyo）\
+**対象アプリ:** v0.1.0〜v1.0.0\
+**状態:** 開発用仕様ベースライン。アプリの実装・実機検証・公開を意味しない。\
+**対応する計画:** [v0.1.0〜v1.0.0開発計画](docs/superpowers/plans/2026-10-05-time-study-desk.md)\
+**仕様の正:** 本書 `APP_SPEC.md`。計画と食い違う場合は本書を優先し、両方を同じ変更で更新する。
 
-## 1. Product identity
+---
 
-- **Working name:** Single HTML App Starter
-- **One-sentence purpose:** Demonstrate the template's local-first, responsive, bilingual, single-file application foundation.
-- **Primary users:** Developers and LLM coding agents starting a new browser utility.
-- **Release artifacts:** `dist/index.html`, `dist/index.self-extract.html`, and a repository-root copy of the readable build named from `repository.name` with a leading `htmlapps-` removed
+## 0. 根拠・現在状態・今回の設計判断
 
-## 2. Problem and outcome
+### 0.1 根拠の区別
 
-The starter must make the repository's constraints visible and testable without pretending to be a finished end-user product. A user can enter text, see basic counts, copy it, save it, and persist it locally.
+本書は、ユーザーが承認した「動画を工程別・回別の時間表にし、数値から根拠映像へ戻れる」という直前の検討内容と、添付 `Browser Kitty Guide.md` を基礎とする。競合比較、市場規模、期待利用数、工数短縮率は製品要件の根拠として追加しない。
 
-A successful replacement app should state here:
+以下を区別する。
 
-- What concrete problem it solves.
-- Who experiences the problem.
-- What result the user gets in one session.
-- Why a local single-HTML implementation is useful.
+- **合意済みの方向:** 一つの作業対象、一本の動画、順次工程、反復計測、手動の区切り、修正、意味の明確な集計、端末内処理、単一HTML、PC・スマートフォン、日本語・英語。
+- **今回具体化した設計判断:** 時刻の内部単位、保存形式、状態遷移、手順変更時の扱い、入力上限、数値表示、Undo容量、CSV仕様、バージョンごとの受入条件。これらの数値は実測値・ブラウザ一般の限界ではない。
+- **外部資料で確認した技術上の制約:** メディア時刻、フレームコールバック、ブラウザ保存領域、CSP、CSVの数式解釈。付録Dに出典を示す。
 
-## 3. Core user flow
+### 0.2 テンプレートの確認記録
 
-1. Open the page locally or through GitHub Pages.
-2. Enter or paste text.
-3. See character, word, and line counts update immediately.
-4. Edit the suggested output filename, then copy or download the text.
-5. Use Clear or Restore sample and undo the reversible change from the toast when needed.
-6. Reload and recover the locally saved text.
+2026-10-05にGitHubの `ttomohisa/htmlapps-template` を読み取り、以下を確認した。[T1–T5]
 
-## 4. Functional requirements
+| 項目 | 確認値 |
+|---|---|
+| 既定ブランチ | `main` |
+| 確認したコミット | `cb908779682fa315ccd0f1eb58549f6c208f36f0` |
+| `app.config.json` のテンプレート版 | `1.3.0` |
+| 編集対象のHTML | `src/index.template.html` |
+| ビルド入口 | `build-standalone.ps1` |
+| 通常版 | `dist/index.html` |
+| 自己展開版 | `dist/index.self-extract.html` |
+| ルートのHTML | `repository.name` の先頭 `htmlapps-` を除いて命名する通常版の完全コピー |
 
-- Provide a responsive text area.
-- Calculate Unicode-aware character count.
-- Calculate approximate word and line counts.
-- Copy text with a compatibility fallback.
-- Download UTF-8 plain text with a user-editable output filename and a predictable `.txt` extension.
-- Save the current text in local storage when available.
-- Use the reusable `AppToast.show()` Undo pattern for reversible Clear / Restore sample operations. Reserve `AppConfirm.ask()` for irreversible or high-risk actions.
-- Switch Japanese and English without reloading.
-- Use a light-only interface; do not add a dark-mode or theme switcher.
-- Expose build version, generation timestamp, and embedded dependency count.
+これは確認時点の記録であり、将来の「最新」を固定するものではない。実装開始時はテンプレートと対象アプリの現在状態を再確認する。ユーザー指定のZIP・ブランチ・PR・コミットがあれば、その指定を優先する。
 
-## 5. Data and privacy
+専用アプリリポジトリは本依頼で指定されていない。本書はGitHubへの作成・コミット・PR・公開を実行しない。**採用案**は slug `time-study-desk`、リポジトリ名 `htmlapps-time-study-desk`。既存リポジトリの有無、URL、既定ブランチ、公開状態は実装時に確認する。Browser Kitty本体の変更・掲載は別作業とする。
 
-- Input text remains in browser memory and local storage.
-- The app performs no runtime network request.
-- There is no server-side storage, login, analytics, telemetry, or tracking.
-- Download occurs only after a user action.
+---
 
-## 6. Non-goals
+## 1. 製品定義
 
-- Collaborative editing.
-- Cloud synchronization.
-- Rich text formatting.
-- Server-side conversion.
-- Account management.
+### 1.1 一文の目的
 
-## 7. UX and accessibility
+**作業動画を見ながら工程を区切り、繰り返し作業の時間を比較し、気になる数値の根拠映像を確認する。**
 
-- Mobile-first responsive layout from 320px upward.
-- All controls have visible labels or accessible names.
-- Keyboard focus is visible.
-- Motion respects `prefers-reduced-motion`.
-- Reversible changes provide a visible Undo action in the reusable toast.
-- Irreversible or high-risk destructive actions use the reusable confirmation component, centered on desktop and presented as a safe-area-aware bottom sheet on smartphones.
-- Status messages use an `aria-live` region.
-- If the finished app needs persistent smartphone access to 3-5 sections or workflow actions, reuse `components/mobile-bottom-bar.html` rather than inventing another fixed bottom bar. For long multi-section tools, prefer its mobile page-tab mode (`data-mobile-page-target`) so tapping a bottom tab shows only that group on smartphones while desktop still shows all sections. Keep unavailable actions disabled until their prerequisites exist.
+### 1.2 主対象と成功体験
 
-## 8. Performance expectations
+主対象は、梱包・組立・検査など、概ね同じ順序で繰り返す作業を見直したい人。専門的な生産管理システムの設定ではなく、手元の動画一本をその場で扱う。
 
-- Initial UI should become interactive without network access.
-- Input updates should remain smooth for at least 100,000 characters on a typical desktop browser.
-- Avoid rebuilding large DOM sections on every keystroke.
+成功体験は、動画選択後に工程名や組織情報を必須入力せず、最初の一回を区切り、二回目以降を同じ順序で計測し、工程別・回別の表を作れること。表から区間へ戻れ、押し間違いを修正でき、分析データを保存して続きから再開できること。
 
-## 9. Browser target
+### 1.3 解決する作業
 
-Current stable desktop and mobile versions of Chromium, Firefox, and Safari. Direct `file://` opening is required.
+「動画の時刻をメモする → 引き算する → 工程を対応付ける → Excelへ転記する → 異常な値の映像を探す」という往復を一つの画面群で完結させる。
 
-## 10. Acceptance criteria
+### 1.4 製品の非目的
 
-- `build-standalone.ps1` produces the readable HTML, a gzip self-extracting variant, and an exact repository-root copy named from `repository.name` with a leading `htmlapps-` removed (for example `htmlapps-tap-counter` → `tap-counter.html`).
-- Embedded asset bytes are Base64-encoded exactly once; the complete asset-bundle JSON is not wrapped in a second Base64 layer.
-- Assets configured with `gzip` / `auto` can be read through the async embedded-asset API, and the build writes `build-size-report.json`.
-- `scripts/verify-standalone.ps1` passes.
-- The self-extract loader is ASCII-only, inherits the embedded favicon from the readable HTML, and restores the source HTML byte-for-byte.
-- The generated HTML contains no unresolved build placeholder.
-- The generated HTML contains no external script, stylesheet, frame, module import, or CSS asset URL.
-- Runtime CSP includes `connect-src 'none'`.
-- The full core user flow works after opening either generated HTML directly.
-- No data leaves the page.
-- Japanese and English copy both fit at 360px width.
-- Clear happens immediately but offers Undo for long enough to recover the previous text.
-- The output filename can be edited before download; invalid filename characters are sanitized and an empty name falls back to the app slug.
+標準時間の設定、作業者の能力評価、法定・認証用計測、工場全体の最適化、製造能力や削減人員の自動算定を目的にしない。数値は**選択した動画で観測した時間**であり、一般化された標準値ではない。
 
-## 11. Open decisions for a new app
+---
 
-Replace these with explicit decisions before implementation:
+## 2. v1.0.0の範囲
 
-- Maximum accepted input size.
-- Supported input file types.
-- Export file formats, default filename, editable filename behavior, sanitization, and extension rules.
-- Persistence strategy and reset behavior.
-- Undo/redo scope.
-- Error and recovery behavior, including stale async-result invalidation when inputs can change during processing.
-- Explicit async phases (`empty`, `ready`, `loading-runtime` if needed, `processing`, `result`, `error`) for heavy processing apps.
-- Mobile relationship between previews and their directly related controls.
-- Smartphone navigation model: bottom-tab page switching, section-scrolling bottom bar, workflow-action bar, or no fixed bottom bar.
-- Media coordinate/orientation strategy when drawing overlays.
-- Required third-party libraries.
-- Whether the app intentionally needs peer-to-peer WebRTC. If so, decide whether the fully serverless same-LAN QR pairing component is appropriate, what DataChannels are required, and how paired-device data is described to users.
-- Whether bilingual UI is required.
+### 2.1 必須要件一覧
 
-## In-app help
+| ID | 必須要件 | 主な実装段階 |
+|---|---|---|
+| R01 | テンプレート準拠、通常版・自己展開版・ルートコピー、外部ランタイム依存なし | v0.1.0、全段階 |
+| R02 | 日本語・英語、ライトUI、ブランド色、SVG、PC・スマートフォン | v0.1.0、全段階 |
+| R03 | 動画一本の読み込み、再生可否判定、交換・失敗時のデータ保護 | v0.1.0 |
+| R04 | 動画内時刻による境界記録、再生・シーク・速度変更 | v0.1.0〜v0.2.0 |
+| R05 | 最初の一回を仮工程名で区切り、後から命名 | v0.2.0 |
+| R06 | 同じ工程順で反復計測、回の明示的な開始・終了、回間時間 | v0.3.0 |
+| R07 | 手順の版管理、変更前の観測を維持、異なる手順を別集計 | v0.3.0 |
+| R08 | 中断・未観測・実施なし・追加工程・未完了の区別 | v0.4.0 |
+| R09 | 境界移動、分割、結合、割当修正、取り消し・やり直し | v0.2.0、v0.4.0 |
+| R10 | 件数付きの全体・工程別統計、除外理由、集計対象の明示 | v0.6.0 |
+| R11 | 数値から区間再生、回の見直し、映像未選択時の適切な制限 | v0.6.0 |
+| R12 | バージョン付き分析JSON、手動保存・検証付き読み込み | v0.2.0〜v0.5.0 |
+| R13 | 元動画の再選択、候補情報の照合、誤対応付け防止 | v0.5.0 |
+| R14 | 分析データだけの自動保存、保存不能・競合の明示、削除 | v0.5.0 |
+| R15 | 時間表・集計・区間明細CSV、出力名編集、出力内容の整合 | v0.7.0 |
+| R16 | JSON・CSV・文字列の安全な扱い、CSP・通信の検証 | 全段階、v0.7.0〜v0.9.0 |
+| R17 | 計測／見直す／結果のスマートフォン画面、操作の近接配置 | v0.2.0から、v0.8.0で総点検 |
+| R18 | キーボード、フォーカス、音声読み上げ、ヘルプ | 全段階、v0.8.0 |
+| R19 | 空・読込・シーク・完了・失敗・一部未観測・復帰待ちの明示 | 全段階 |
+| R20 | 大きな入力、非同期競合、破損データ、動画末尾の回帰試験 | 全段階、v0.9.0 |
+| R21 | README日英、favicon、実アプリのスクリーンショット、CHANGELOG | 全段階、v0.9.0〜v1.0.0 |
+| R22 | 手順・開始終了条件・集計規則を画面／保存／出力で一致させる | v0.3.0〜v0.7.0 |
+| R23 | データを端末内に保ち、第三者通信や自動送信を行わない | 全段階 |
+| R24 | 受入試験の証跡と未検証事項を分離し、ユーザーがマージする | 全段階、v1.0.0 |
 
-The upper-right header includes a compact help button. It opens a bilingual “使い方と注意事項” dialog containing:
+### 2.2 v1.0.0に入れないもの
 
-- the real user workflow,
-- privacy and local-processing behavior,
-- limitations and data-loss risks,
-- any browser or device constraints relevant to the app.
+AI工程判定、映像認識、アプリ内撮影、動画なしのストップウォッチ、複数動画の同時読み込み・同期、並行作業の複数レーン、動画編集・変換・切り出しファイル生成、標準時間、レイティング、余裕率、タクトタイムからの人員算定、作業者ランキング、クラウド保存、ログイン、共有サーバー、FFmpeg、WASM、WebRTC、外部解析・広告タグ。
 
-Acceptance criteria: help content is updated together with each user-facing behavior change, contains no leftover starter instructions, and remains fully scrollable at narrow smartphone widths / short viewport heights so the final item and close control are always reachable.
+**v1.1.0以降の候補**は「同じ工程だけを回ごとに連続再生」「印刷」「動画を含めないHTMLレポート」。いずれもv1.0.0の受入条件ではない。追加の便利機能を理由に初回リリースを延期しない。
 
-## WebRTC readiness requirement
+---
 
-When an app uses peer-to-peer WebRTC DataChannels, define which reliable channel represents application readiness. Custom channel layouts must set `readyChannelLabel`; do not define application-ready from ICE/PeerConnection `connected` alone.
+## 3. 用語と計測対象
+
+| 用語 | 定義 |
+|---|---|
+| 分析 | 一本の元動画、工程定義、観測回、条件メモ、表示設定をまとめたもの |
+| 工程 | 比較したい作業の単位。名称とは別の固定IDで識別する |
+| 工程の実施 | 一回の観測の中で、その工程を実施した一単位。やり直しは別の実施として記録できる |
+| 手順 | 工程の順序と開始・終了条件をまとめた定義。変更時は別の手順として残す |
+| 回／観測回 | 利用者が開始・終了を指定した一回の作業。UIでは原則「1回目」と表示する |
+| 区間 | 隣り合う二つの境界で挟まれた時間。工程・中断・未観測のいずれか |
+| 中断 | 手順に通常含まれない臨時の停止。通常工程としての待ちとは分ける |
+| 未観測 | 何が行われていたか、または工程の全所要時間を判断できない状態 |
+| 実施なし | その回では工程を実施しなかったと利用者が確認した状態。0秒とは違う |
+| 未完了 | 一回の終了または必要な工程の確定が終わっていない状態 |
+| 回と回の間 | ある回の終了から次の回の開始までの動画内時間。どちらの回にも自動加算しない |
+| 集計対象外 | 利用者が理由を付けて回全体を集計から外した状態。記録の削除ではない |
+
+通常の手順に「機械の処理を待つ」が含まれる場合、その時間は工程として記録する。工程時間を「実働時間」「付加価値時間」と自動で呼び替えない。
+
+一つの動画で一つの作業対象を追う。観測回同士は時間上重複させない。同じ映像を別の切り方で分析したい場合は、別の分析として保存する。
+
+---
+
+## 4. 基本操作フロー
+
+### 4.1 開始画面
+
+主操作は「動画を選択 / Choose video」。PCでは一ファイルのドラッグ＆ドロップも受け付ける。「保存した分析を開く / Open analysis」は副操作とする。
+
+会社・部署・担当者・品番は入力項目として設けない。分析タイトルと条件メモは任意。初期ヘッダーの説明文は「動画を工程ごとに区切り、作業時間を比較します。」とする。
+
+### 4.2 動画を開く
+
+メタデータ読み込み後、ファイル名、動画の長さ、縦横サイズ、ファイルサイズを表示する。長いファイル名はUI内で折り返すか省略し、全体を確認する方法を残す。映像が表示され、シーク可能になってから計測操作を有効化する。音声のみのファイルは対象外。
+
+### 4.3 最初の一回
+
+開始位置で「ここから開始」。工程が変わる位置で「ここで区切る」。仮名「工程1」「工程2」を使い、動画を見ている最中に文字入力させない。
+
+最終工程では「この回を終了」。最後の区間を確定して停止し、工程名を編集する。終了時に空の次工程を自動作成しない。名前を付けなくても仮名のまま次へ進める。工程名を編集する場合は前後空白を除いて空の名前を確定せず、元の仮名を維持する。工程を事前に知っている利用者には、改行区切りで工程名を入力する副導線を設ける。
+
+### 4.4 二回目以降
+
+利用する手順を選び、作業の開始位置で明示的に開始する。現在の回、現在の工程、次の工程を動画の近くに表示する。
+
+通常の主操作は「ここで次の工程へ」。最後の工程では、同じ主操作の位置を「この回を終了」に変える。終了後に次の回を自動開始しない。開始・終了は同じ判定条件で行うよう、条件メモへの短い案内を置く。
+
+### 4.5 見直しと出力
+
+結果の数値を押すと、対象区間を選択して見直し画面へ移り、開始位置へシークして停止する。動画を勝手に再生しない。「この区間を再生」を押すと区間末尾付近で停止する。停止位置はブラウザ依存のためフレーム精度を保証しない。
+
+分析データは作業途中から保存できる。集計CSVは有効な完了回が一つ以上ある場合、時間表・明細CSVは手順に対応付けた記録が一つ以上ある場合に保存できる。未完了の行には状態を明記する。
+
+---
+
+## 5. 動画・時刻・再生の仕様
+
+### 5.1 入力条件と上限
+
+以下は本アプリの設計上限であり、すべての端末での再生保証ではない。
+
+| 項目 | 仕様 |
+|---|---|
+| 同時に対応付ける動画 | 1本 |
+| ファイルサイズ | 0バイトを拒否。8 GiB（8×1024³ bytes）以下 |
+| 動画の長さ | 正の有限値、24時間以下 |
+| 対象 | ブラウザが再生でき、長さとシーク位置を取得できるローカル動画 |
+| 非対象 | URL入力、ストリーミング、長さ不明、音声のみ、暗号化メディア |
+| 大容量案内 | 1 GiB以上で端末によって再生や移動に時間がかかる案内。自動変換はしない |
+
+MP4・MOV等の拡張子だけで成功を判定しない。MIMEが空でも拡張子だけで拒否せず、ブラウザの実際の読み込み結果で判定する。再生できない場合はデータを保護して別ファイル選択へ戻す。プラットフォームによってコーデック対応が異なることをヘルプに記す。[W7]
+
+### 5.2 時刻の唯一の基準
+
+計測コマンドを確定する瞬間に、当該動画の `currentTime` を読む。[W1]
+
+`timeUs = Math.round(currentTime * 1_000_000)`
+
+保存・比較は非負の安全な整数マイクロ秒で行う。これは演算上の単位であり、マイクロ秒の計測精度を意味しない。区間時間は境界の差で算出し、壁時計、UI更新回数、再生に費やした実時間を用いない。速度を掛けたり割ったりして補正しない。
+
+`requestVideoFrameCallback()` は利用できる場合に映像更新・診断へ使用してよいが、その値と `currentTime` を境界ごとに無条件で混用しない。コールバックの厳密な同期保証やフレーム単位の計測保証をうたわない。[W2]
+
+### 5.3 プレイヤー
+
+再生／一時停止、シーク、経過位置、動画の長さ、音量／ミュート、再生速度 `0.25 / 0.5 / 0.75 / 1 / 1.5 / 2` を提供する。既定値は1倍。再生失敗を捕捉してUI上へ示す。再生速度の変更は記録済み時刻・時間を変更しない。[W3]
+
+位置の微調整は `−1秒 / −0.1秒 / ＋0.1秒 / ＋1秒` とし、ボタンを全て同格で並べすぎない。狭い画面では微調整メニューから選べる。「1フレーム」とは呼ばない。時刻の直接入力も境界編集で提供する。
+
+数値表示は原則0.1秒単位、境界編集と明細は最大小数6桁。丸めるのは表示・出力時だけで、集計は内部値から行う。正の値が表示丸めで0になる場合は主画面では「0.1秒未満」とする。
+
+### 5.4 確定を禁止する状態
+
+読み込み中、シーク中、メディアエラー、動画未選択、バックグラウンド、現在位置が直前の境界以下、古いソースの非同期結果しかない場合は区切りを確定しない。理由を短く表示する。
+
+計測中に戻って映像を見ても既存記録を自動削除しない。直前の境界以前で追記を試みた場合は「前の区切りより後へ移動するか、見直しで修正してください」と案内する。
+
+回の終了・未完了としての中断だけは、現在位置が最後の確定境界と等しい場合に新しい0秒区間を作らず状態だけ変更してよい。finishCycleは既存区間が正の長さを持ち、全実施の状態を解決できた場合だけ完了する。通常のmarkBoundaryにはこの例外を適用しない。
+
+### 5.5 撮影速度・動画末尾・画面復帰
+
+通常速度で撮影され、時間伸縮されていない動画を前提とする。スローモーション・タイムラプス・編集済み速度変更から実時間を自動復元しない。
+
+動画が末尾に達しても回を「完了」にしない。末尾までの未確定区間を保存可能な未完了記録にし、明示的な見直し・確定を必要とする。バックグラウンド移行では再生を停止し、最後に画面上で観測した位置までを未確定の続きとして保持する。復帰時は最後の確定境界から再開を提案し、離席時間を動画内の中断として自動挿入しない。
+
+---
+
+## 6. 工程・手順・例外
+
+### 6.1 工程の固定ID
+
+名称変更は同じ工程IDの全回へ反映する。「全回の工程名を変更する」と明示しUndo可能にする。同名工程も許容し、選択・CSVでは短い識別子を補助表示する。別工程を同名だからと自動結合しない。
+
+工程は通常作業または通常の待ちとして分類できるが、分類は時間の加算規則を変更しない。工程IDの付け直しで過去の比較が切れる操作はしない。
+
+### 6.2 手順を変える
+
+工程の追加・削除・順番、開始・終了条件の意味を変える場合は、新しい手順IDを作成する。既存の手順は不変とし、過去回は元の手順IDを参照し続ける。UIでは「手順1」「手順2」と表示し、内部の版番号・スキーマ用語は前面に出さない。
+
+次の回から新手順を選べる。v1.0.0では異なる手順を一つの平均へ統合しない。結果画面は手順で切り替え、対象回数を表示する。最初の仮工程分割中だけは手順未確定を許し、最初の回を終了するときに仮名を含む最初の手順を自動作成して、その回へ対応付ける。名称の訂正はその後に行える。新しい工程定義はcreatePhaseで作り、既存手順には自動挿入しない。手順へ加える場合はchangeProcedureで新手順を作る。工程のアーカイブは新規選択肢から外す操作であり、既存手順・観測・統計を削除しない。分類変更も時間計算を変えない。
+
+### 6.3 実施なし
+
+「この工程は実施なし」で、その工程の実施を `not-performed` として残す。0秒の工程区間は作らない。操作自体は動画の時間を消費しない。
+
+適用できるのは当該実施に工程／未観測の確定区間がない場合だけ。未確定の開始境界はそのまま次工程へ引き継ぐ。既に区間がある工程を実施なしにしたい場合は、見直しで区間の割当てを訂正してから状態を変更する。時間を黙って削除しない。
+
+### 6.4 中断
+
+「中断を記録」で現在の工程の途中を確定し、同じ境界から中断区間を始める。「工程へ戻る」で中断を確定し、同じ工程の続きを記録する。工程の実施IDは同じまま、複数区間へ分かれる。
+
+中断を入れ子にしない。中断の理由メモは任意で、空ならUI上は単に「中断」。通常の待ち工程へ勝手に変換しない。中断中に作業を終了する場合は、見直しで残りの工程状態を解決してから回を完了する。動画末尾などで判断できなければ未完了を維持する。
+
+### 6.5 未観測
+
+「観測できない区間」で開始・終了を記録し、未観測として別に保持する。どの工程の途中か分かる場合はその実施IDへ対応付け、その工程の実施状態を `unobserved` にする。分からない場合は実施IDを空にして、影響する未確定工程を見直しで解決する。
+
+一部だけ観測できた工程は、観測済み区間を残すが工程平均へ入れない。「参考：記録済み4秒／未観測あり」のように表示する。未観測区間の時間は全体内訳に含めるが、工程や中断へ推定配分しない。
+
+### 6.6 この回だけの追加工程・やり直し
+
+確定境界の間へ一回限りの工程の実施を挿入できる。次回の手順は変更しない。既存工程のやり直しなら同じ工程IDに対する別の実施として扱う。
+
+主計測画面には大きな専用ボタンを増やさず、「その他」または見直しの割当操作へ置く。工程の途中に別作業が入った場合は境界を分割して各区間を割り当てる。自動推定や時間の複製は行わない。
+
+### 6.7 集計から外す
+
+v1.0.0の手動除外単位は**回全体のみ**。理由の入力を必須とする。個別区間だけを任意に引いた平均や、自動外れ値除外は実装しない。
+
+除外した回も一覧・時間表・明細へ残し、除外理由を表示する。除外解除はUndoとは別にいつでも実行できる。数値が長いという理由だけで自動除外しない。
+
+---
+
+## 7. 境界編集・取り消し
+
+### 7.1 共有境界
+
+区間は隣接する境界を共有する。境界を移動すると左区間の終了と右区間の開始を同時に更新する。左右の境界を追い越す移動、0以下の長さ、動画範囲外、他の回との重なりは拒否する。入力中は強制丸めせず、確定時にフィールド内で理由を示す。
+
+### 7.2 操作
+
+「選んだ境界を現在位置へ」「時刻の直接入力」「ドラッグで移動」を提供する。ドラッグ以外でも同じ結果へ到達できることを必須とする。
+
+見直しでは区間分割・隣接区間の結合・工程割当てを修正できる。結合は左右が同じ種別・同じ工程の実施の場合に直接許可し、それ以外は残す割当てを選ばせる。削除により工程が実施なしや未観測へ変わる場合も勝手に確定しない。
+
+回の開始・終了境界の変更は対象回だけに作用する。回間時間は再計算する。時間順で表示番号を再表示しても回IDは変えない。
+
+### 7.3 Undo / Redo
+
+区切り、回開始・終了・再開、分析タイトル・分析メモ・回／実施／区間のメモ訂正、境界移動、分割・結合、名前変更、工程割当て、実施なし、中断／未観測、追加工程、手順作成、回削除、除外変更を対象とする。ドラッグ一連は一操作として記録する。
+
+履歴は最大100操作か差分合計16 MiBの早い方。古い履歴から破棄し、現在の分析は破棄しない。新規編集後はRedoをクリアする。再生・シーク・タブ・言語変更は履歴に含めない。履歴自体は保存ファイルに含めず、再読み込み後は新しい履歴とする。
+
+動画交換・分析の読み込み・全消去は確認が必要な境界操作とし、成功後にUndo履歴をリセットする。キャンセル時は元の状態を完全に維持する。通常の区切りに確認ダイアログを挟まない。
+
+---
+
+## 8. 集計仕様
+
+### 8.1 集計母集団
+
+選択した一つの手順に属する回を対象とする。全体統計の母集団 `C` は、回が完了し、手動除外されていない回。
+
+表示する件数は、選択手順の「記録回数」「完了・対象回数」「完了・除外回数」「未完了回数」。未完了の除外フラグは保持しても件数は未完了に一度だけ数える。これにより件数の重複を防ぐ。
+
+未観測を含んでいても開始・終了が確定した完了回は全体時間の母集団に含める。未観測の存在と件数を併記する。未完了回はその中の完了工程も含め、標準の比較統計から外す。
+
+### 8.2 全体時間と内訳
+
+回 `c` の全体時間を `E(c)`、工程として確定した区間の合計を `P(c)`、中断を `I(c)`、未観測区間を `U(c)` とする。
+
+```text
+E(c) = 終了境界 − 開始境界
+P(c) = kind=phase の区間長の合計（追加工程・通常の待ちを含む）
+I(c) = kind=interruption の区間長の合計
+U(c) = kind=unobserved の区間長の合計
+E(c) = P(c) + I(c) + U(c)
+```
+
+完了回ではこの等式が内部整数値で厳密に成立する。未観測工程の観測できた部分は `P` に含まれるため、ラベルは**記録済み工程時間**とする。「未観測を除けば実作業時間が分かる」という説明はしない。
+
+全体内訳の平均はすべて同じ `C` で算出する。したがって数学上は `mean(E)=mean(P)+mean(I)+mean(U)`。実装の正は丸めていない整数の区間和と件数であり、平均小数の浮動小数点演算で完全一致することを要求しない。丸めによる表示差がある場合は注記する。
+
+### 8.3 工程別の値
+
+工程 `p` の一回当たりの値 `D(c,p)` は、その回にある当該工程の全実施の工程区間長を合算する。ただし、いずれかの実施が未観測・未確定なら当該回の工程値は統計対象外。
+
+当該工程が全て実施なしの場合は `not-performed`、当該手順にも追加実施にも存在しない場合は `not-in-procedure`。両者を区別し、0秒にはしない。中断で分かれた同一実施の区間や、一回の中のやり直しを別々の「観測回」として数えない。
+
+工程平均の母集団 `C_p` は `C` のうち `D(c,p)` を確定できる回。平均の横に `n=|C_p|` を表示し、実施なし・未観測・手順外の件数も確認できるようにする。
+
+**工程別平均の合計から全体平均を作らない。** 工程ごとに母集団が異なる場合がある。
+
+### 8.4 統計と表示
+
+初版の統計は件数・平均・中央値・最小・最大。範囲は最大−最小。標準偏差、信頼区間、能力指数、ヒストグラム、外れ値自動判定はv1.0.0に入れない。
+
+0件なら数値は `—` とし「集計できる記録がありません」と表示する。1件なら平均・中央値・最小・最大は同じ値とし、件数1を明示する。中央値は偶数件なら中央二値の算術平均。
+
+主な表示は「工程×回」の表、工程別の平均時間棒グラフ、選択回の工程・中断・未観測の内訳。棒グラフの値は工程別の値であり、棒の合計を一回の全体時間として説明しない。
+
+色だけで警告・種別を区別しない。比較のためのグラフはゼロ始点とし、数値と件数を併記する。全体時間から生産個数／時を自動計算しない。
+
+---
+
+## 9. データモデルと不変条件
+
+### 9.1 ファイル形式
+
+保存ファイルはUTF-8 JSON、拡張子 `.tsd.json`。`format` は `time-study-desk`、`schemaVersion` は整数 `1`。アプリのSemVerと保存スキーマ版を独立管理する。
+
+主なデータの型は以下。これは設計上の型定義であり、TypeScript導入を要求しない。
+
+| エンティティ | フィールド |
+|---|---|
+| Project | `format, schemaVersion, appVersion, projectId, createdAt, updatedAt, title, note, source, phases[], procedures[], cycles[], settings` |
+| Source | `name, size, lastModified, durationUs, width, height` |
+| Phase | `id, label, kind: operation\|planned-wait, archived` |
+| Procedure | `id, label, phaseIds[], startCondition, endCondition, createdAt` |
+| Cycle | `id, procedureId: string\|null, status: open\|complete\|incomplete, boundaries[], spans[], occurrences[], cursor, excluded, exclusionReason, note` |
+| Boundary | `id, timeUs` |
+| Span | `id, kind: phase\|interruption\|unobserved, occurrenceId: string\|null, note` |
+| Occurrence | `id, phaseId, planned, resolution: pending\|measured\|not-performed\|unobserved, note` |
+| Cursor | `kind: phase\|interruption\|unobserved, occurrenceId: string\|null, note` または `null`。最後の境界からの未確定区間の割当て |
+| Settings | `language: ja\|en, selectedProcedureId: string\|null, outputBaseName` |
+
+動画バイト、Fileオブジェクト、Blob URL、ローカル絶対パス、DOM、再生中フラグ、Undo履歴、集計済みの派生値をJSONへ保存しない。更新日時は文書管理用で、工程時間計算に使わない。
+
+### 9.2 区間の表現
+
+区間の開始・終了時刻を重複保存しない。`spans[i]` は `boundaries[i]` と `boundaries[i+1]` の間を表す。
+
+```text
+boundaries.length = spans.length + 1
+boundaries[i+1].timeUs > boundaries[i].timeUs
+```
+
+一回を開始しただけなら境界一つ、区間ゼロ、cursorあり。区切るたびに境界・確定区間を一つ増やす。未確定区間の時刻は再生に合わせてUIで示すが、確定済み時間として保存・集計しない。手動保存・自動保存では未確定の時間を勝手に区間へ変えず、最後の確定境界とcursorを保存する。続きは最後の確定境界から再観測する。再開はresumeCycleで明示的に行い、最後の境界へシークして停止した後に利用者が再生する。「この位置まで記録して中断」または動画末尾では、最後に観測した位置を一つの未完了区間として確定する。未終了の通常工程の実施は `pending` のまま残し、既に未観測となっている実施は `unobserved` を維持する。
+
+### 9.3 必ず守る不変条件
+
+1. IDは正規表現 `^[a-z0-9][a-z0-9-]{0,63}$` に一致し、プロジェクト内の各エンティティ種別で一意。参照は存在するIDのみを指す。
+2. 全時刻は非負の安全な整数で動画の長さ以下。境界は厳密に増加する。
+3. 完了回は正の長さを持ち、cursorがなく、実施状態にpendingがない。
+4. 未完了回に残るcursorは読み込み時に自動再生・自動計測を開始しない。
+5. phase区間は実施ID必須。not-performed実施へphase／unobserved区間を割り当てない。
+6. measured実施は正のphase区間を持ち、当該実施に未観測区間がない。
+7. 未観測実施の既知部分は保持するが、完全な工程値とは扱わない。
+8. 同時に編集を継続するopen回は一つだけ。前の回を完了または未完了として閉じてから次を開始する。
+9. 回同士は重複せず、回間時間は派生値として計算する。
+10. procedureIdがnullでよいのは、初回の手順作成中のopen／incomplete回だけ。
+11. 除外理由はexcluded=trueのとき空白以外の入力が必須。
+12. 手順は作成後不変。表示名の単純訂正を除き構造変更は新IDへ分離する。
+13. 実施ID付きunobserved区間がある実施のresolutionはunobservedとする。区間の再割当て時は関連する実施の状態も再検証する。
+14. 手順に対応付けた回のplanned=true実施は手順の各位置に一対一で対応し、その工程ID列はphaseIdsと一致する。同じ工程IDが手順に複数回登場しても実施IDは分ける。回だけに追加した実施はplanned=falseとする。
+
+### 9.4 入力・保存上限
+
+工程定義50、手順20、観測回1,000、確定区間の総数10,000、分析JSON10 MiB、入れ子深さ20。タイトル160文字、工程名80文字、手順名80文字、条件各1,000文字、理由1,000文字、分析メモ4,000文字、区間／実施／回のメモ各1,000文字。文字数はUnicodeコードポイントで数える。
+
+上限は無条件な性能保証ではない。複数の上限を同時に最大まで使用できるとは限らない。追加操作で保存可能サイズを越える場合は、その操作をコミットせず、現データを保持して保存を案内する。読み込みも同じ上限で検証し、黙って切り捨てない。
+
+---
+
+## 10. 実行時状態と非同期処理
+
+### 10.1 状態は分けて持つ
+
+| 系統 | 状態 |
+|---|---|
+| 動画 | empty / loading / ready / seeking / error / detached |
+| 分析 | empty / editing / result |
+| 計測 | idle / first-cycle / repeating / interruption / unobserved / suspended |
+| 永続化 | available / saving / saved / unavailable / conflict |
+| 出力 | idle / preparing / handed-off / failed |
+
+分析の結果があることと、動画が選択されていることを同一視しない。動画なしでも、読み込んだ分析の表の確認・工程名訂正・保存・CSV出力を可能にする。新しい境界を打つ操作と映像へ戻る操作は動画が必要。
+
+### 10.2 原子操作
+
+ユーザー操作は検証→状態変更→派生値再計算→描画→保存キューの順に行う。検証失敗時は元の状態を変更しない。表示と出力で別々の計算ロジックを持たない。
+
+### 10.3 ソースの交換
+
+新しいファイルを選んだだけで現在の分析を破棄しない。必要な確認の後、既存分析を保持したまま新ファイル候補を別の一時状態で読み込む。成功して利用者が確定した時点で表示ソースを切り替え、旧Blob URL等を解放する。失敗・キャンセル時は旧分析へ戻れる。
+
+切り替え開始時に表示対象の世代トークンを更新し、古い読み込み、シーク、再生Promise、メタデータ取得、出力準備の結果が新しい状態へ書き込めないようにする。トークンはソース単位に加え、シーク要求・保存要求にも順序を持たせる。
+
+### 10.4 動画の選び直しと別動画への交換
+
+保存済み分析に対する「元動画を選び直す」と、「別動画で新しい分析を始める」を別操作にする。別動画を既存の時刻へ強制対応付けする機能はv1.0.0に設けない。
+
+---
+
+## 11. 保存・再開・データ保護
+
+### 11.1 手動保存
+
+主操作名は「分析データを保存 / Save analysis」。既定名は元動画の拡張子を除いた名前に `-time-study.tsd.json` を付ける。拡張子は分離表示し、ベース名を編集可能にする。
+
+保存するのは分析データだけと明記する。動画は含まれず、再開には元動画の選び直しが必要。分析データだけでも結果の確認・CSV出力はできる。
+
+ブラウザへダウンロードを渡した事実と、ディスクへ確実に保存された事実を混同しない。通常のダウンロードでは「ダウンロードを開始しました」と表示し、保存先の確認を案内する。
+
+### 11.2 JSON読み込み
+
+サイズを先に確認し、JSONをparseした後、固定フィールド・型・値・ID・参照・境界順・上限・schemaVersionを検証する。許可フィールドだけから新しいオブジェクトを作り、入力オブジェクトをそのまま状態へ混ぜない。
+
+破損・未知形式・未対応スキーマ・不正参照は、理由を示して全体を拒否する。現在の分析は変更しない。schemaVersion=1では未定義フィールドも検証エラーとし、読み飛ばして黙って失うデータを作らない。schemaVersionが新しい場合は部分復元しない。対応する旧版の移行がある場合だけ、テスト済みの変換を行い、元ファイルを上書きしない。
+
+### 11.3 元動画の照合
+
+保存した `name, size, lastModified, durationUs, width, height` と候補を比較する。
+
+- サイズと縦横サイズが一致し、長さの差が100,000 µs以下なら「候補情報が一致」とする。
+- 名前・更新日時の違いは、移動・コピーの可能性があるため警告にとどめる。
+- サイズ・縦横サイズの不一致、長さの差が100,000 µsを越える場合は既存分析への対応付けを拒否する。
+- 候補情報が一致しても、候補の実際の動画長が既存の最終境界より短い場合は対応付けを拒否する。既存境界を丸めたり切り詰めたりしない。
+- 一致しても同一動画の証明ではない。「保存時と同じ動画か確認してください」と表示し、利用者の確定で接続する。
+
+100,000 µsは候補照合だけの許容差であり、計測精度・境界丸めの許容差ではない。フル動画ハッシュ、全バイト読み込み、サーバー照合は初版では行わない。
+
+### 11.4 自動保存
+
+v0.5.0からIndexedDBへ、動画を含まない分析スナップショットを保存する。新しい分析の最初の編集前に「分析データをこのブラウザに自動保存する」設定を表示し、初期値ONを明示する。OFFでも手動保存は使用できる。自動保存のON/OFFは端末側のアプリ専用設定であり、読み込んだ分析JSONにより勝手に変更しない。端末設定の保存も使えない場合はセッション内だけ保持する。
+
+確定操作後750 msのデバウンス、連続編集時は最長5秒で保存を試みる。成功表示はトランザクション成功後のみ。完了・全消去・分析交換では保留処理を整理する。ページ離脱時の非同期保存だけに依存しない。
+
+保存領域は永久保管ではなく、ブラウザや利用条件で制約がある。[W4] `file://` での保存挙動も一律に仮定しない。[W5] 実際に読み書きできるかを確認し、失敗したら「この環境では自動保存できません。分析データを保存してください」を継続表示する。手動保存・計測は継続可能。
+
+### 11.5 競合・復元・削除
+
+一つの分析の保存リビジョンを単調増加させる。別タブが新しいリビジョンを保存していた場合、IndexedDBの同一トランザクションで競合を検出し、黙って上書きしない。「別タブで更新されています」と表示し、現在の分析を手動保存できるようにする。
+
+前回の分析がある場合は開始画面へ復元カードを出す。自動で新規データへ上書きしない。複数プロジェクトを一覧管理する製品にはしない。自動保存は前回の一分析を基本とし、置き換え前に未保存の分析を保護する。
+
+「このブラウザの分析データを削除」は確認を伴い、アプリ専用DB／キーだけを削除する。同じオリジンの他ツールの保存領域を全消去しない。元動画や利用者がダウンロードしたファイルは削除しない。
+
+---
+
+## 12. CSV出力
+
+### 12.1 三種類の出力
+
+一度の操作で一ファイルを保存する。複数ファイルの自動ダウンロードやZIPライブラリは導入しない。
+
+| 種別 | 一行の単位 | 主な内容 |
+|---|---|---|
+| 時間表 | 観測回 | 手順、回ID、状態、対象可否、理由、開始・終了、全体・工程・中断・未観測、工程ごとの秒数と状態 |
+| 集計 | 全体内訳の指標または工程 | 対象手順、指標／工程IDと名前、n、平均・中央値・最小・最大、実施なし・未観測・手順外件数 |
+| 区間明細 | 区間または状態記録 | 回ID、区間ID、工程実施ID、種別、開始・終了秒、所要秒、工程状態、対象可否、理由、メモ |
+
+時間表・集計は選択した手順を対象とする。明細には出力設定で「選択手順／分析全体」を明示し、既定は選択手順。除外回・未完了回を含めて出力し、平均の対象フラグを必ず付ける。
+
+実施なしは時間列を空欄にし状態列へ出す。未観測工程は完全な所要秒を空欄にし、必要なら記録済み部分を別列に出す。明細では区間のない実施なし等を `row_type=occurrence-status` として残す。回間時間は `row_type=between-cycles`、集計対象falseとし、回の工程に混ぜない。
+
+### 12.2 フォーマット
+
+UTF-8 BOM付き、区切りカンマ、改行CRLF。全セルを二重引用符で囲み、内部の二重引用符を二重化する。秒数は小数点 `.`、桁区切りなし、最大小数6桁。数値の欠損は空欄であり0ではない。
+
+時間表・集計の見出しと状態表示は選択中の言語。明細のキーはASCII固定とし、`row_type, procedure_id, cycle_id, cycle_number, cycle_status, included_in_cycle_stats, exclusion_reason, span_id, occurrence_id, phase_id, phase_name, span_kind, start_seconds, end_seconds, duration_seconds, occurrence_state, note` をこの順で出す。対象外の値は空欄にする。
+
+時間表では各工程を「名称＋秒」「名称＋状態」の二列で表す。同名工程は短縮IDの補助表示で見出しを一意にする。短縮IDが重複する場合は識別できる長さまで伸ばす。開始・終了条件は専用列へ含め、設定の異なる分析との取り違えを防ぐ。
+
+### 12.3 安全性と出力名
+
+利用者入力の工程名・理由・メモ等が表計算ソフトで数式として解釈される危険を考慮する。[W6] 先頭の空白・制御文字・BOMを飛ばした最初の文字が `= + - @` または全角相当の場合、あるいは先頭がタブ／改行等の場合は、テキストセルへ先頭アポストロフィを追加してからCSV引用する。元文字列はJSONで保持する。
+
+CSVの再保存・他ソフトによる再解釈まで完全に防止できるとは説明しない。初回読み込みの対象ソフトで検証する。数値としてアプリが生成した正の秒数と、利用者入力の文字列は別処理にする。
+
+既定名は `{base}-time-table.csv`、`{base}-summary.csv`、`{base}-intervals.csv`。全出力でベース名編集を可能にし、パス区切り、制御文字、危険な末尾や予約名をサニタイズする。空名は `time-study` に戻す。利用者入力からディレクトリへ書き込まない。
+
+---
+
+## 13. UI・アクセシビリティ・文言
+
+### 13.1 画面構成
+
+PCは動画と計測操作、工程・回の一覧を近くに配置し、必要な結果を同画面に表示できる。スマートフォンは**計測／見直す／結果**の三画面タブとする。
+
+計測画面に横長の集計表を詰め込まない。見直しでは動画の直近にシーク・微調整・境界変更を置く。結果では工程別／回別の縦型表示を選べ、横スクロールなしで主用途が完結する。PC表も大きい場合は表領域内で制御し、ページ全体を横へ押し出さない。
+
+### 13.2 レイアウトの受入値
+
+320 / 360 / 390 / 430 / 768 / 1360 CSS px幅、短い横画面高さ、200%ズームを確認する。主タップ領域は高さ48 CSS px以上、補助操作は44 CSS px以上を基本とする。下部タブは一つだけ固定し、主要計測ボタンを別の固定バーに重ねない。safe-areaとソフトキーボード表示時を考慮する。
+
+動画は `object-fit: contain` を用い、縦長動画を切り抜かない。低い画面では操作が隠れないよう動画の最大表示高さを調整する。これは映像の元データを書き換える処理ではない。
+
+### 13.3 外観
+
+Primary `#16624F`、ライトUIのみ、色だけで状態を識別しない。SVGアイコンを使用し、汎用絵文字を主操作へ使わない。faviconと左上アイコンは同じ `assets/favicon.svg` を正とする。64×64、rx=16、主色と白のアイコンを採用案とし、正式図案はv0.9.0で確定する。
+
+### 13.4 キーボード
+
+- 動画プレイヤー領域のフォーカス時、Spaceで再生／停止、左右で0.1秒移動、Shift＋左右で1秒移動。
+- 主操作ボタンへフォーカスしてEnter／Spaceで区切る。フォーカスがボタン上ならプレイヤーのSpace処理は動かさない。
+- アプリ編集領域でCtrl/Cmd＋Z、Ctrl/Cmd＋Shift＋Z。文字入力中はブラウザの文字編集Undoを優先する。
+- Escでメニュー・ダイアログを閉じる。閉じたら元の起点へフォーカスを戻す。
+
+押しっぱなしの区切りで記録を増やさない。同じキーイベント／タップを複数経路で処理しない。Tabのみで動画選択、計測、修正、保存に到達できる。
+
+### 13.5 日本語・英語の主要文言
+
+| 日本語 | 英語 |
+|---|---|
+| 動画を選択 | Choose video |
+| 保存した分析を開く | Open analysis |
+| ここから開始 | Start cycle here |
+| ここで区切る | Mark boundary |
+| ここで次の工程へ | Next step here |
+| この回を終了 | Finish cycle here |
+| 再生を一時停止 | Pause video |
+| 中断を記録 | Mark interruption |
+| 工程へ戻る | Resume step |
+| この工程は実施なし | Step not performed |
+| 未観測 | Not observed |
+| 未完了 | Incomplete |
+| 集計対象外 | Excluded from statistics |
+| 分析データを保存 | Save analysis |
+| 元動画を選び直す | Reconnect original video |
+| 計測／見直す／結果 | Measure / Review / Results |
+
+「再生を一時停止」と「作業中断」を同じ停止ラベルにしない。再生位置を毎フレームaria-liveへ読み上げない。主要な確定・失敗・保存状態だけを通知する。
+
+### 13.6 ヘルプと初期・失敗状態
+
+右上に「使い方と注意事項 / How to use & notes」。できること、基本操作、対応形式、通常速度の動画、精度限界、未観測・除外、保存の内容と消失リスク、外部送信の有無を含める。
+
+空状態は次の操作を示す。集計不能なときは理由と見直し導線を示す。技術的な例外文字列は折りたたむ。ヘルプ・確認ダイアログはスマートフォンで末尾までスクロールできること。
+
+---
+
+## 14. プライバシー・安全性
+
+### 14.1 データの境界
+
+元動画はFile参照とBlob URLで扱い、通常操作で全バイトをJavaScript配列へ複製しない。映像、工程名、条件、メモ、ファイル名をサーバーへ送らない。分析JSONとCSVは利用者操作でローカルに出力する。
+
+自動保存は同一端末のブラウザ内で、動画を含めない。ただしファイル名・工程名・メモも機密情報になり得ると説明する。端末内保存は暗号化保管や他利用者からのアクセス防止を保証するものではない。
+
+### 14.2 CSPの設計値
+
+通常版のアプリに対する基準は以下。実際のテンプレート生成・自己展開版の動作と合わせて検証し、理由なく権限を広げない。[T1, W8]
+
+```text
+default-src 'none';
+script-src 'unsafe-inline';
+style-src 'unsafe-inline';
+img-src data: blob:;
+media-src blob:;
+connect-src 'none';
+font-src 'none';
+worker-src 'none';
+object-src 'none';
+frame-src 'none';
+base-uri 'none';
+form-action 'none';
+```
+
+v1.0.0ではランタイムモジュール読み込みやWorkerを必要としない。テンプレート内に汎用の埋め込み資産APIが存在しても、不要な外部通信・Worker機能を使用しない。自己展開ローダーのCSPは別に確認し、アプリ展開後に通常版と同等の境界が維持されることを確認する。
+
+### 14.3 禁止・防御
+
+CDN、外部フォント、外部画像、fetch/XHR、WebSocket、EventSource、sendBeacon、解析・広告、隠れたiframe、外部フォーム送信、URLを指定して動画取得、Service Worker登録を追加しない。
+
+利用者文字列を `innerHTML` へ流し込まない。HTMLタグを含む工程名でもテキストとして表示する。JSONで `__proto__` 等を受けても状態へ混入させない。import時の循環・巨大配列・深い入れ子・負数・重複ID・未知版を検証する。
+
+通信試験は「CSPで遮断されたから成功」とせず、アプリが不要な送信を試みていないことも確認する。初回HTML取得や、明示的に外部ヘルプへ移動する操作と、アプリ内部のランタイム通信を分けて記録する。
+
+「完全ローカル処理」という表示は実装と検証結果が一致するときに限る。[G1]
+
+---
+
+## 15. 実装構成と責務
+
+### 15.1 初版の技術構成
+
+HTML / CSS / JavaScript、HTMLMediaElement、File / Blob URL、IndexedDB、SVG。ランタイム依存ライブラリはゼロを初期方針とする。FFmpeg・WASM・WebCodecs・WebGPUに依存しない。
+
+開発用のNode.js、ブラウザテストツール、動画試験素材の生成ツールは利用者の実行環境へ要求しない。開発依存を導入する場合はその時点でバージョンとライセンスを確認し、正確な版をロックする。
+
+### 15.2 ソースの責務
+
+テンプレートの単一編集元 `src/index.template.html` を維持し、アプリ内を次の明示的なブロックへ分ける。[T1–T3]
+
+| ブロック | 責務 |
+|---|---|
+| TOKENS / LAYOUT | 色・余白・レスポンシブ・safe-area |
+| I18N | 全UI翻訳とヘルプ |
+| CORE | 時刻、データ検証、コマンド、Undo差分、集計、シリアライズ。DOMなしの純粋処理 |
+| MEDIA | ファイル候補、動画状態、再生・シーク、時刻取得、世代管理、解放 |
+| STORAGE / EXPORT | IndexedDB、保存キュー、インポート、CSV、ファイル名 |
+| UI / CONTROLLER | 操作の接続、派生値を使う描画、選択とフォーカス |
+
+COREは `// TSD:CORE:BEGIN`〜`// TSD:CORE:END` に一組だけ置き、`const TsdCore = ...` として同じスクリプト内で利用する。ユニットテストはこの実ソースを抽出して評価し、計算ロジックをテスト用ファイルへ複製しない。
+
+一つのHTMLが安全に編集できない規模になったときは、開発ソース分割を別の構造変更として提案し、ビルド・検証・単一HTMLを維持する。本計画の途中で無断でフレームワークへ置き換えない。
+
+### 15.3 共通コンポーネント
+
+確認、Undo通知、ポップオーバー、非同期世代管理、スマートフォン下部タブはテンプレートの対応コンポーネントを読み、必要部分を適用する。完成UIへネイティブalert／prompt／confirmを安易に持ち込まない。
+
+生成HTMLの直接修正、必須マーカーを通すだけのダミー文字列追加、チェックの削除によるCI回避を禁止する。`outputFilename` などの現行テンプレート契約は実際の挙動とともに維持する。[T5]
+
+---
+
+## 16. 品質・対応環境・性能確認
+
+### 16.1 対象環境
+
+正式判定はリリース時の安定版と具体的なOS・ブラウザ版を記録する。現時点で「動作確認済み」とはしない。
+
+| 環境 | v1.0.0の扱い |
+|---|---|
+| Windows Chrome / Edge | 主要対象。通常版・自己展開版のfile://とHTTPSで主経路を確認 |
+| macOS Safari | 主要確認対象。ブラウザ差を明記 |
+| Android Chrome | 実機でHTTPSの読み込み・計測・保存・復元を必須確認 |
+| iPhone Safari | 実機でHTTPSの読み込み・計測・保存・復元を必須確認 |
+| Firefox | 主要経路を確認。時刻・シーク差を観測し、精度を断定しない |
+| スマートフォンの保存HTML直接起動 | OSのファイル引渡し経路を別途確認。未検証なら保証を記載しない |
+
+Playwrightの端末設定によるテストは画面・入力条件のエミュレーションであり、実機のファイル選択・保存の証跡とは別とする。[W9]
+
+実機が用意できない場合はv0.9.xの候補として保持し、対応済みの表示を付けない。正式版へ進めるために要件を変更する場合は、ユーザーが制限を明示的に承認し、仕様・README・公開説明を同時に直す。
+
+### 16.2 性能の設計目標
+
+標準試験規模は50工程、1,000回、10,000区間。操作確定から表示更新までp95 100 ms以内、表の再集計p95 200 ms以内を参照PCでの目標とする。実機スマートフォンでは同一規模も試し、達成値と必要な表示のページ分けを記録する。これらは未測定の設計目標。
+
+動画素材は短い標準動画のほか、PCで2 GiB程度、スマートフォンで500 MiB程度の再生可能な素材を用意して試験する。単に小さい動画のFile.sizeだけを偽装して大容量対応済みとしない。
+
+アプリの通常版2 MiB、自己展開版1 MiBを初期の警告予算とする。テスト動画をアプリへ埋め込まない。予算超過は内容をレビューし、利用者メリットなしに依存や素材を増やさない。
+
+### 16.3 不具合の優先度
+
+- **P0:** データ外部送信、保存データ消失・破損、別動画の無断対応付け。
+- **P1:** 誤集計、境界の破綻、主操作不能、スマートフォンで保存できない、復元不能。
+- **P2:** 回避可能な表示や操作の不具合。
+
+P0・P1未解決でv1.0.0へ進めない。P2は影響と回避方法を明記して判定する。未実施の検証を「合格」としない。
+
+---
+
+## 17. 受入試験
+
+各ケースはユニット／ブラウザ自動試験／実機のどこで証明するかを開発計画に対応付ける。想定動画や数値は検証用の人工例であり、実在作業の性能データではない。
+
+| ID | 条件・操作 | 合格条件 |
+|---|---|---|
+| AC01 | 新規起動、日本語／英語 | 主操作と説明、空状態、バージョンが一致し、スターター機能が残らない |
+| AC02 | 正常動画、0バイト、音声のみ、破損、非対応形式 | 正常のみready。不正時に分析データを失わない |
+| AC03 | 0.25／0.5／1／2倍で同じ境界を確定 | 内部時刻・所要時間が同じ。壁時計の経過に依存しない |
+| AC04 | 初回を四工程で区切って終了 | 四工程だけが残り、空の五工程目がない |
+| AC05 | 二回目を同手順で記録 | 工程の対応が一致し、終了後に次回を自動開始しない |
+| AC06 | 境界より前へ戻して追記、同じ時刻を連打 | 状態変更しない。負数・0区間を作らない |
+| AC07 | 境界移動、Undo、Redo | 隣接区間が同時更新され、合計不変、状態を復元可能 |
+| AC08 | F1の中断あり三回 | 全体平均39秒、工程平均内訳34秒、中断平均5秒、n=3 |
+| AC09 | F2の工程実施なし | 工程3のn=3、平均10秒。0秒を混ぜない。全体平均35.75秒 |
+| AC10 | F3の一部未観測工程 | 既知部分4秒は保持、工程3平均へ入れず、全体は未観測5秒を含む |
+| AC11 | F1の三回目を理由付き除外 | 記録は3回のまま対象2回、全体平均33.5秒 |
+| AC12 | 途中で動画末尾に達する | 未完了のまま保存可能、完了回平均へ混ぜない |
+| AC13 | 工程名変更、順番変更 | 名称訂正はID維持、構造変更は別手順。過去回は不変 |
+| AC14 | 追加工程・同じ工程のやり直し | 時間を複製せず、同じ工程の回内合計として一観測を数える |
+| AC15 | JSON保存→再読込→元動画再選択 | 境界・ID・除外・手順が一致、元動画なしで結果閲覧可 |
+| AC16 | 違うサイズ／長さの動画を再接続 | 既存時刻へ強制接続しない。候補一致でも本人の確定が必要 |
+| AC17 | 壊れたJSON、未来版、重複ID、負時刻、上限越え | 全体拒否、旧状態不変、復元成功表示を出さない |
+| AC18 | 保存禁止／容量不足／別タブ更新 | 自動保存失敗・競合を表示し、現在データの手動保存が可能 |
+| AC19 | CSV三種 | 画面・JSON由来の計算と一致。状態・件数・除外理由を失わない |
+| AC20 | 名前にカンマ・改行・引用符・数式先頭文字 | 列ずれせず、初回CSV読み込み時に危険文字列を数式実行しない |
+| AC21 | 編集済み出力名、不正文字、空名 | 名前が反映され、拡張子が正しく、安全な既定名へ戻せる |
+| AC22 | ソースA→Bの素早い交換、古いシーク応答 | Aの遅延結果でBや保存状態を書き換えない |
+| AC23 | 320px、短い横画面、長い日英文字列 | ページ横溢れ、固定UI重なり、操作の画面外消失がない |
+| AC24 | キーボードのみ、ダイアログ、200%ズーム | 主用途を完了、フォーカス復帰、説明と状態を読める |
+| AC25 | 通常版・自己展開版・ルートコピー | ビルド検証合格、rootと通常版がバイト一致、自己展開が通常版を復元 |
+| AC26 | 初期読込後の全操作、オフライン | 外部ランタイム要求なし。読み込み・計測・保存の主経路が動作 |
+| AC27 | `<img onerror=...>`、`__proto__`等の入力 | コードとして実行されず、状態やプロトタイプを汚染しない |
+| AC28 | 10,000区間と大容量実ファイル | 応答とメモリ傾向を記録、UI停止・無警告データ欠落がない |
+| AC29 | Android／iPhone実機の主経路 | 動画選択→三回計測→保存→再読込→元動画再接続を実行 |
+| AC30 | README・ヘルプ・スクショ・実装 | 対応形式、制約、保存、精度、版が一致し、未検証を誇張しない |
+
+---
+
+## 18. リリース成果物と運用
+
+通常HTML、自己展開HTML、ルートコピー、ソース、ビルド・検証、テスト、README.md、README.ja.md、CHANGELOG.md、LICENSE、THIRD_PARTY_NOTICES.md、SECURITY.md、favicon、日英PCスクリーンショット、スマートフォン確認用スクリーンショットを揃える。生成先は実装対象の設定から確認する。[G1, T1]
+
+画面撮影は実アプリで行い、生成画像や手描きのUIで置き換えない。サンプル動画は個人情報・業務機密を含まない人工素材とし、アプリへ常時同梱しない。READMEに未公開URLを記載しない。
+
+開発版でもSemVerを使用する。`v0.n.0` は段階追加、同段階の修正は `v0.n.1` 以降。v0.9.xは機能追加を止めた候補、v1.0.0は受入確認後の正式版。タグを付けるだけで未完了の要件を完了扱いにしない。
+
+ブランチ作成・コミット・PRは実装依頼時の範囲で行う。PRはマージしない。Browser Kitty本体への登録は別依頼であり、その際に対象リポジトリ、設定、公開HTML・アセット・CIを確認する。本体トップページの既存コピーは変更しない。
+
+---
+
+## 付録A. 集計の固定検証データ
+
+### F1: 基本三回＋中断
+
+| 回 | 開始–終了（秒） | 工程1 | 工程2 | 工程3 | 工程4 | 中断 | 未観測 | 全体 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0–34 | 6 | 12 | 10 | 6 | 0 | 0 | 34 |
+| 2 | 39–72 | 5 | 11 | 10 | 7 | 0 | 0 | 33 |
+| 3 | 77–127 | 7 | 12 | 10 | 6 | 15 | 0 | 50 |
+
+3回目の境界は `[77,84,96,101,116,121,127]`。区間は工程1、工程2、工程3前半、中断、工程3後半、工程4。工程3前後は同じ実施ID。
+
+期待値: 全体平均39、中央値34、最小33、最大50。記録済み工程時間平均34、中断平均5、未観測平均0。工程平均は順に6、35/3、10、19/3。回間時間は5秒×2で10秒だが、全体平均へ混ぜない。
+
+### F2: 実施なし
+
+F1に4回目を追加。開始132、終了158、工程1=7、工程2=12、工程3=実施なし、工程4=7、中断0。全体26秒。
+
+期待値: 全体平均35.75、記録済み工程時間平均32、中断平均3.75。工程3はn=3、平均10。各工程平均の合計34.5を全体平均として使わない。
+
+### F3: 一部未観測
+
+F1に別の4回目を追加。開始163、終了198、工程1=7、工程2=12、工程3の既知部分4＋未観測5、工程4=7。境界 `[163,170,182,186,191,198]`。
+
+期待値: 回の全体35、記録済み工程30、未観測5。工程3はunobservedで平均対象外、既知部分4を保持。全体平均38、内訳平均は33＋3.75＋1.25。工程3のn=3、平均10。
+
+### F4: 未完了
+
+F1に開始203、最後の観測位置221の未完了回を追加。工程1=6、工程2は12秒の観測済み部分だが完了未確定。
+
+期待値: 未完了回の記録済み範囲18秒を保持。集計母集団はF1の3回だけ。未完了回の工程1を勝手に工程平均へ加えない。
+
+### F5: 理由付き除外
+
+F1の3回目を除外、理由は「条件が異なる」。期待値: 記録3、完了対象2、完了除外1、未完了0。全体平均33.5、中断平均0。3回目と理由は出力に残す。
+
+### F6: 境界と丸め
+
+秒 `1.2345678` は内部 `1,234,568 µs`。保存→読込で整数値を保持する。これは計測誤差の保証ではない。境界の移動・分割・結合では総区間長が変わらないことを整数値で確認する。
+
+---
+
+## 付録B. 実装インターフェースの契約
+
+次の名称は計画と合わせる。引数・戻り値の型は本書9章のデータを参照する。
+
+```text
+TsdCore.toTimeUs(seconds: number): Result<number>
+TsdCore.createProject(meta, context): Project
+TsdCore.validateProject(value: unknown): ValidationResult<Project>
+TsdCore.applyCommand(project: Project, command: Command, context: CommandContext): CommandResult
+TsdCore.summarize(project: Project, procedureId: string): Summary
+TsdCore.serializeProject(project: Project, appVersion: string): string
+TsdCore.parseProject(text: string): ValidationResult<Project>
+TsdCore.matchSource(saved: Source, candidate: Source): SourceMatch
+TsdCore.buildCsv(project: Project, options: CsvOptions): string
+TsdCore.sanitizeFilename(base: string, suffix: string): string
+MediaController.captureTime(): Result<number>
+MediaController.loadCandidate(file: File): Promise<SourceCandidate>
+MediaController.seekTo(timeUs: number): Promise<SeekResult>
+MediaController.commitCandidate(candidate: SourceCandidate): void
+MediaController.dispose(): void
+StorageAdapter.load(): Promise<StoredSnapshot | null>
+StorageAdapter.save(project: Project, expectedRevision: number): Promise<SaveResult>
+StorageAdapter.clear(): Promise<void>
+```
+
+`Result<T>` は成功 `{ok:true,value:T}`、失敗 `{ok:false,error:{code,messageKey,details?}}`。`ValidationResult<T>` は成功同形、失敗 `{ok:false,issues:[{path,code,messageKey}]}`。失敗に生の個人データをログ送信しない。
+
+`CommandContext` は `makeId()` と `nowIso()` を注入する。時刻の計測値はcommandの `timeUs` に入り、COREからDOMや壁時計を読まない。`CommandResult` は成功 `{ok:true,project,undoPatch}` またはResult失敗形。`undoPatch` は前後差分で、Projectを二重に常時複製しない。
+
+`Command` の種別は `startCycle, resumeCycle, markBoundary, finishCycle, closeIncomplete, updateProjectMeta, editNote, createPhase, renamePhase, updatePhaseMeta, renameProcedure, changeProcedure, skipOccurrence, beginInterruption, endInterruption, beginUnobserved, endUnobserved, insertOccurrence, moveBoundary, splitSpan, mergeSpans, assignSpan, resolveOccurrence, setCycleExclusion, deleteCycle`。対象ID・時刻等の不足は検証エラーとする。Undo/Redo管理は履歴担当が逆差分を適用して再検証する。
+
+`Summary` は `counts, cycleTotals, phaseStats, cycleRows, intervalRows` を持つ。`counts` は `{recorded, included, excluded, incomplete}`。`cycleTotals` は `elapsed, recordedPhase, interruption, unobserved` の四つの統計オブジェクト。各統計は `{n, meanUs, medianUs, minUs, maxUs}` で0件の数値はnull。`phaseStats` はphaseIdをキーとしたオブジェクトで同じ統計に `notPerformedCount, unobservedCount, outOfProcedureCount` を持つ。`CsvOptions` は `{kind:'time-table'|'summary'|'intervals', language:'ja'|'en', procedureId:string, scope:'selected-procedure'|'all'}`。`scope:'all'` はintervalsだけ許可する。
+
+### コマンドの必須ペイロード
+
+全コマンドは `type` と以下の値を持つ。ID生成・操作日時はCommandContext、動画の計測時刻はtimeUsを使う。
+
+| type | 追加フィールド |
+|---|---|
+| startCycle | `timeUs, procedureId`（初回自由分割のみnull） |
+| resumeCycle | `cycleId` |
+| markBoundary / finishCycle / closeIncomplete | `cycleId, timeUs` |
+| updateProjectMeta | `title, note` |
+| editNote | `targetType: cycle\|occurrence\|span, cycleId, targetId, note` |
+| createPhase | `label, kind` |
+| renamePhase | `phaseId, label` |
+| updatePhaseMeta | `phaseId, kind, archived` |
+| renameProcedure | `procedureId, label` |
+| changeProcedure | `baseProcedureId, label, phaseIds, startCondition, endCondition` |
+| skipOccurrence | `cycleId, occurrenceId` |
+| beginInterruption / beginUnobserved | `cycleId, timeUs, note` |
+| endInterruption / endUnobserved | `cycleId, timeUs` |
+| insertOccurrence | `cycleId, beforeOccurrenceId`（末尾ならnull）, `phaseId` |
+| moveBoundary | `cycleId, boundaryId, timeUs` |
+| splitSpan | `cycleId, spanId, timeUs` |
+| mergeSpans | `cycleId, leftSpanId, rightSpanId, kind, occurrenceId, note` |
+| assignSpan | `cycleId, spanId, kind, occurrenceId, note` |
+| resolveOccurrence | `cycleId, occurrenceId, resolution` |
+| setCycleExclusion | `cycleId, excluded, reason` |
+| deleteCycle | `cycleId` |
+
+resumeCycleはopenまたはincomplete回を、他にopen回がないときだけ再開する。未完了として確定した部分は残し、cursorの同じ実施の続きを最後の境界から記録する。動画末尾では見直しで状態を解決してから、同時刻のfinishCycleで確定できる。
+
+updateProjectMeta、editNote、createPhase、updatePhaseMeta、renameProcedureもUndo対象にする。renameProcedureは表示名の訂正だけを行い、開始・終了条件と工程順は変えない。表示設定（言語・選択手順・出力ベース名）は専用検証後に更新し、Undoには含めない。renamePhase等のテキスト入力もCOREで上限を検証する。初回自由分割のmarkBoundaryは仮工程を追加するが、finishCycleは追加しない。反復の最後の工程でmarkBoundaryを呼んだ場合は `END_REQUIRED` とし、UIの最後の主操作がfinishCycleを選ぶ。
+
+`SourceMatch` は `{compatible:boolean, metadataMatch:boolean, warnings:string[], requiresConfirmation:true}`。`SourceCandidate` は `{generation:number, file:File, url:string, source:Source}` で永続化しない。`SeekResult` は `{generation:number, requestedUs:number, actualUs:number}`。破棄された世代は画面へ反映せず、必要な解放だけを行う。
+
+`StoredSnapshot` は `{project:Project, revision:number}`。`SaveResult` は `{ok:true,revision:number}` または `{ok:false,reason:'unavailable'|'quota'|'conflict'|'failed'}`。DB名は `time-study-desk`、プロジェクト保存storeは `snapshots`、前回ポインタとrevision管理storeは `meta` とする。
+
+---
+
+## 付録C. 変更管理
+
+本書の集計式、JSONスキーマ、不変条件、除外ルール、プライバシー境界の変更は、単なるUI微調整とは分けて記録する。変更理由・影響する保存データ・移行・受入試験を併記する。
+
+v0.2.0で初めて出力するschemaVersion=1のファイルから、v1.0.0まで読み込み互換を維持する。後の段階で使う空配列やnullableフィールドは初回形式に含める。互換を壊す必要がある場合は版を更新し、旧ファイルを読む移行試験を追加する。古い保存ファイルを黙って別解釈しない。
+
+---
+
+## 付録D. 出典と参照範囲
+
+参照日はいずれも2026-10-05。URLは再確認用で、実行時にアプリから取得するものではない。
+
+- **G1:** ユーザー提供 `Browser Kitty Guide.md`。基本方針、処理場所、単一HTML、スマートフォン、状態、保存、日英、リリース、GitHub運用の共通基準。個別アプリの計測式や入力上限の出典ではない。
+- **T1:** テンプレート `AGENTS.md`。`https://github.com/ttomohisa/htmlapps-template/blob/cb908779682fa315ccd0f1eb58549f6c208f36f0/AGENTS.md`
+- **T2:** テンプレート `APP_SPEC.md`。`https://github.com/ttomohisa/htmlapps-template/blob/cb908779682fa315ccd0f1eb58549f6c208f36f0/APP_SPEC.md`
+- **T3:** テンプレート `docs/ARCHITECTURE.md`。`https://github.com/ttomohisa/htmlapps-template/blob/cb908779682fa315ccd0f1eb58549f6c208f36f0/docs/ARCHITECTURE.md`
+- **T4:** テンプレート `app.config.json`。`https://github.com/ttomohisa/htmlapps-template/blob/cb908779682fa315ccd0f1eb58549f6c208f36f0/app.config.json`
+- **T5:** テンプレート `scripts/check-repository.ps1`。`https://github.com/ttomohisa/htmlapps-template/blob/cb908779682fa315ccd0f1eb58549f6c208f36f0/scripts/check-repository.ps1`
+- **W1:** MDN `HTMLMediaElement.currentTime`。動画内時刻と精度表示の注意。`https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime`
+- **W2:** MDN `HTMLVideoElement.requestVideoFrameCallback()`。コールバックと同期の限界。`https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestVideoFrameCallback`
+- **W3:** MDN `HTMLMediaElement.playbackRate`。再生速度のプロパティ。`https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate`
+- **W4:** MDN `Storage quotas and eviction criteria`。保存領域の制約・退避。`https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria`
+- **W5:** MDN `Window.localStorage`。保存拒否やfile:での制約。`https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage`
+- **W6:** OWASP `CSV Injection`。表計算ソフトでの数式解釈リスク。`https://owasp.org/www-community/attacks/CSV_Injection`
+- **W7:** MDN `Media container formats`。コンテナとコーデック。`https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Containers`（形式説明の参照先。対応表はリリース時に再確認する。）
+- **W8:** MDN `CSP: media-src`。メディア読み込み元の指定。`https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/media-src`
+- **W9:** Playwright `Emulation`。エミュレーションで扱う条件。`https://playwright.dev/docs/emulation`
+- **W10:** Playwright `Command line`。計画内の試験実行コマンド。`https://playwright.dev/docs/test-cli`

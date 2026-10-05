@@ -96,26 +96,122 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
 @media(max-width:520px) { .header-inner { min-height:58px; padding:8px 12px; } .brand-name { font-size:13px; } .version-badge { font-size:9px; } .brand { gap:8px; } .brand-mark { width:30px; height:30px; } .brand-meta { display:none; } .main { padding-top:18px; } .local-badge { padding:4px 8px; font-size:11px; } .panel-head,.transport { padding:12px; } .empty-view { min-height:240px; } .side-column { grid-template-columns:minmax(0,1fr); } #videoHost video { height:min(37vh,300px); min-height:160px; } .preview { min-height:160px; } .time-readout { font-size:11px; } .seek-row { gap:8px; } #playButton { min-width:108px; } .rate-field { gap:5px; } .source-facts { font-size:13px; } #helpDialog { width:calc(100% - 20px); max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); } .app-confirm-dialog { width:100%; max-width:none; margin:auto 0 0; border-radius:22px 22px 0 0; } .app-confirm-actions { grid-template-columns:1fr; } .app-confirm-button { min-height:48px; font-size:14px; } .app-toast { left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); max-width:none; } }
 @media(max-height:500px) { .app-header { position:static; } #videoHost video { height:44vh; min-height:120px; } .preview { min-height:120px; } .empty-view { min-height:160px; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+/* Measurement / review use the same player; mobile has one fixed navigation bar. */
+textarea { font:inherit; resize:vertical; min-height:76px; }
+.field { display:grid; gap:5px; margin:10px 0; min-width:0; font-size:12px; color:var(--muted); }
+.field input,.field textarea,.phase-name { width:100%; min-width:0; min-height:44px; border:1px solid var(--line); border-radius:8px; padding:9px; background:var(--surface); color:var(--text); }
+.field input[aria-invalid="true"],.phase-name[aria-invalid="true"] { border-color:var(--danger); }
+.small-note { color:var(--muted); font-size:12px; margin:10px 0; overflow-wrap:anywhere; }
+.measurement,.review-editor { padding:16px 18px; border-top:1px solid var(--line); }
+.measurement { background:#f3f8f5; }
+.section-heading { display:flex; gap:8px; justify-content:space-between; align-items:baseline; flex-wrap:wrap; margin-bottom:12px; }
+.section-heading h2 { font-size:15px; margin:0; }
+.current-step { color:var(--accent); overflow-wrap:anywhere; }
+.measure-actions,.review-actions,.history-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.measure-actions .button { flex:1; } .review-actions .button { flex:1; min-height:44px; font-size:12px; padding:8px; }
+.text-button { border:0; background:transparent; color:var(--accent); min-height:44px; padding:6px 0; text-align:left; font-size:12px; }
+.boundary-controls { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:end; margin-bottom:12px; }
+.boundary-controls .field { margin:0; } .boundary-controls .button { min-height:44px; }
+.boundary-slider-label { display:grid; gap:4px; font-size:12px; color:var(--muted); margin-top:12px; }
+.field-error { color:var(--danger); font-size:12px; margin:8px 0; }
+.record-status { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-variant-numeric:tabular-nums; color:var(--accent); }
+.history-actions { margin:12px 0; } .side-card .history-actions .button { width:auto; flex:1; min-height:44px; padding:6px; font-size:12px; }
+.phase-row { border-top:1px solid var(--line); padding:12px 0 4px; min-width:0; }
+.phase-line { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
+.phase-duration { font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.phase-name { font-size:13px; } .phase-note { font:inherit; width:100%; min-width:0; border:1px solid var(--line); border-radius:8px; padding:8px; }
+.notes-details { margin:10px 0 14px; } .notes-details summary { padding:10px; min-height:44px; font-size:12px; }
+.notes-details .field { margin:8px 10px; } .notes-details textarea { font-size:13px; }
+.save-status { white-space:pre-line; overflow-wrap:anywhere; }
+.mobile-tabs { display:none; } #recordCard { grid-column:1/-1; }
+@media(min-width:821px) { .desk { grid-template-columns:minmax(0,1fr) 310px; } }
+@media(max-width:600px) {
+ body { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
+ .main { padding-top:12px; } .page-intro { padding-bottom:6px; } .page-intro h1 { font-size:23px; }
+ .page-intro .local-badge { display:none; } .intro-note { margin-bottom:12px; }
+ .app-mobile-page { display:none; } .app-mobile-page.is-mobile-active { display:block; }
+ body[data-current-page="results"] .player-panel,body[data-current-page="measure"] #recordCard,body[data-current-page="measure"] .side-column { display:none; }
+ body[data-current-page="review"] #analysisCard,body:not([data-current-page="results"]) #sourceCard { display:none; }
+ .side-column { grid-template-columns:minmax(0,1fr); }
+ .measurement,.review-editor { padding:12px; }
+ #videoHost video { height:min(29dvh,260px); min-height:100px; } .preview { min-height:100px; }
+ .transport-hint { display:none; } .transport { padding:10px 12px; } .transport-row { margin-top:4px; }
+ .adjustment { margin-top:7px; } .measure-actions .button { font-size:13px; padding:8px; }
+ .mobile-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); position:fixed; z-index:50; inset:auto 0 0; padding:6px 10px calc(6px + env(safe-area-inset-bottom)); gap:4px; background:var(--surface); border-top:1px solid var(--line); }
+ .mobile-tabs button { min-width:0; min-height:54px; padding:5px; border:0; border-radius:10px; background:transparent; color:var(--muted); display:grid; justify-items:center; gap:2px; font-size:11px; }
+ .mobile-tabs button[aria-current="page"] { color:var(--accent); background:var(--accent-soft); font-weight:700; }
+ .mobile-tabs svg { width:21px; height:21px; }
+ .app-toast { bottom:calc(84px + env(safe-area-inset-bottom)); }
+ body[data-current-page="measure"] .build-section,body[data-current-page="review"] .build-section { display:none; }
+ .app-confirm-dialog { max-height:calc(100dvh - 16px - env(safe-area-inset-top)); }
+}
+@media(max-height:500px) { #videoHost video { height:36dvh; min-height:80px; } }
+
+
+/* Keep the video and active editing controls together after opening a file. */
+.has-source .page-intro { display:none; }
+.has-source #videoHost video { height:min(31vh,280px); }
+.workspace-switch { display:flex; gap:4px; margin-left:auto; }
+.workspace-switch button { min-height:44px; padding:7px 13px; border:0; border-radius:9px; background:transparent; color:var(--muted); font:inherit; font-size:12px; }
+.workspace-switch button[aria-current="page"] { background:var(--accent-soft); color:var(--accent); font-weight:700; }
+.measurement:not(.is-mobile-active),.review-editor:not(.is-mobile-active) { display:none; }
+@media(max-width:600px) {
+ .has-source .intro-note [data-i18n="versionLimit"] { display:none; }
+ .has-source .intro-note { margin:0 0 10px; }
+ .has-source #videoHost video { height:min(25dvh,220px); min-height:100px; }
+ .workspace-switch { display:none; }
+}
+@media(max-height:500px) { .has-source #videoHost video { height:30dvh; min-height:80px; } }
 </style>
 </head>
-<body>
-<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.1.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
+<body data-current-page="measure">
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.2.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
 <main class="main">
 <section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">動画作業分析</h1><p data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">動画をアップロードしません</span></div></section>
-<!-- APP:BEGIN Time Study Desk Foundation / Video -->
+<!-- APP:BEGIN Time Study Desk First Measurement -->
 <div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 動画再生基盤</span><span data-i18n="versionLimit">この版では工程の計測・集計・分析保存はまだ利用できません。</span></div>
 <div id="errorMessage" class="notice error" role="alert" hidden></div>
 <div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
 <div id="backgroundNotice" class="notice" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
-<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button></div><div id="videoHost" hidden></div></div>
+<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" data-i18n="tabReview">見直す</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button></div><div id="videoHost" hidden></div></div>
 <div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
-<details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div></section>
-<aside class="side-column"><section class="side-card" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><button id="replaceVideoButton" type="button" class="button" style="margin-top:16px" data-i18n="replaceVideo">別の動画を選択</button></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section>
-<section class="side-card"><h2 data-i18n="analysisTitle">分析データ</h2><button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">読み込み・再開はv0.5.0で追加予定です。</p><details class="next-features"><summary data-i18n="savePreparation">保存名の準備</summary><div class="next-inner"><label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label><p id="savePlanned" data-i18n="savePlanned">名前はこの画面内だけで保持します。計測・分析保存はv0.2.0で追加予定です。</p><button id="saveAnalysisButton" class="button" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button></div></details><p class="flow-note"><strong data-i18n="nextStage">次の段階：最初の一回を計測</strong><span data-i18n="nextStageBody">開始・区切り・終了を記録し、境界の修正と分析JSON保存へ進めます。</span></p></section></aside></div>
+<details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
+  <div class="section-heading"><h2 id="measureTitle" data-i18n="measureTitle">最初の一回を計測</h2><strong id="currentStep" class="current-step"></strong></div>
+  <div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
+  <div class="history-actions" id="measureHistory" hidden><button class="button" id="undoMeasureButton" type="button" data-i18n="undo" disabled>取り消す</button><button class="button" id="redoMeasureButton" type="button" data-i18n="redo" disabled>やり直す</button></div>
+  <p id="measurementHint" class="small-note"></p><button id="closeIncompleteButton" type="button" class="text-button" data-i18n="closeIncomplete" hidden>この位置まで記録して中断</button>
+</div>
+<div class="review-editor app-mobile-page" data-screen="review" id="reviewPanel" aria-labelledby="reviewTitle">
+  <div class="section-heading"><h2 id="reviewTitle" data-i18n="reviewTitle">区切りを見直す</h2><span class="small-note" id="reviewCycleStatus"></span></div>
+  <p id="reviewEmpty" class="small-note" data-i18n="reviewEmpty">計測を始めると、ここで境界を修正できます。</p>
+  <div id="boundaryEditor" hidden>
+    <label class="field"><span data-i18n="selectedBoundary">修正する境界</span><select id="boundarySelect"></select></label>
+    <div class="boundary-controls"><label class="field"><span data-i18n="boundarySeconds">動画内の時刻（秒）</span><input id="boundaryTime" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="boundaryError"></label><button id="applyBoundaryButton" class="button" type="button" data-i18n="applyTime">時刻を適用</button></div>
+    <p id="boundaryError" class="field-error" role="alert" hidden></p>
+    <div class="review-actions"><button id="boundaryToVideoButton" class="button" type="button" data-i18n="boundaryToVideo">この境界へ移動</button><button id="boundaryFromVideoButton" class="button" type="button" data-i18n="boundaryFromVideo">境界を現在位置へ</button></div>
+    <label class="boundary-slider-label"><span data-i18n="dragBoundary">スライダーで境界を調整</span><input id="boundarySlider" type="range" step="1" min="0" max="1" value="0" aria-describedby="sharedBoundaryHint"></label>
+    <p class="small-note" id="sharedBoundaryHint" data-i18n="sharedBoundaryHint">境界を動かすと、前後の工程時間が同時に変わります。</p>
+    <details class="notes-details"><summary data-i18n="spanNoteTitle">選択境界の後の区間メモ</summary><label class="field"><span id="spanNoteLabel"></span><textarea id="spanNote" rows="2"></textarea></label></details>
+  </div>
+</div>
+</section>
+<aside class="side-column">
+<section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><div class="history-actions"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
+<section class="side-card app-mobile-page" data-screen="results" id="analysisCard"><h2 data-i18n="analysisTitle">分析データ</h2>
+<label class="field"><span data-i18n="projectTitle">分析タイトル（任意）</span><input id="projectTitle" type="text" autocomplete="off"></label>
+<details class="notes-details"><summary data-i18n="notesTitle">分析・今回のメモ</summary><label class="field"><span data-i18n="projectNote">分析メモ</span><textarea id="projectNote" rows="3"></textarea></label><label class="field"><span data-i18n="cycleNote">今回のメモ</span><textarea id="cycleNote" rows="2" disabled></textarea></label></details>
+<label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label>
+<p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存はありません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
+<button id="openAnalysisButton" class="button" type="button" disabled aria-describedby="openAnalysisHint" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importPlanned">この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：同じ工程を繰り返し計測</strong><span data-i18n="nextStageBody">v0.3.0で複数回の計測を追加します。集計・CSV出力は後続版です。</span></p></section>
+<section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><button id="replaceVideoButton" type="button" class="button" style="margin-top:16px" data-i18n="replaceVideo">別の動画を選択</button></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
 <input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
 <!-- APP:END -->
 <section class="build-section"><details><summary data-i18n="buildInfo">ビルド情報</summary><div class="build-grid"><div class="build-item"><span data-i18n="appVersion">アプリ版</span><strong id="buildVersion"></strong></div><div class="build-item"><span data-i18n="builtAt">生成日時</span><strong id="builtAt"></strong></div><div class="build-item"><span data-i18n="dependencies">実行時の外部依存</span><strong id="dependencyCount"></strong></div></div></details></section>
 </main>
+<nav class="mobile-tabs" aria-label="分析画面" data-i18n-aria-label="screenNavigation">
+<button type="button" data-page="measure" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4z"/></svg><span data-i18n="tabMeasure">計測</span></button>
+<button type="button" data-page="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M9 3v6M16 9v6M8 15v6"/></svg><span data-i18n="tabReview">見直す</span></button>
+<button type="button" data-page="results"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"/></svg><span data-i18n="tabResults">結果</span></button></nav>
 <footer><span>Time Study Desk</span> · <span data-i18n="footer">動画を送信せず、ブラウザで確認</span></footer>
 <div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" data-tone="default"><span class="app-toast-message" id="appToastMessage"></span><button class="app-toast-action" id="appToastAction" type="button" hidden></button></div>
 <dialog class="app-confirm-dialog" id="appConfirmDialog" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage"><div class="app-confirm-header"><h2 class="app-confirm-title" id="appConfirmTitle">確認</h2><button class="app-confirm-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="app-confirm-body"><p class="app-confirm-message" id="appConfirmMessage"></p><div class="app-confirm-actions"><button class="app-confirm-button" id="appConfirmCancel" type="button">キャンセル</button><button class="app-confirm-button primary" id="appConfirmOk" type="button">実行する</button></div></div></dialog>
@@ -174,32 +270,164 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
   // I18N
   const translations = {
     ja: {
-      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:'開発版 · 動画再生基盤', versionLimit:'この版では工程の計測・集計・分析保存はまだ利用できません。',
+      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 最初の一回", versionLimit:"一回の計測・修正・分析保存ができます。再読込は後続版です。",
       playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
-      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:'読み込み・再開はv0.5.0で追加予定です。', savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:'名前はこの画面内だけで保持します。計測・分析保存はv0.2.0で追加予定です。', saveAnalysis:'分析データを保存', nextStage:'次の段階：最初の一回を計測', nextStageBody:'開始・区切り・終了を記録し、境界の修正と分析JSON保存へ進めます。',
+      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importPlanned:"この版では保存したデータを再読込できません。読み込み・再開はv0.5.0で追加予定です。", savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存はありません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：同じ工程を繰り返し計測", nextStageBody:"v0.3.0で複数回の計測を追加します。統計・CSV出力は後続版です。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
-      confirmTitle:'動画を入れ替えますか？', replaceMessage:'新しい動画の読み込みを確認しました。現在の動画と再生位置を、この動画へ置き換えます。', confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
-      helpBasicsTitle:'この開発版でできること', helpBasicsBody:'v0.1.0は動画の読み込み・再生・移動を確認する開発版です。「動画を選択」から端末内の動画を一本開きます。工程の計測、統計、分析JSONの保存・読み込み、CSV出力、自動保存はまだありません。',
-      helpControlsTitle:'動画の操作', helpControlsBody:'再生／一時停止、再生位置、速度、微調整、ミュート・音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。ボタンや入力欄のキー操作は奪いません。微調整はフレーム送りではありません。',
-      helpPrivacyTitle:'データの扱い', helpPrivacyBody:'動画はFileとBlob URLとしてブラウザ内で扱い、ファイル名も含めて外部送信しません。動画の全バイトをJavaScript配列へ読み込みません。この版で端末に保存するのは言語設定だけです。動画と保存名はページを閉じると保持されません。元動画を書き換えたり削除したりしません。',
+      confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
+      helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.2.0では一回の作業を計測できます。開始位置で「ここから開始」、工程が変わる位置で「ここで区切る」、最後に「この回を終了」を押します。工程名は後から変えられます。複数回の計測、統計、分析の再読込、CSV、自動保存はまだありません。",
+      helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。",
+      helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動でJSON保存し、動画は含めません。ブラウザ内へ自動保存するのは言語設定だけです。ページを閉じると未保存の分析を失います。元動画は変更・削除しません。",
       helpLimitsTitle:'形式・時間・精度', helpLimitsBody:'8 GiB以下、長さが正の有限値で24時間以下、映像とシーク可能な位置を持つ動画が対象です。拡張子だけで再生対応を保証しません。音声のみ、破損、未対応コーデックは扱えません。通常速度で撮影された動画を前提とし、スロー撮影・タイムラプス・編集で変更した速度から実時間を復元しません。動画内時刻はブラウザの精度に依存し、フレーム単位の精度は保証しません。',
-      helpRecoveryTitle:'選び直しと画面の復帰', helpRecoveryBody:'別の動画は候補として読み込み、確認後に交換します。失敗・キャンセルでは元の動画と位置を保持します。動画を選び直す操作や画面を離れる操作では再生を一時停止します。復帰しても自動再生しません。', helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン実機のファイル選択・保存と大容量動画は未検証です。',
-      FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。'
+      helpRecoveryTitle:'選び直しと画面の復帰', helpRecoveryBody:"別の動画は確認後に新しい分析として開きます。失敗・キャンセルでは元の分析を保持します。動画末尾は未完了とし、自動で完了させません。取り消して区切りを修正するか未完了のまま保存できます。画面復帰後は最後の確定境界から再開を押し、映像を確認して再生してください。保存したJSONを開く機能はv0.5.0で追加予定です。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン実機のファイル選択・保存と大容量動画は未検証です。',
+      FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。',
+      screenNavigation:"分析画面",
+      tabMeasure:"計測",
+      tabReview:"見直す",
+      tabResults:"結果",
+      measureTitle:"最初の一回を計測",
+      startCycle:"ここから開始",
+      markBoundary:"ここで区切る",
+      finishCycle:"この回を終了",
+      resumeCycle:"最後の区切りから再開",
+      closeIncomplete:"この位置まで記録して中断",
+      reviewTitle:"区切りを見直す",
+      precisionNote:"動画内の秒数で調整します",
+      reviewEmpty:"計測を始めると、ここで境界を修正できます。",
+      selectedBoundary:"修正する境界",
+      boundarySeconds:"動画内の時刻（秒）",
+      applyTime:"時刻を適用",
+      boundaryToVideo:"この境界へ移動",
+      boundaryFromVideo:"境界を現在位置へ",
+      dragBoundary:"スライダーで境界を調整",
+      sharedBoundaryHint:"境界を動かすと、前後の工程時間が同時に変わります。",
+      spanNoteTitle:"選択境界の後の区間メモ",
+      recordTitle:"今回の記録",
+      undo:"取り消す",
+      redo:"やり直す",
+      renameHint:"工程名は後から変更できます。名前の変更も取り消せます。",
+      projectTitle:"分析タイトル（任意）",
+      notesTitle:"分析・今回のメモ",
+      projectNote:"分析メモ",
+      cycleNote:"今回のメモ",
+      stepNote:"この工程のメモ",
+      stepLabel:"工程名",
+      startLabel:"開始",
+      endLabel:"最後の境界",
+      boundaryLabel:"境界",
+      emptyRecord:"まだ計測していません",
+      openRecord:"計測中",
+      completeRecord:"完了",
+      incompleteRecord:"未完了",
+      firstHint:"開始位置へ移動して「ここから開始」を押してください。",
+      markHint:"工程が変わる位置で区切ります。最後は「この回を終了」。",
+      completeHint:"計測が終わりました。工程名・境界を見直し、分析データを保存できます。",
+      incompleteHint:"終了は未確定です。続きから再開するか、取り消して境界を修正してください。",
+      suspendedHint:"最後の確定境界から再開して、未確定の続きを見直してください。",
+      recordedOnly:"表示は確定した区間の合計です。未確定の続きは含みません。",
+      recordComplete:"この動画の一回分の観測時間です。標準時間ではありません。",
+      underTenth:"0.1秒未満",
+      secondsUnit:"秒",
+      downloadStarted:"ダウンロードを開始しました。保存先でファイルを確認してください。",
+      saveFailed:"分析データを保存できませんでした。現在の分析は保持しています。",
+      edited:"変更を適用しました",
+      endReached:"動画の末尾です。未完了の記録として保持しました。",
+      boundaryApplied:"境界を修正しました",
+      BOUNDARY_ORDER:"前の区切りより後へ移動するか、見直しで修正してください。境界は隣の境界を越えられません。",
+      INVALID_TIME_INPUT:"0以上の秒数を小数6桁以内で入力してください。",
+      INVALID_PROJECT:"分析データを検証できませんでした。現在の記録を保持しています。",
+      INVALID_TARGET:"対象の記録を選び直してください。",
+      CYCLE_CLOSED:"この回は計測中ではありません。",
+      UNRESOLVED:"未確定の工程があります。取り消して境界を修正するか、未完了として保存してください。",
+      FIRST_CYCLE_ONLY:"この版で計測できるのは最初の一回です。",
+      PHASE_LIMIT:"工程は50個までです。この回を終了するか、前の区切りを取り消してください。",
+      TEXT_LIMIT:"文字数が上限を超えています。工程名80、タイトル160、区間・回のメモ1000、分析メモ4000文字以内にしてください。",
+      SAVE_LIMIT:"分析データの保存上限を超えるため、変更しませんでした。現在の記録を保存してください。",
+      HISTORY_CONFLICT:"取り消し対象と現在のデータが一致しません。記録は変更していません。",
+      HISTORY_EMPTY:"取り消す操作がありません。",
+      UNKNOWN_COMMAND:"この操作はまだ利用できません。",
+      END_REQUIRED:"最後の工程は「この回を終了」で確定してください。"
     },
     en: {
-      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:'Development · Video foundation', versionLimit:'Step measurement, statistics and analysis saving are not available in this version.',
+      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · First measurement", versionLimit:"Measure, edit and save one cycle. Import is planned for a later version.",
       playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
-      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:'Import and resume are planned for v0.5.0.', savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:'The name stays in this page only. Measurement and saving are planned for v0.2.0.', saveAnalysis:'Save analysis', nextStage:'Next stage: measure the first cycle', nextStageBody:'Record a start, boundaries and an end, then edit boundaries and save analysis JSON.',
+      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importPlanned:"This version cannot reopen saved analysis files. Import and resume are planned for v0.5.0.", savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. There is no autosave.", saveAnalysis:'Save analysis', nextStage:"Next stage: repeat the same steps", nextStageBody:"Multiple cycles are planned for v0.3.0. Statistics and CSV follow in later versions.",
       buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
-      confirmTitle:'Replace the video?', replaceMessage:'The new video is ready. Confirm to replace your current video and playback position.', confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
-      helpBasicsTitle:'What this development version does', helpBasicsBody:'v0.1.0 is a development build for opening, playing and seeking a video. Choose one local video. Step measurement, statistics, analysis JSON import/export, CSV and autosave are not yet implemented.',
-      helpControlsTitle:'Player controls', helpControlsBody:'Use play/pause, the seek bar, playback speed, fine adjustment, mute and volume. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Buttons and input fields keep their native keyboard behavior. Fine adjustment is not frame stepping.',
-      helpPrivacyTitle:'Your data', helpPrivacyBody:'Videos use File references and Blob URLs inside your browser. No video or filename is sent to a server. The app does not copy the whole video into a JavaScript array. Only your language setting is persisted in this version. Closing the page forgets the video and prepared save name. Original files are never modified or deleted.',
+      confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
+      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.2.0 measures one work cycle. Choose its starting position and select Start cycle here. Mark a boundary at each step change, then Finish cycle here. Name the steps afterwards. Repeated cycles, statistics, analysis import, CSV and autosave are not available yet.",
+      helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping.",
+      helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Manually save analysis as JSON; it does not include video. Only the language setting is automatically persisted. Closing this page loses unsaved analysis. Original videos are never modified or deleted.",
       helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
-      helpRecoveryTitle:'Replacement and returning to the page', helpRecoveryBody:'A replacement video is loaded separately and used only after confirmation. Failure or cancellation retains your previous video and position. Choosing a replacement or hiding the page pauses playback. Returning never starts playback automatically.', helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Real-device mobile file selection/saving and large videos have not been verified.',
-      FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.'
+      helpRecoveryTitle:'Replacement and returning to the page', helpRecoveryBody:"A replacement starts an empty analysis only after confirmation. Failed or cancelled loads preserve your analysis. Reaching the video end records an incomplete cycle, never a completed one. Undo to correct its boundaries, or save it as incomplete. After returning to the page, resume from the last confirmed boundary and play explicitly. Reopening saved JSON is planned for v0.5.0.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Real-device mobile file selection/saving and large videos have not been verified.',
+      FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.',
+      screenNavigation:"Analysis screens",
+      tabMeasure:"Measure",
+      tabReview:"Review",
+      tabResults:"Results",
+      measureTitle:"Measure the first cycle",
+      startCycle:"Start cycle here",
+      markBoundary:"Mark boundary",
+      finishCycle:"Finish cycle here",
+      resumeCycle:"Resume from last boundary",
+      closeIncomplete:"Record to here and suspend",
+      reviewTitle:"Review boundaries",
+      precisionNote:"Adjust seconds within the video",
+      reviewEmpty:"Start measuring to edit boundaries here.",
+      selectedBoundary:"Boundary to edit",
+      boundarySeconds:"Video position (seconds)",
+      applyTime:"Apply time",
+      boundaryToVideo:"Seek to boundary",
+      boundaryFromVideo:"Use current position",
+      dragBoundary:"Adjust boundary with slider",
+      sharedBoundaryHint:"Moving a shared boundary changes both neighboring step durations.",
+      spanNoteTitle:"Note for the span after this boundary",
+      recordTitle:"This cycle",
+      undo:"Undo",
+      redo:"Redo",
+      renameHint:"Rename steps after measuring. Renaming can also be undone.",
+      projectTitle:"Analysis title (optional)",
+      notesTitle:"Analysis and cycle notes",
+      projectNote:"Analysis note",
+      cycleNote:"Cycle note",
+      stepNote:"Note for this step",
+      stepLabel:"Step name",
+      startLabel:"Start",
+      endLabel:"Last boundary",
+      boundaryLabel:"Boundary",
+      emptyRecord:"Not started",
+      openRecord:"Measuring",
+      completeRecord:"Complete",
+      incompleteRecord:"Incomplete",
+      firstHint:"Seek to the starting position and select Start cycle here.",
+      markHint:"Mark each step change. For the final step, select Finish cycle here.",
+      completeHint:"Cycle finished. Review the names and boundaries, then save your analysis.",
+      incompleteHint:"The end is not confirmed. Resume or undo to correct the boundaries.",
+      suspendedHint:"Resume from the last confirmed boundary to review the unfinished part.",
+      recordedOnly:"Only confirmed spans are totaled. The unfinished continuation is not included.",
+      recordComplete:"The observed time for one cycle in this video, not a standard time.",
+      underTenth:"Less than 0.1 s",
+      secondsUnit:"s",
+      downloadStarted:"Download started. Check the file in your chosen save location.",
+      saveFailed:"Could not save the analysis. Your current data has been kept.",
+      edited:"Change applied",
+      endReached:"Video ended. The cycle was kept as incomplete.",
+      boundaryApplied:"Boundary updated",
+      BOUNDARY_ORDER:"Move after the previous boundary, or correct it in Review. Boundaries cannot cross their neighbors.",
+      INVALID_TIME_INPUT:"Enter non-negative seconds with up to six decimal places.",
+      INVALID_PROJECT:"Analysis validation failed. Your current data has been kept.",
+      INVALID_TARGET:"Select the record again.",
+      CYCLE_CLOSED:"This cycle is not being measured.",
+      UNRESOLVED:"A step is still unresolved. Undo to correct the boundaries, or save as incomplete.",
+      FIRST_CYCLE_ONLY:"This version measures only the first cycle.",
+      PHASE_LIMIT:"Up to 50 steps are supported. Finish this cycle or undo a boundary.",
+      TEXT_LIMIT:"Text is too long. Limits: step name 80, title 160, span/cycle note 1000, analysis note 4000 characters.",
+      SAVE_LIMIT:"This change would exceed the analysis save limit. Save your existing records.",
+      HISTORY_CONFLICT:"The current data does not match the history entry. Nothing was changed.",
+      HISTORY_EMPTY:"There is no operation to undo.",
+      UNKNOWN_COMMAND:"This operation is not available yet.",
+      END_REQUIRED:"Use Finish cycle here for the last step."
     }
   };
   const $ = selector => document.querySelector(selector);
@@ -281,7 +509,229 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
       if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)) name += '-file';
       return name + suffix;
     }
-    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename});
+    // Analysis schema 1. Only integers below the source duration enter the model.
+    const MAX_BYTES = 10 * 1024 * 1024;
+    const clone = value => JSON.parse(JSON.stringify(value));
+    const bytesOf = value => new TextEncoder().encode(JSON.stringify(value)).length;
+    const countChars = value => [...value].length;
+    const integer = (value,min,max) => Number.isSafeInteger(value) && value >= min && value <= max;
+    function assert(condition,code='INVALID_PROJECT') { if (!condition) throw Object.assign(new Error(code),{code}); }
+    function text(value,max,required=false) { return typeof value === 'string' && countChars(value) <= max && (!required || value.trim().length > 0); }
+    function fields(value,names) {
+      assert(value && typeof value === 'object' && !Array.isArray(value));
+      const keys = names.split(' ');
+      assert(Object.keys(value).length === keys.length && keys.every(key => Object.prototype.hasOwnProperty.call(value,key)));
+      assert(Object.keys(value).every(key => keys.includes(key)));
+    }
+    function parseTimeInput(value) {
+      if (typeof value !== 'string' || !/^\d+(?:\.\d{1,6})?$/.test(value.trim())) return fail('INVALID_TIME_INPUT');
+      const [whole,fraction=''] = value.trim().split('.');
+      const timeUs = Number(whole) * 1000000 + Number(fraction.padEnd(6,'0'));
+      return Number.isSafeInteger(timeUs) && timeUs >= 0 ? ok(timeUs) : fail('INVALID_TIME_INPUT');
+    }
+    function validateProject(value) {
+      let path = '$';
+      try {
+        // Bound nesting before stringify; reject cycles and non-JSON values rather than coerce.
+        const visiting = new Set();
+        function inspect(item,depth) {
+          assert(depth <= 20);
+          if (item === null || typeof item === 'string' || typeof item === 'boolean') return;
+          if (typeof item === 'number') { assert(Number.isFinite(item)); return; }
+          assert(typeof item === 'object' && !visiting.has(item)); visiting.add(item);
+          for (const key of Object.keys(item)) { assert(!['__proto__','constructor','prototype'].includes(key)); inspect(item[key],depth+1); }
+          visiting.delete(item);
+        }
+        inspect(value,0); assert(bytesOf(value) <= MAX_BYTES,'SAVE_LIMIT');
+        fields(value,'format schemaVersion appVersion projectId createdAt updatedAt title note source phases procedures cycles settings');
+        assert(value.format === 'time-study-desk' && value.schemaVersion === 1);
+        assert(text(value.appVersion,40,true) && /^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?$/.test(value.appVersion));
+        const iso = s => typeof s === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/.test(s);
+        assert(iso(value.createdAt) && iso(value.updatedAt));
+        assert(text(value.title,160) && text(value.note,4000));
+        const ids = new Map();
+        function id(kind,s) { assert(typeof s === 'string' && /^[a-z0-9][a-z0-9-]{0,63}$/.test(s)); const seen = ids.get(kind) || new Set(); assert(!seen.has(s)); seen.add(s); ids.set(kind,seen); }
+        id('project',value.projectId);
+        path = '$.source'; const source = value.source;
+        fields(source,'name size lastModified durationUs width height');
+        assert(text(source.name,1024,true) && integer(source.size,1,8*1024**3) && integer(source.lastModified,-Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER));
+        assert(integer(source.durationUs,1,86400000000) && integer(source.width,1,Number.MAX_SAFE_INTEGER) && integer(source.height,1,Number.MAX_SAFE_INTEGER));
+        const array = (a,max) => assert(Array.isArray(a) && a.length <= max);
+        array(value.phases,50); array(value.procedures,20); array(value.cycles,1000);
+        const phases = new Map(), procedures = new Map();
+        for (const phase of value.phases) {
+          path = '$.phases'; fields(phase,'id label kind archived'); id('phase',phase.id);
+          assert(text(phase.label,80,true) && ['operation','planned-wait'].includes(phase.kind) && typeof phase.archived === 'boolean'); phases.set(phase.id,phase);
+        }
+        for (const procedure of value.procedures) {
+          path = '$.procedures'; fields(procedure,'id label phaseIds startCondition endCondition createdAt'); id('procedure',procedure.id);
+          assert(text(procedure.label,80,true) && text(procedure.startCondition,1000) && text(procedure.endCondition,1000) && iso(procedure.createdAt));
+          array(procedure.phaseIds,50); assert(procedure.phaseIds.length > 0 && procedure.phaseIds.every(p => phases.has(p))); procedures.set(procedure.id,procedure);
+        }
+        let openCount = 0, spanCount = 0, freeCount = 0; const ranges = [];
+        for (const cycle of value.cycles) {
+          path = '$.cycles'; fields(cycle,'id procedureId status boundaries spans occurrences cursor excluded exclusionReason note'); id('cycle',cycle.id);
+          assert(['open','complete','incomplete'].includes(cycle.status)); if (cycle.status === 'open') openCount++;
+          assert(cycle.procedureId === null || procedures.has(cycle.procedureId));
+          if (cycle.procedureId === null) { freeCount++; assert(cycle.status !== 'complete' && value.procedures.length === 0); }
+          assert(typeof cycle.excluded === 'boolean' && text(cycle.exclusionReason,1000,cycle.excluded) && text(cycle.note,1000));
+          array(cycle.boundaries,10001); array(cycle.spans,10000); array(cycle.occurrences,10000);
+          spanCount += cycle.spans.length; assert(cycle.boundaries.length === cycle.spans.length + 1 && cycle.occurrences.length > 0);
+          let previous = -1;
+          for (const boundary of cycle.boundaries) { fields(boundary,'id timeUs'); id('boundary',boundary.id); assert(integer(boundary.timeUs,0,source.durationUs) && boundary.timeUs > previous); previous = boundary.timeUs; }
+          ranges.push([cycle.boundaries[0].timeUs,previous]);
+          const occurrences = new Map();
+          for (const occurrence of cycle.occurrences) {
+            fields(occurrence,'id phaseId planned resolution note'); id('occurrence',occurrence.id);
+            assert(phases.has(occurrence.phaseId) && typeof occurrence.planned === 'boolean' && ['pending','measured','not-performed','unobserved'].includes(occurrence.resolution) && text(occurrence.note,1000)); occurrences.set(occurrence.id,occurrence);
+          }
+          if (cycle.procedureId !== null) {
+            const planned = cycle.occurrences.filter(o => o.planned).map(o => o.phaseId);
+            assert(JSON.stringify(planned) === JSON.stringify(procedures.get(cycle.procedureId).phaseIds));
+          }
+          const evidence = new Map(cycle.occurrences.map(o => [o.id,{phase:0,unobserved:0}]));
+          function assignment(item) {
+            assert(['phase','interruption','unobserved'].includes(item.kind) && text(item.note,1000));
+            assert(item.occurrenceId === null || occurrences.has(item.occurrenceId));
+            assert(item.kind !== 'phase' || item.occurrenceId !== null);
+            if (item.occurrenceId !== null && item.kind !== 'interruption') assert(occurrences.get(item.occurrenceId).resolution !== 'not-performed');
+          }
+          for (const span of cycle.spans) { fields(span,'id kind occurrenceId note'); id('span',span.id); assignment(span); if (span.occurrenceId && span.kind !== 'interruption') evidence.get(span.occurrenceId)[span.kind]++; }
+          if (cycle.cursor !== null) { fields(cycle.cursor,'kind occurrenceId note'); assignment(cycle.cursor); }
+          if (cycle.status === 'complete') assert(cycle.cursor === null && cycle.spans.length > 0 && cycle.occurrences.every(o => o.resolution !== 'pending'));
+          else assert(cycle.cursor !== null);
+          for (const occurrence of cycle.occurrences) {
+            const ev = evidence.get(occurrence.id);
+            if (occurrence.resolution === 'measured') assert(ev.phase > 0 && ev.unobserved === 0);
+            if (occurrence.resolution === 'not-performed') assert(ev.phase === 0 && ev.unobserved === 0);
+            if (ev.unobserved > 0) assert(occurrence.resolution === 'unobserved');
+          }
+        }
+        assert(openCount <= 1 && spanCount <= 10000 && freeCount <= 1);
+        ranges.sort((a,b) => a[0]-b[0]); for (let i=1;i<ranges.length;i++) assert(ranges[i][0] >= ranges[i-1][1]);
+        path = '$.settings'; fields(value.settings,'language selectedProcedureId outputBaseName');
+        assert(['ja','en'].includes(value.settings.language) && (value.settings.selectedProcedureId === null || procedures.has(value.settings.selectedProcedureId)) && text(value.settings.outputBaseName,180,true));
+        // Every field has been allow-listed. Reconstruct the JSON object, never retain a caller's object.
+        return ok(clone(value));
+      } catch (error) { return {ok:false,issues:[{path,code:error.code || 'INVALID_PROJECT',messageKey:error.code || 'INVALID_PROJECT'}]}; }
+    }
+    function createProject(source,context) {
+      const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.2.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      assert(validateProject(project).ok); return project;
+    }
+    // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
+    function diff(before,after,path=[],patch=[]) {
+      if (JSON.stringify(before) === JSON.stringify(after)) return patch;
+      if (Array.isArray(before) && Array.isArray(after)) {
+        const shared = Math.min(before.length,after.length);
+        for (let i=0;i<shared;i++) diff(before[i],after[i],path.concat(i),patch);
+        if (before.length !== after.length) patch.push({path:path.slice(),index:shared,before:clone(before.slice(shared)),after:clone(after.slice(shared))});
+      } else if (before && after && typeof before === 'object' && typeof after === 'object' && !Array.isArray(before) && !Array.isArray(after)) {
+        for (const key of Object.keys(before)) diff(before[key],after[key],path.concat(key),patch);
+      } else patch.push({path:path.slice(),before:clone(before),after:clone(after)});
+      return patch;
+    }
+    function applyPatch(project,patch,backwards=false) {
+      try {
+        const next = clone(project), changes = backwards ? [...patch].reverse() : patch;
+        for (const change of changes) {
+          assert(Array.isArray(change.path) && change.path.length > 0 && change.path.every(k => !['__proto__','constructor','prototype'].includes(k)));
+          const expected = backwards ? change.after : change.before, replacement = backwards ? change.before : change.after;
+          if (change.index !== undefined) {
+            let target = next; for (const key of change.path) target = target[key];
+            assert(JSON.stringify(target.slice(change.index)) === JSON.stringify(expected),'HISTORY_CONFLICT'); target.splice(change.index,expected.length,...clone(replacement));
+          } else {
+            let target = next; for (const key of change.path.slice(0,-1)) target = target[key]; const key = change.path.at(-1);
+            assert(JSON.stringify(target[key]) === JSON.stringify(expected),'HISTORY_CONFLICT'); target[key] = clone(replacement);
+          }
+        }
+        assert(validateProject(next).ok); return {ok:true,project:next};
+      } catch (error) { return fail(error.code || 'HISTORY_CONFLICT'); }
+    }
+    function createHistory({maxBytes=16*1024*1024}={}) {
+      const undo = [], redo = [];
+      const used = () => [...undo,...redo].reduce((sum,item) => sum+item.bytes,0);
+      function travel(from,to,project,backwards) {
+        if (!from.length) return fail('HISTORY_EMPTY');
+        const item = from.at(-1), result = applyPatch(project,item.patch,backwards);
+        if (result.ok) { from.pop(); to.push(item); } return result;
+      }
+      return Object.freeze({
+        push(patch) { if (!patch.length) return; redo.length=0; const item={patch:clone(patch),bytes:bytesOf(patch)}; undo.push(item); while (undo.length > 100 || used() > Math.min(maxBytes,16*1024*1024)) undo.shift(); },
+        undo: project => travel(undo,redo,project,true), redo: project => travel(redo,undo,project,false),
+        get undoCount() { return undo.length; }, get redoCount() { return redo.length; }, get bytes() { return used(); }
+      });
+    }
+    function applyCommand(project,command,context) {
+      try {
+        const supported = ['startCycle','markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','renamePhase','updateProjectMeta','editNote'];
+        assert(command && supported.includes(command.type),'UNKNOWN_COMMAND'); assert(validateProject(project).ok);
+        const next = clone(project), type = command.type;
+        const at = command.timeUs;
+        if (['startCycle','markBoundary','finishCycle','closeIncomplete','moveBoundary'].includes(type)) assert(integer(at,0,next.source.durationUs),'INVALID_TIME');
+        let cycle = null;
+        if (['markBoundary','finishCycle','closeIncomplete','resumeCycle','moveBoundary','editNote'].includes(type)) { cycle = next.cycles.find(c => c.id === command.cycleId); assert(cycle,'INVALID_TARGET'); }
+        const id = () => context.makeId();
+        function addStep(c) {
+          assert(next.phases.length < 50,'PHASE_LIMIT');
+          const phase = {id:id(),label:(next.settings.language === 'ja' ? '工程' : 'Step ')+(next.phases.length+1),kind:'operation',archived:false};
+          next.phases.push(phase);
+          const occurrence = {id:id(),phaseId:phase.id,planned:true,resolution:'pending',note:''}; c.occurrences.push(occurrence);
+          c.cursor = {kind:'phase',occurrenceId:occurrence.id,note:''};
+        }
+        if (type === 'startCycle') {
+          assert(command.procedureId === null && next.cycles.length === 0,'FIRST_CYCLE_ONLY');
+          assert(at < next.source.durationUs,'INVALID_TIME');
+          cycle = {id:id(),procedureId:null,status:'open',boundaries:[{id:id(),timeUs:at}],spans:[],occurrences:[],cursor:null,excluded:false,exclusionReason:'',note:''};
+          next.cycles.push(cycle); addStep(cycle);
+        } else if (['markBoundary','finishCycle','closeIncomplete'].includes(type)) {
+          assert(cycle.status === 'open' || (type === 'finishCycle' && cycle.status === 'incomplete'),'CYCLE_CLOSED');
+          const last = cycle.boundaries.at(-1).timeUs;
+          assert(at >= last && (type !== 'markBoundary' || at > last),'BOUNDARY_ORDER');
+          assert(cycle.cursor && cycle.cursor.kind === 'phase','INVALID_TARGET');
+          const occurrence = cycle.occurrences.find(o => o.id === cycle.cursor.occurrenceId);
+          if (at > last) {
+            cycle.spans.push({id:id(),kind:'phase',occurrenceId:occurrence.id,note:cycle.cursor.note}); cycle.boundaries.push({id:id(),timeUs:at});
+            if (type !== 'closeIncomplete') occurrence.resolution = 'measured';
+          }
+          if (type === 'markBoundary') { assert(cycle.procedureId === null,'END_REQUIRED'); addStep(cycle); }
+          if (type === 'closeIncomplete') cycle.status='incomplete';
+          if (type === 'finishCycle') {
+            assert(cycle.spans.length > 0 && cycle.occurrences.every(o => o.resolution !== 'pending'),'UNRESOLVED');
+            if (cycle.procedureId === null) {
+              const procedure = {id:id(),label:next.settings.language === 'ja' ? '手順1' : 'Procedure 1',phaseIds:cycle.occurrences.map(o => o.phaseId),startCondition:'',endCondition:'',createdAt:context.nowIso()};
+              next.procedures.push(procedure); cycle.procedureId=procedure.id; next.settings.selectedProcedureId=procedure.id;
+            }
+            cycle.status='complete'; cycle.cursor=null;
+          }
+        } else if (type === 'resumeCycle') {
+          assert(cycle.status !== 'complete' && !next.cycles.some(c => c.id !== cycle.id && c.status === 'open'),'CYCLE_CLOSED'); cycle.status='open';
+        } else if (type === 'moveBoundary') {
+          const index = cycle.boundaries.findIndex(b => b.id === command.boundaryId); assert(index >= 0,'INVALID_TARGET');
+          assert((index === 0 || at > cycle.boundaries[index-1].timeUs) && (index === cycle.boundaries.length-1 || at < cycle.boundaries[index+1].timeUs),'BOUNDARY_ORDER'); cycle.boundaries[index].timeUs=at;
+        } else if (type === 'renamePhase') {
+          const phase = next.phases.find(p => p.id === command.phaseId); assert(phase,'INVALID_TARGET'); assert(typeof command.label === 'string','TEXT_LIMIT');
+          const label = command.label.trim(); assert(text(label,80),'TEXT_LIMIT'); if (label) phase.label=label;
+        } else if (type === 'updateProjectMeta') {
+          assert(text(command.title,160) && text(command.note,4000),'TEXT_LIMIT'); next.title=command.title; next.note=command.note;
+        } else if (type === 'editNote') {
+          assert(text(command.note,1000),'TEXT_LIMIT');
+          const target = command.targetType === 'cycle' ? (cycle.id === command.targetId ? cycle : null) : command.targetType === 'span' ? cycle.spans.find(s => s.id === command.targetId) : command.targetType === 'occurrence' ? cycle.occurrences.find(o => o.id === command.targetId) : null;
+          assert(target,'INVALID_TARGET'); target.note=command.note;
+        }
+        if (JSON.stringify(project) !== JSON.stringify(next)) next.updatedAt=context.nowIso();
+        const validation = validateProject(next); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
+        return {ok:true,project:next,undoPatch:diff(project,next)};
+      } catch (error) { return fail(error.code || 'INVALID_PROJECT'); }
+    }
+    function serializeProject(project,appVersion) {
+      const output = clone(project); output.appVersion=appVersion;
+      const validation = validateProject(output); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
+      // Compact output keeps the exported UTF-8 byte budget identical to validation.
+      return JSON.stringify(validation.value);
+    }
+    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,createProject,validateProject,applyCommand,createHistory,serializeProject});
   })();
   // TSD:CORE:END
 
@@ -296,7 +746,7 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
     }
     get video() { return this.active?.video || null; }
     get source() { return this.active?.candidate.source || null; }
-    notify() { this.onChange?.(this); }
+    notify(event) { this.onChange?.(this,event); }
     failure(code) { return Object.assign(new Error(code),{code}); }
     release(item) {
       if (!item || item.released) return;
@@ -364,7 +814,7 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
           if (this.active !== item || this.pending) return;
           if (item.video.error) this.state = 'error';
           else if (!this.pendingSeek) this.state = item.video.seeking ? 'seeking' : 'ready';
-          this.notify();
+          this.notify(event);
         },{signal:events.signal});
       }
       this.host.replaceChildren(item.video); this.release(old); this.notify();
@@ -416,9 +866,12 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
   }
   // TSD:MEDIA:END
 
-  // UI / CONTROLLER. No analysis persistence/export exists in the foundation milestone.
-  const media = new MediaController($('#videoHost'),renderMedia);
+  // UI / CONTROLLER. Analysis stays in memory until the user exports JSON.
+  let project = null, history = TsdCore.createHistory(), selectedBoundaryId = null;
+  let suspended = false, projectRevision = 0, attachedSource = null, savedSnapshot = null;
   let errorCode = '', displayedSource = null;
+  const media = new MediaController($('#videoHost'),onMediaChange);
+  const commandContext = {makeId:() => 'id-'+[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join(''),nowIso:() => new Date().toISOString(),get language() { return language; }};
   function setError(error) {
     if (error?.code === 'STALE') return;
     errorCode = translations.en[error?.code] ? error.code : 'UNSUPPORTED';
@@ -430,14 +883,28 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
     const hours = Math.floor(tenths / 36000), minutes = Math.floor(tenths / 600) % 60, rest = Math.floor(tenths / 10) % 60;
     return `${hours ? String(hours).padStart(2,'0') + ':' : ''}${String(minutes).padStart(2,'0')}:${String(rest).padStart(2,'0')}.${tenths % 10}`;
   }
+  function exactSeconds(timeUs) { return (timeUs / 1000000).toFixed(6).replace(/\.?0+$/,'') || '0'; }
+  function durationText(timeUs) { return timeUs > 0 && timeUs < 50000 ? translate('underTenth') : `${(timeUs/1000000).toFixed(1)} ${translate('secondsUnit')}`; }
   function formatBytes(size) {
     const unit = size >= 1024 ** 3 ? 'GiB' : size >= 1024 ** 2 ? 'MiB' : 'KiB';
     const divisor = unit === 'GiB' ? 1024 ** 3 : unit === 'MiB' ? 1024 ** 2 : 1024;
     return `${(size / divisor).toLocaleString(language,{maximumFractionDigits:1})} ${unit}`;
   }
+  function cycleNow() { return project?.cycles[0] || null; }
+  function onMediaChange(controller,event) {
+    renderMedia(controller);
+    const cycle = cycleNow();
+    if (event === 'ended' && cycle?.status === 'open' && attachedSource === controller.source && !document.hidden) {
+      const time = controller.captureTime();
+      if (time.ok && execute({type:'closeIncomplete',cycleId:cycle.id,timeUs:time.value})) {
+        AppToast.show({message:translate('endReached'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});
+      }
+    }
+  }
   function renderMedia(controller) {
     const source = controller.source, video = controller.video;
     const ready = Boolean(source) && controller.state === 'ready' && !controller.pending;
+    document.body.classList.toggle('has-source',Boolean(source));
     const status = $('#mediaStatus'), text = translate(controller.state);
     status.dataset.state = controller.state; if (status.textContent !== text) status.textContent = text;
     $('#loadingNotice').hidden = !controller.pending;
@@ -461,72 +928,255 @@ dialog::backdrop { background:#0f110e7a; } dialog[open] { display:flex; flex-dir
     $('#playLabel').textContent = translate(playing ? 'pause' : 'play');
     $('#playIcon').setAttribute('d',playing ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'm8 4 12 8-12 8z');
     if (controller.state === 'error' && !errorCode) setError({code:'UNSUPPORTED'});
+    renderMeasurementControls();
+  }
+  function renderMeasurementControls() {
+    const cycle = cycleNow(), position = media.captureTime();
+    const active = cycle?.status === 'open' && !suspended;
+    const after = active && position.ok && position.value > cycle.boundaries.at(-1).timeUs;
+    $('#startCycleButton').hidden = Boolean(cycle);
+    $('#startCycleButton').disabled = !project || !position.ok || position.value >= project.source.durationUs;
+    $('#markBoundaryButton').hidden = !active; $('#markBoundaryButton').disabled = !after || project.phases.length >= 50;
+    $('#finishCycleButton').hidden = !active; $('#finishCycleButton').disabled = !after;
+    $('#closeIncompleteButton').hidden = !active; $('#closeIncompleteButton').disabled = !position.ok || position.value < (cycle?.boundaries.at(-1).timeUs ?? 0);
+    $('#resumeCycleButton').hidden = !cycle || cycle.status === 'complete' || (active && !suspended);
+    $('#resumeCycleButton').disabled = !position.ok;
+    const occurrence = cycle?.cursor && cycle.occurrences.find(o=>o.id===cycle.cursor.occurrenceId);
+    $('#currentStep').textContent = occurrence ? project.phases.find(p=>p.id===occurrence.phaseId)?.label || '' : '';
+    let hint = !project ? 'choosePrompt' : !cycle ? 'firstHint' : cycle.status === 'complete' ? 'completeHint' : suspended ? 'suspendedHint' : cycle.status === 'incomplete' ? 'incompleteHint' : !position.ok ? position.error.code : !after ? 'BOUNDARY_ORDER' : 'markHint';
+    if (active && project.phases.length >= 50 && after) hint='PHASE_LIMIT';
+    $('#measurementHint').textContent = translate(hint);
+    $('#boundaryFromVideoButton').disabled = !position.ok || !cycle;
+    $('#boundaryToVideoButton').disabled = !position.ok || !cycle;
+  }
+  function execute(command,{quiet=false}={}) {
+    if (!project) return false;
+    const result = TsdCore.applyCommand(project,command,commandContext);
+    if (!result.ok) { if (!quiet) setError(result.error); return false; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++;
+    if (['startCycle','markBoundary','finishCycle','closeIncomplete'].includes(command.type)) selectedBoundaryId=cycleNow().boundaries.at(-1).id;
+    if (result.undoPatch.length) $('#saveStatus').textContent='';
+    renderProject(); return true;
+  }
+  function runMeasurement(type) {
+    const position = media.captureTime(); if (!position.ok) { setError(position.error); return; }
+    if (suspended && type !== 'startCycle') return;
+    clearError();
+    const cycle = cycleNow();
+    if (execute({type,timeUs:position.value,cycleId:cycle?.id,procedureId:null})) {
+      if (type === 'finishCycle' || type === 'closeIncomplete') media.pause();
+      if (type === 'finishCycle') selectPage('review');
+    }
+  }
+  async function resumeMeasurement() {
+    const cycle = cycleNow(); if (!cycle) return;
+    const revision = projectRevision, identity = project.projectId;
+    try {
+      await media.seekTo(cycle.boundaries.at(-1).timeUs);
+      if (revision !== projectRevision || identity !== project?.projectId) return;
+      if (execute({type:'resumeCycle',cycleId:cycle.id})) { suspended=false; $('#backgroundNotice').hidden=true; renderMeasurementControls(); }
+    } catch (error) { setError(error); }
+  }
+  function travelHistory(direction) {
+    if (!project) return;
+    media.pause(); const result = history[direction](project);
+    if (!result.ok) { setError(result.error); return; }
+    AppToast.dismiss(); project=result.project; projectRevision++; suspended=false; clearError();
+    $('#saveStatus').textContent=''; $('#boundaryError').hidden=true; renderProject();
+  }
+  function syncInput(input,value) {
+    if (document.activeElement !== input && !input.validationMessage) input.value=value;
+  }
+  function commitInput(input,command) {
+    input.setCustomValidity(''); input.removeAttribute('aria-invalid');
+    if (!project) return;
+    const result = TsdCore.applyCommand(project,command,commandContext);
+    if (!result.ok) { input.setCustomValidity(translate(result.error.code)); input.setAttribute('aria-invalid','true'); setError(result.error); return; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; clearError(); $('#saveStatus').textContent=''; renderProject();
+  }
+  function element(tag,className='',content='') { const node=document.createElement(tag); node.className=className; node.textContent=content; return node; }
+  function renderProject() {
+    const cycle = cycleNow();
+    $('#cycleState').textContent = translate(!cycle ? 'emptyRecord' : cycle.status+'Record');
+    $('#cycleDuration').textContent = cycle ? durationText(cycle.boundaries.at(-1).timeUs-cycle.boundaries[0].timeUs) : '—';
+    $('#reviewCycleStatus').textContent = cycle ? `${$('#cycleState').textContent} · ${$('#cycleDuration').textContent}` : '';
+    $('#recordHint').textContent = translate(cycle?.status === 'complete' ? 'recordComplete' : 'recordedOnly');
+    $('#undoButton').disabled = history.undoCount===0; $('#redoButton').disabled=history.redoCount===0;
+    $('#undoMeasureButton').disabled=history.undoCount===0; $('#redoMeasureButton').disabled=history.redoCount===0;
+    $('#measureHistory').hidden=!cycle && history.redoCount===0;
+    $('#saveAnalysisButton').disabled=!project;
+    $('#projectTitle').disabled=!project; $('#projectNote').disabled=!project; $('#cycleNote').disabled=!cycle;
+    syncInput($('#projectTitle'),project?.title || ''); syncInput($('#projectNote'),project?.note || ''); syncInput($('#cycleNote'),cycle?.note || '');
+    const list=$('#phaseList'), wanted=new Set();
+    for (const [index,occurrence] of (cycle?.occurrences || []).entries()) {
+      wanted.add(occurrence.id);
+      let row=[...list.children].find(r=>r.dataset.occurrenceId===occurrence.id);
+      if (!row) {
+        row=element('div','phase-row'); row.dataset.occurrenceId=occurrence.id;
+        const line=element('div','phase-line'), input=element('input','phase-name'), duration=element('span','phase-duration'); input.type='text'; input.autocomplete='off';
+        input.addEventListener('change',()=>commitInput(input,{type:'renamePhase',phaseId:occurrence.phaseId,label:input.value}));
+        line.append(input,duration); row.append(line);
+        const details=element('details','notes-details'), summary=element('summary'), label=element('label','field'), note=element('textarea','phase-note'); note.rows=2;
+        const labelText=element('span'); label.append(labelText,note); details.append(summary,label); row.append(details);
+        note.addEventListener('change',()=>commitInput(note,{type:'editNote',targetType:'occurrence',cycleId:cycle.id,targetId:occurrence.id,note:note.value}));
+      }
+      if (list.children[index] !== row) list.insertBefore(row,list.children[index] || null);
+      const phase=project.phases.find(p=>p.id===occurrence.phaseId), input=row.querySelector('.phase-name');
+      input.setAttribute('aria-label',`${translate('stepLabel')} ${index+1}`); syncInput(input,phase.label);
+      let timeUs=0; cycle.spans.forEach((span,i)=>{if(span.occurrenceId===occurrence.id && span.kind==='phase') timeUs+=cycle.boundaries[i+1].timeUs-cycle.boundaries[i].timeUs;});
+      row.querySelector('.phase-duration').textContent=occurrence.resolution==='measured' ? durationText(timeUs) : `${timeUs ? durationText(timeUs)+' · ' : ''}${translate('incompleteRecord')}`;
+      row.querySelector('summary').textContent=translate('stepNote'); row.querySelector('label span').textContent=translate('stepNote'); syncInput(row.querySelector('textarea'),occurrence.note);
+    }
+    for (const row of [...list.children]) if (!wanted.has(row.dataset.occurrenceId)) row.remove();
+    renderBoundaryEditor(); renderMeasurementControls();
+  }
+  function selectedBoundary() {
+    const cycle=cycleNow(); if (!cycle) return null;
+    let index=cycle.boundaries.findIndex(b=>b.id===selectedBoundaryId); if(index<0) index=cycle.boundaries.length-1;
+    return {cycle,index,boundary:cycle.boundaries[index]};
+  }
+  function renderBoundaryEditor() {
+    const selected=selectedBoundary(), select=$('#boundarySelect');
+    $('#reviewEmpty').hidden=Boolean(selected); $('#boundaryEditor').hidden=!selected;
+    if (!selected) { select.replaceChildren(); return; }
+    const {cycle,index,boundary}=selected; selectedBoundaryId=boundary.id;
+    const options=cycle.boundaries.map((b,i)=>{const option=element('option','',`${i===0 ? translate('startLabel') : i===cycle.boundaries.length-1 ? translate('endLabel') : translate('boundaryLabel')+' '+i} · ${exactSeconds(b.timeUs)} ${translate('secondsUnit')}`); option.value=b.id; return option;});
+    select.replaceChildren(...options); select.value=boundary.id;
+    $('#boundaryTime').value=exactSeconds(boundary.timeUs);
+    const min=index===0 ? 0 : cycle.boundaries[index-1].timeUs+1;
+    const max=index===cycle.boundaries.length-1 ? project.source.durationUs : cycle.boundaries[index+1].timeUs-1;
+    $('#boundarySlider').min=String(min); $('#boundarySlider').max=String(max); $('#boundarySlider').value=String(boundary.timeUs);
+    $('#boundarySlider').disabled=min>=max; $('#boundarySlider').setAttribute('aria-valuetext',`${exactSeconds(boundary.timeUs)} ${translate('secondsUnit')}`);
+    // Last boundary has no following span. Do not silently edit the previous span's note.
+    const span=cycle.spans[index]; $('#spanNote').disabled=!span;
+    $('#spanNote').dataset.spanId=span?.id || ''; $('#spanNoteLabel').textContent=span ? `${exactSeconds(boundary.timeUs)}–${exactSeconds(cycle.boundaries[index+1].timeUs)} ${translate('secondsUnit')}` : '—';
+    syncInput($('#spanNote'),span?.note || '');
+  }
+  function moveSelectedBoundary(timeResult) {
+    const selected=selectedBoundary(); if(!selected) return;
+    const result=timeResult.ok ? TsdCore.applyCommand(project,{type:'moveBoundary',cycleId:selected.cycle.id,boundaryId:selected.boundary.id,timeUs:timeResult.value},commandContext) : timeResult;
+    if(!result.ok) { $('#boundaryError').textContent=translate(result.error.code); $('#boundaryError').hidden=false; $('#boundaryTime').setAttribute('aria-invalid','true'); return; }
+    AppToast.dismiss(); project=result.project; history.push(result.undoPatch); projectRevision++; $('#boundaryError').hidden=true; $('#boundaryTime').removeAttribute('aria-invalid'); $('#saveStatus').textContent=''; renderProject();
+    if(result.undoPatch.length) AppToast.show({message:translate('boundaryApplied'),actionLabel:translate('undo'),onAction:()=>travelHistory('undo')});
+  }
+  function selectPage(page) {
+    if (!['measure','review','results'].includes(page)) return;
+    document.body.dataset.currentPage=page;
+    document.querySelectorAll('[data-screen]').forEach(node=>node.classList.toggle('is-mobile-active',node.dataset.screen===page));
+    document.querySelectorAll('[data-page]').forEach(node=>{if(node.dataset.page===page) node.setAttribute('aria-current','page'); else node.removeAttribute('aria-current');});
+    if(page!=='measure') media.pause();
+    if (matchMedia('(max-width:600px)').matches) window.scrollTo({top:0,behavior:'instant'});
   }
   async function chooseFile(file) {
     AppConfirm.cancel(); clearError();
     try {
-      const candidate = await media.loadCandidate(file);
-      if (media.source) {
-        const accepted = await AppConfirm.ask({message:`${translate('replaceMessage')}\n\n${candidate.source.name}`});
-        if (candidate.generation !== media.generation) return;
-        if (!accepted) { media.cancelCandidate(); return; }
+      const candidate=await media.loadCandidate(file);
+      if(media.source) {
+        const accepted=await AppConfirm.ask({message:`${translate('replaceMessage')}\n\n${candidate.source.name}`});
+        if(candidate.generation!==media.generation) return;
+        if(!accepted) {media.cancelCandidate();return;}
       }
-      media.commitCandidate(candidate); $('#backgroundNotice').hidden = true;
-    } catch (error) { setError(error); }
+      const next=TsdCore.createProject(candidate.source,commandContext);
+      media.commitCandidate(candidate);
+      project=next; attachedSource=media.source; projectRevision++; history=TsdCore.createHistory(); selectedBoundaryId=null; suspended=false; savedSnapshot=null;
+      document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
+      $('#boundaryError').hidden=true; $('#saveStatus').textContent=''; $('#backgroundNotice').hidden=true; AppToast.dismiss();
+      renderProject(); selectPage('measure');
+    } catch(error) { setError(error); }
   }
   function seekBy(delta) {
-    if (!media.source) return;
-    const target = Math.max(0,Math.min(media.source.durationUs,Math.round((media.video.currentTime + delta) * 1000000)));
+    if(!media.source) return;
+    const target=Math.max(0,Math.min(media.source.durationUs,Math.round((media.video.currentTime+delta)*1000000)));
     media.seekTo(target).catch(setError);
   }
-  function applyLanguage() {
-    document.documentElement.lang = language;
-    document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = translate(element.dataset.i18n); });
-    document.querySelectorAll('[data-i18n-aria-label]').forEach(element => { element.setAttribute('aria-label',translate(element.dataset.i18nAriaLabel)); });
-    $('#languageButton').textContent = language === 'ja' ? 'EN' : '日本語';
-    $('#languageButton').setAttribute('aria-label',language === 'ja' ? '英語に切り替え' : 'Switch to Japanese');
-    document.title = language === 'ja' ? 'Time Study Desk / 動画作業分析' : 'Time Study Desk / Video work analysis';
-    if (errorCode) $('#errorMessage').textContent = translate(errorCode);
-    renderMedia(media);
+  function saveAnalysis() {
+    if(!project) return;
+    const invalid=[...document.querySelectorAll('input,textarea')].find(input=>!input.checkValidity());
+    if(invalid) { setError({code:'TEXT_LIMIT'}); invalid.reportValidity(); return; }
+    let url=null;
+    try {
+      outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);
+      project.settings.outputBaseName=outputFilename.value; project.settings.language=language;
+      const text=TsdCore.serializeProject(project,APP_CONFIG.version);
+      const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+      if(blob.size>10*1024*1024) throw Object.assign(new Error('SAVE_LIMIT'),{code:'SAVE_LIMIT'});
+      url=URL.createObjectURL(blob); const link=element('a'); link.href=url; link.download=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json');
+      document.body.append(link); try {link.click();} finally {link.remove();}
+      savedSnapshot=JSON.stringify(project); $('#saveStatus').textContent=translate('downloadStarted');
+    } catch(error) { $('#saveStatus').textContent=translate('saveFailed'); setError({code:typeof error.code==='string' && translations.en[error.code] ? error.code : 'saveFailed'}); }
+    finally { if(url) setTimeout(()=>URL.revokeObjectURL(url),30000); }
   }
-  $('#chooseVideoButton').addEventListener('click',() => $('#videoInput').click());
-  $('#replaceVideoButton').addEventListener('click',() => $('#videoInput').click());
-  $('#videoInput').addEventListener('change',event => {
-    const files = [...event.target.files]; event.target.value = '';
-    if (files.length === 1) chooseFile(files[0]); else if (files.length) setError({code:'MULTIPLE_FILES'});
+  function applyLanguage() {
+    AppToast.dismiss(); document.documentElement.lang=language;
+    document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=translate(node.dataset.i18n);});
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(node=>{node.setAttribute('aria-label',translate(node.dataset.i18nAriaLabel));});
+    $('#languageButton').textContent=language==='ja' ? 'EN' : '日本語';
+    $('#languageButton').setAttribute('aria-label',language==='ja' ? '英語に切り替え' : 'Switch to Japanese');
+    document.title=language==='ja' ? 'Time Study Desk / 動画作業分析' : 'Time Study Desk / Video work analysis';
+    if(project) project.settings.language=language;
+    if(errorCode) $('#errorMessage').textContent=translate(errorCode);
+    renderMedia(media); renderProject();
+  }
+  $('#chooseVideoButton').addEventListener('click',()=>$('#videoInput').click());
+  $('#replaceVideoButton').addEventListener('click',()=>$('#videoInput').click());
+  $('#videoInput').addEventListener('change',event=>{const files=[...event.target.files];event.target.value='';if(files.length===1) chooseFile(files[0]);else if(files.length) setError({code:'MULTIPLE_FILES'});});
+  $('#cancelLoadButton').addEventListener('click',()=>{AppConfirm.cancel();media.cancelCandidate();clearError();});
+  $('#playButton').addEventListener('click',()=>{clearError();if(media.video?.paused) media.play().catch(setError);else media.pause();});
+  $('#seekBar').addEventListener('change',event=>media.seekTo(Math.round(Number(event.target.value)*1000000)).catch(setError));
+  document.querySelectorAll('[data-seek]').forEach(button=>button.addEventListener('click',()=>seekBy(Number(button.dataset.seek))));
+  $('#playbackRate').addEventListener('change',event=>{if(media.video) media.video.playbackRate=Number(event.target.value);});
+  $('#muteButton').addEventListener('click',()=>{if(media.video) media.video.muted=!media.video.muted;});
+  $('#volume').addEventListener('input',event=>{if(media.video) media.video.volume=Number(event.target.value);});
+  $('#playerRegion').addEventListener('keydown',event=>{
+    if(event.target!==event.currentTarget || event.ctrlKey || event.metaKey || event.altKey || ![' ','ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault();if(event.repeat) return;
+    if(event.key===' ') {if(media.video?.paused) media.play().catch(setError);else media.pause();}
+    else seekBy((event.key==='ArrowRight'?1:-1)*(event.shiftKey?1:.1));
   });
-  $('#cancelLoadButton').addEventListener('click',() => { AppConfirm.cancel(); media.cancelCandidate(); clearError(); });
-  $('#playButton').addEventListener('click',() => { clearError(); if (media.video?.paused) media.play().catch(setError); else media.pause(); });
-  $('#seekBar').addEventListener('change',event => media.seekTo(Math.round(Number(event.target.value) * 1000000)).catch(setError));
-  document.querySelectorAll('[data-seek]').forEach(button => button.addEventListener('click',() => seekBy(Number(button.dataset.seek))));
-  $('#playbackRate').addEventListener('change',event => { if (media.video) media.video.playbackRate = Number(event.target.value); });
-  $('#muteButton').addEventListener('click',() => { if (media.video) media.video.muted = !media.video.muted; });
-  $('#volume').addEventListener('input',event => { if (media.video) media.video.volume = Number(event.target.value); });
-  $('#playerRegion').addEventListener('keydown',event => {
-    if (event.target !== event.currentTarget || event.ctrlKey || event.metaKey || event.altKey) return;
-    if (![' ','ArrowLeft','ArrowRight'].includes(event.key)) return;
-    event.preventDefault(); if (event.repeat) return;
-    if (event.key === ' ') { if (media.video?.paused) media.play().catch(setError); else media.pause(); }
-    else seekBy((event.key === 'ArrowRight' ? 1 : -1) * (event.shiftKey ? 1 : .1));
+  for(const [selector,type] of [['#startCycleButton','startCycle'],['#markBoundaryButton','markBoundary'],['#finishCycleButton','finishCycle'],['#closeIncompleteButton','closeIncomplete']]) {
+    $(selector).addEventListener('click',()=>runMeasurement(type));
+    $(selector).addEventListener('keydown',event=>{if(event.repeat && [' ','Enter'].includes(event.key)) event.preventDefault();});
+  }
+  $('#resumeCycleButton').addEventListener('click',resumeMeasurement);
+  for(const selector of ['#undoButton','#undoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('undo'));
+  for(const selector of ['#redoButton','#redoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('redo'));
+  document.addEventListener('keydown',event=>{
+    if(!(event.ctrlKey||event.metaKey) || event.altKey || event.key.toLowerCase()!=='z' || event.repeat || event.target.closest('input,textarea,[contenteditable="true"],dialog[open]')) return;
+    event.preventDefault(); const direction=event.shiftKey?'redo':'undo'; if(history[direction+'Count']) travelHistory(direction);
   });
-  outputFilename.addEventListener('blur',() => { outputFilename.value = TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9); });
-  $('#languageButton').addEventListener('click',() => { language = language === 'ja' ? 'en' : 'ja'; try { localStorage.setItem('time-study-desk:language',language); } catch { /* Session-only setting. */ } applyLanguage(); });
-  const helpDialog = $('#helpDialog');
-  $('#helpButton').addEventListener('click',() => helpDialog.showModal());
-  $('#closeHelpButton').addEventListener('click',() => helpDialog.close());
-  helpDialog.addEventListener('close',() => $('#helpButton').focus({preventScroll:true}));
-  helpDialog.addEventListener('click',event => { const r = helpDialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) helpDialog.close(); });
-  document.addEventListener('dragover',event => { if (!event.dataTransfer.types.includes('Files')) return; event.preventDefault(); $('#dropZone').classList.add('drag-over'); });
-  document.addEventListener('dragleave',event => { if (!event.relatedTarget) $('#dropZone').classList.remove('drag-over'); });
-  document.addEventListener('drop',event => { event.preventDefault(); $('#dropZone').classList.remove('drag-over'); const files = [...event.dataTransfer.files]; if (files.length === 1) chooseFile(files[0]); else if (files.length) setError({code:'MULTIPLE_FILES'}); });
-  document.addEventListener('visibilitychange',() => { if (document.hidden) { media.pause(); if (media.source) $('#backgroundNotice').hidden = false; } });
+  $('#boundarySelect').addEventListener('change',event=>{selectedBoundaryId=event.target.value;$('#boundaryError').hidden=true;renderBoundaryEditor();});
+  $('#applyBoundaryButton').addEventListener('click',()=>moveSelectedBoundary(TsdCore.parseTimeInput($('#boundaryTime').value)));
+  $('#boundaryTime').addEventListener('keydown',event=>{if(event.key==='Enter') {event.preventDefault();moveSelectedBoundary(TsdCore.parseTimeInput(event.target.value));}});
+  $('#boundaryFromVideoButton').addEventListener('click',()=>moveSelectedBoundary(media.captureTime()));
+  $('#boundaryToVideoButton').addEventListener('click',()=>{const selected=selectedBoundary();if(selected) media.seekTo(selected.boundary.timeUs).catch(setError);});
+  $('#boundarySlider').addEventListener('input',event=>{$('#boundaryTime').value=exactSeconds(Number(event.target.value));});
+  $('#boundarySlider').addEventListener('change',event=>moveSelectedBoundary({ok:true,value:Number(event.target.value)}));
+  $('#projectTitle').addEventListener('change',event=>commitInput(event.target,{type:'updateProjectMeta',title:event.target.value,note:$('#projectNote').value}));
+  $('#projectNote').addEventListener('change',event=>commitInput(event.target,{type:'updateProjectMeta',title:$('#projectTitle').value,note:event.target.value}));
+  $('#cycleNote').addEventListener('change',event=>{const c=cycleNow();if(c) commitInput(event.target,{type:'editNote',targetType:'cycle',cycleId:c.id,targetId:c.id,note:event.target.value});});
+  $('#spanNote').addEventListener('change',event=>{const c=cycleNow();if(c && event.target.dataset.spanId) commitInput(event.target,{type:'editNote',targetType:'span',cycleId:c.id,targetId:event.target.dataset.spanId,note:event.target.value});});
+  $('#saveAnalysisButton').addEventListener('click',saveAnalysis);
+  outputFilename.addEventListener('blur',()=>{outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);});
+  document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>selectPage(button.dataset.page)));
+  $('#languageButton').addEventListener('click',()=>{language=language==='ja'?'en':'ja';try{localStorage.setItem('time-study-desk:language',language);}catch{/* Session-only setting. */}applyLanguage();});
+  const helpDialog=$('#helpDialog');
+  $('#helpButton').addEventListener('click',()=>{media.pause();helpDialog.showModal();});
+  $('#closeHelpButton').addEventListener('click',()=>helpDialog.close());
+  helpDialog.addEventListener('close',()=>$('#helpButton').focus({preventScroll:true}));
+  helpDialog.addEventListener('click',event=>{const r=helpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)helpDialog.close();});
+  document.addEventListener('dragover',event=>{if(!event.dataTransfer.types.includes('Files'))return;event.preventDefault();$('#dropZone').classList.add('drag-over');});
+  document.addEventListener('dragleave',event=>{if(!event.relatedTarget)$('#dropZone').classList.remove('drag-over');});
+  document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1)chooseFile(files[0]);else if(files.length)setError({code:'MULTIPLE_FILES'});});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){media.pause();if(media.source)$('#backgroundNotice').hidden=false;if(cycleNow()?.status==='open')suspended=true;}renderMeasurementControls();});
+  window.addEventListener('beforeunload',event=>{if(project && (project.cycles.length||project.title||project.note) && JSON.stringify(project)!==savedSnapshot){event.preventDefault();event.returnValue='';}});
   // Preserve File/Blob references in the back-forward cache, but never autoplay on return.
-  window.addEventListener('pagehide',event => { media.pause(); if (!event.persisted) media.dispose(); });
-  $('#versionBadge').textContent = `v${APP_CONFIG.version}`;
-  $('#buildVersion').textContent = APP_CONFIG.version;
-  $('#builtAt').textContent = BUILD_MANIFEST.generatedAtUtc || '—';
-  $('#dependencyCount').textContent = String(BUILD_MANIFEST.dependencies?.length || 0);
+  window.addEventListener('pagehide',event=>{media.pause();if(!event.persisted)media.dispose();});
+  $('#versionBadge').textContent=`v${APP_CONFIG.version}`;
+  $('#buildVersion').textContent=APP_CONFIG.version;
+  $('#builtAt').textContent=BUILD_MANIFEST.generatedAtUtc||'—';
+  $('#dependencyCount').textContent=String(BUILD_MANIFEST.dependencies?.length||0);
   applyLanguage();
+
 })();
 </script>
 </body>
