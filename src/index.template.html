@@ -400,7 +400,18 @@ body[data-current-page="results"] .desk { width:min(1180px,100%); }
 .cycle-complete-summary strong { font-size:18px; font-variant-numeric:tabular-nums; color:var(--accent); }
 .cycle-complete-summary span { color:var(--muted); font-size:11px; white-space:pre-line; }
 .cycle-complete-actions .button { min-height:42px; white-space:nowrap; }
-#recordCard { max-width:980px; margin-inline:auto; }
+#recordCard { width:100%; max-width:none; margin:0; }
+.build-section { width:min(1120px,100%); margin:22px auto 0; }
+@media(min-width:821px) {
+  body[data-current-page="review"] .side-column { grid-template-columns:minmax(0,1fr); width:min(1080px,100%); margin-inline:auto; }
+  body[data-current-page="review"] #cyclesCard { display:none !important; }
+  body[data-current-page="review"] #recordCard .phase-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 12px; padding:12px 0; }
+  body[data-current-page="review"] #recordCard .phase-line { grid-column:1/-1; }
+  body[data-current-page="review"] #recordCard .notes-details,
+  body[data-current-page="review"] #recordCard .resolution-details { margin:0; }
+  body[data-current-page="results"] .side-column { grid-template-columns:repeat(2,minmax(0,1fr)); width:min(1180px,100%); margin-inline:auto; }
+  body[data-current-page="results"] #sourceCard { grid-column:1/-1; }
+}
 
 body[data-current-page="measure"] #cyclesCard,
 body[data-current-page="measure"] #analysisCard,

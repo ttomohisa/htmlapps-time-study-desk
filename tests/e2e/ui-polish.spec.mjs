@@ -43,3 +43,36 @@ test('measurement page defers management and export cards until their dedicated 
   await expect(page.locator('#cyclesCard')).toBeHidden();await expect(page.locator('#analysisCard')).toBeHidden();await expect(page.locator('#sourceCard')).toBeHidden();
   await page.locator('.workspace-switch [data-page="results"]').click();await expect(page.locator('#analysisCard')).toBeVisible();await expect(page.locator('#sourceCard')).toBeVisible();
 });
+
+
+test('desktop review is one coherent editor instead of narrow detached cards', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openApp(page); await selectFixtureVideo(page);
+  const { measureFirstCycle } = await import('../helpers/app.mjs');
+  await measureFirstCycle(page);
+  await page.locator('.workspace-switch [data-page="review"]').click();
+  await expect(page.locator('#cyclesCard')).toBeHidden();
+  await expect(page.locator('#recordCard')).toBeVisible();
+  const player=await page.locator('.player-panel').boundingBox();
+  const record=await page.locator('#recordCard').boundingBox();
+  expect(record.width).toBeGreaterThanOrEqual(850);
+  expect(Math.abs(record.x-player.x)).toBeLessThanOrEqual(18);
+  const note=await page.locator('#phaseList .phase-row').first().locator('.notes-details').boundingBox();
+  const resolution=await page.locator('#phaseList .phase-row').first().locator('.resolution-details').boundingBox();
+  expect(Math.abs(note.y-resolution.y)).toBeLessThanOrEqual(4);
+});
+
+test('desktop results management uses balanced columns without half-width orphan cards', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openApp(page); await selectFixtureVideo(page);
+  const { measureFirstCycle } = await import('../helpers/app.mjs');
+  await measureFirstCycle(page);
+  await page.locator('.workspace-switch [data-page="results"]').click();
+  const cycles=await page.locator('#cyclesCard').boundingBox();
+  const analysis=await page.locator('#analysisCard').boundingBox();
+  const source=await page.locator('#sourceCard').boundingBox();
+  expect(cycles.width).toBeGreaterThan(430);
+  expect(analysis.width).toBeGreaterThan(430);
+  expect(Math.abs(cycles.y-analysis.y)).toBeLessThanOrEqual(4);
+  expect(source.width).toBeGreaterThan(900);
+});
