@@ -1,6 +1,6 @@
 # QA matrix — staged acceptance
 
-The complete release matrix is APP_SPEC.md section 17. v0.7.0 targets CSV / Export while retaining all earlier gates. Later mobile/accessibility/release-candidate requirements are not marked complete merely because source data exists.
+The complete release matrix is APP_SPEC.md section 17. v0.8.0 targets Mobile / Accessibility while retaining all earlier gates. Release-candidate real-device, screen-reader, multi-browser, large-media and performance requirements are not marked complete by emulation.
 
 | Area | Current evidence target | Remaining work |
 |---|---|---|

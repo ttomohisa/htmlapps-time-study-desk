@@ -2,6 +2,15 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.8.0 — 2026-10-06 — Mobile / Accessibility (development)
+
+- Refine the phone Measure / Review / Results flow with explicit controlled-panel relationships, fixed-bottom navigation clearance and scroll padding so focused controls can move above the bottom bar.
+- Mark background playback suspension as a polite status message without creating a work interruption, and retain explicit resume/no-autoplay behavior.
+- Complete keyboard/focus regressions for Space vs measurement actions, native text-field Undo vs project Undo, dialog focus return, Help reachability, keyboard-only saving and 200%-equivalent narrow layouts.
+- Keep playback pause distinct from recorded work interruption in Japanese/English help and status copy; add a lightweight live announcement for screen changes without announcing every media-time update.
+- Replace `assets/favicon.svg` with the user-approved 64×64 Time Study Desk SVG and keep the browser favicon and upper-left brand icon sourced from that exact file.
+- Retain schemaVersion 1, local-only media/data handling, CSV safety and all earlier measurement/statistics/export behavior. Android/iPhone hardware, soft keyboards and screen-reader user testing remain release-candidate gates.
+
 ## 0.7.0 — 2026-10-06 — CSV / Export (development)
 
 - Export the selected procedure as a localized time-table CSV and summary CSV, and export interval detail for either the selected procedure or the whole analysis. Each user action downloads one file only.
