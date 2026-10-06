@@ -16,6 +16,9 @@ test('capture actual exception-aware repeated-cycle UI using synthetic non-perso
  await page.locator('#phaseList .phase-name').nth(1).fill('確認');await page.locator('#phaseList .phase-name').nth(1).press('Tab');
  await page.locator('#boundarySelect').selectOption({index:1});await page.evaluate(()=>window.scrollTo(0,0));
  await page.screenshot({path:'test-results/screenshots/screenshot.png'});
+ await page.screenshot({path:'test-results/screenshots/screenshot-review-full.png',fullPage:true});
+ await page.locator('.workspace-switch [data-page="results"]').click();await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/screenshots/screenshot-results-full.png',fullPage:true});
+ await page.locator('.workspace-switch [data-page="review"]').click();await page.evaluate(()=>window.scrollTo(0,0));
  await page.locator('#languageButton').click();await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/screenshots/screenshot-en.png'});
  await page.locator('#languageButton').click();await page.setViewportSize({width:390,height:844});
  await page.locator('.mobile-tabs [data-page="review"]').click();await page.screenshot({path:'test-results/screenshots/screenshot-mobile.png'});
