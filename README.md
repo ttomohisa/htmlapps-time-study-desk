@@ -4,7 +4,7 @@
 
 Measure repeated work cycles in one local video, edit their step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
 
-**v0.6.0 — development build.** Measure and edit repeated cycles, reopen saved analysis, use count-aware statistics and a step × cycle time table, and return from a result number to its exact video evidence. CSV remains a later milestone. It is not a v1.0 release.
+**v0.7.0 — development build.** Measure and edit repeated cycles, reopen saved analysis, use count-aware statistics and video evidence, and export the time table, summary, or interval detail as CSV. It is not a v1.0 release.
 
 ## Screenshot
 
@@ -26,10 +26,11 @@ The app tests capture the actual Japanese, English and phone-width UI in `test-r
 - Reconnect the original video separately. Size, dimensions and duration (within 100 ms) are checked; matching metadata never claims identity and still requires explicit confirmation. A candidate shorter than recorded evidence is rejected.
 - Autosave analysis data only to IndexedDB with a device-side on/off setting (default on). Successful transactions advance a revision; a stale tab reports a conflict instead of overwriting a newer revision. Browser-stored analysis can be restored or explicitly deleted.
 - Japanese/English, light UI and phone navigation: Measure / Review / Results. Results summarizes one procedure at a time with recorded/included/excluded/incomplete counts, cycle statistics, per-step means with their own n, a zero-origin SVG bar chart, and a step × cycle table. Not-performed, unobserved and incomplete records are not treated as zero.
+- Export one CSV at a time: time table, summary, or interval detail. CSV uses UTF-8 BOM, CRLF, quoted cells, explicit missing values and state/reason columns. Spreadsheet-formula-like user text is exported as literal text rather than a formula.
 
 ## Usage
 
-Open a freshly built `dist/index.html` or `time-study-desk.html`, choose a video, seek to the work's starting position, and select **Start cycle here**. Select **Mark boundary** at each step change and **Finish cycle here** at the end. Return to **Measure**, seek to the next cycle's start, and select **Start next cycle here**. Use **Review** to select and correct a cycle. **Results** contains count-aware statistics, the step × cycle table, cycle breakdown/exclusion controls, plus the existing cycle/procedure management cards. The editor changes nothing until saved; cancelling leaves the original procedure intact. Choose **Save analysis** to download a `.tsd.json` file.
+Open a freshly built `dist/index.html` or `time-study-desk.html`, choose a video, seek to the work's starting position, and select **Start cycle here**. Select **Mark boundary** at each step change and **Finish cycle here** at the end. Return to **Measure**, seek to the next cycle's start, and select **Start next cycle here**. Use **Review** to select and correct a cycle. **Results** contains count-aware statistics, the step × cycle table, cycle breakdown/exclusion controls, plus the existing cycle/procedure management cards. The editor changes nothing until saved; cancelling leaves the original procedure intact. Choose **Save analysis** to download a `.tsd.json` file, or use the CSV buttons below it to download one time-table, summary, or interval-detail file at a time.
 
 The filename is editable; the extension is fixed. A “Download started” message means the file was handed to the browser, not that a particular disk location was verified. Check the download yourself. Autosave starts enabled when IndexedDB is actually available; it stores analysis only, never video. If storage is unavailable or full, the warning remains visible and manual JSON saving still works.
 
@@ -52,6 +53,14 @@ Choose the procedure to summarize in **Results**. Overall elapsed statistics use
 Not performed is a state rather than zero seconds. A partly unobserved step keeps its known recorded portion but is excluded from that step's mean. Incomplete cycles remain visible but do not enter the standard statistics. Excluding a complete cycle requires a reason and leaves the row visible.
 
 Select a numeric cycle/step/exception value to open **Review** at the saved evidence range. The player seeks to the start and stays paused. **Play this interval** starts only after an explicit click and stops near the saved end; this does not claim frame-accurate stopping. If the analysis is detached from its video, the exact time range remains readable and playback stays disabled until a compatible source is reconnected.
+
+### CSV export
+
+The output base name is shared by JSON and CSV. The app fixes each suffix: `.tsd.json`, `-time-table.csv`, `-summary.csv`, or `-intervals.csv`. Invalid path/control characters and reserved names are sanitized; the app does not write to a user-supplied directory.
+
+**Time table CSV** has one row per recorded cycle for the selected procedure, including status, inclusion/exclusion reason, start/end, elapsed/breakdown values, and seconds + state columns for each planned step. **Summary CSV** uses the same `TsdCore.summarize()` populations as the on-screen results and includes each statistic's own `n`. **Interval detail CSV** uses fixed ASCII keys and can cover the selected procedure or the whole analysis; it keeps span rows, no-span occurrence-status rows, exclusions/incomplete cycles, and between-cycle gaps.
+
+CSV is UTF-8 with BOM, CRLF, commas, and every cell quoted. Missing numeric values are empty rather than `0`; a real zero remains `0`. User text that could be interpreted as a spreadsheet formula is prefixed with an apostrophe in CSV only. The original text remains unchanged in the analysis JSON. See [CSV_FORMAT.md](docs/CSV_FORMAT.md). A “Download started” message is only browser handoff, not proof that a particular spreadsheet program or disk destination accepted the file.
 
 ### Reopen, reconnect and autosave
 
@@ -110,7 +119,7 @@ Unit tests extract the real `TSD:CORE` block, not a copy of its implementation. 
 
 ## Save format and project status
 
-[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected rather than silently discarded. v0.6.0 imports schema 1, keeps the v0.2.0 fixture as a compatibility regression, and requires explicit original-video reconnection. Autosave stores schema-1 analysis data only; statistics and evidence ranges are derived at runtime and are not serialized.
+[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected rather than silently discarded. v0.7.0 imports schema 1, keeps the v0.2.0 fixture as a compatibility regression, and requires explicit original-video reconnection. Autosave stores schema-1 analysis data only; statistics, evidence ranges and CSV are derived at runtime and are not serialized.
 
 This work does not publish a release, merge the PR, or add the app to the Browser Kitty site. The user merges the PR.
 

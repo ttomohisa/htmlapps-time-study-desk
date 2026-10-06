@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.6.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.7.0 is a development build, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -20,7 +20,7 @@ Procedure order and conditions are immutable snapshots; old cycles keep their or
 
 Commands are atomic: validation failure leaves the previous model unchanged. Undo uses validated differences, not permanent duplicated project snapshots. Replacement cancellation and loading failures preserve the previous analysis. Video-end observation is incomplete until explicitly resolved. Never label partly observed time as a complete step value.
 
-User strings go into text nodes or form values, not `innerHTML`. Names resembling HTML remain literal text. Filenames are sanitized before downloads; fixed extensions do not allow directory writes. CSV formula handling is a later requirement and is not claimed implemented here.
+User strings go into text nodes or form values, not `innerHTML`. Names resembling HTML remain literal text. Filenames are sanitized before downloads; fixed extensions do not allow directory writes. CSV export treats user-authored text separately from app-generated numeric fields. After BOM/leading whitespace-control inspection, text whose first meaningful character is `=`, `+`, `-`, `@` or the specified full-width equivalents, and text beginning with tab/newline controls, receives a leading apostrophe before CSV quoting. This changes only the CSV representation; JSON and in-memory source text remain unchanged. All CSV cells are quoted and embedded quotes are doubled.
 
 ## Import and source reconnection
 
@@ -31,6 +31,8 @@ A reopened or browser-restored analysis starts detached from video. Results and 
 Interruptions and unobserved intervals retain explicit kinds and times. A step not performed has a state but no invented zero-length work span. Reassignment and merging conserve the recorded time range and revalidate affected occurrence states. Losing complete evidence makes a step pending; it is never automatically changed to not performed. Editing a live assignment suspends recording. An explicit review finish is required after incomplete observations are resolved.
 
 A merge that changes assignments or notes is confirmed and guarded by project identity/revision, so an old confirmation cannot apply to a replacement analysis. Reversible deletion removes only the selected cycle, not the source video or phase/procedure definitions. No-op assignment offers no Undo for earlier work.
+
+CSV downloads are generated locally from validated analysis state. They use fixed suffixes and sanitized base filenames, never a user-supplied filesystem path. A download-handoff message does not claim disk persistence or safe behavior after arbitrary third-party re-save/reinterpretation. No CSV is uploaded.
 
 Result statistics are derived only from validated integer boundaries and explicit states. Incomplete, not-performed, unobserved and excluded records are not coerced into zero values. Result links carry only in-memory cycle/phase identifiers and saved time ranges; selecting evidence does not upload data or autoplay the video. Derived statistics and chart values are not persisted separately in JSON or IndexedDB.
 

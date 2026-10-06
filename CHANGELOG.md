@@ -2,6 +2,15 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 0.7.0 — 2026-10-06 — CSV / Export (development)
+
+- Export the selected procedure as a localized time-table CSV and summary CSV, and export interval detail for either the selected procedure or the whole analysis. Each user action downloads one file only.
+- Keep missing numeric values blank rather than zero, retain not-performed/unobserved/incomplete/excluded states and reasons, and emit no-span occurrence-status and between-cycle detail rows.
+- Use UTF-8 BOM, CRLF, comma separators and quoted cells. Interval detail uses the fixed ASCII column order defined by the product spec.
+- Prefix spreadsheet-formula-like user text with an apostrophe in CSV only; JSON and in-memory source strings remain unchanged. Keep filename sanitization and fixed output suffixes for JSON and all three CSV types.
+- Add unit and browser regressions for CSV round trips, formula-like text, filenames, failed CSV preparation and one-file download behavior.
+- Repair four merged-v0.6 browser tests whose selectors did not distinguish the desktop table from responsive result cards, and make connected evidence tests navigate explicitly to Results. The v0.7 PR CI is the canonical verification for those repairs.
+
 ## 0.6.0 — 2026-10-06 — Results / Review (development)
 
 - Add a single pure `summarize(project, procedureId)` engine for count-aware cycle totals and phase statistics. Complete/included cycles form the overall population; each phase keeps its own denominator.

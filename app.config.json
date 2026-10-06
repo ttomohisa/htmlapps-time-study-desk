@@ -3,9 +3,9 @@
   "name": "Time Study Desk",
   "nameJa": "動画作業分析",
   "slug": "time-study-desk",
-  "version": "0.6.0",
-  "description": "Measure repeated work in a local video, calculate count-aware cycle and step statistics, and return from result numbers to exact video evidence.",
-  "descriptionJa": "作業動画を工程・回ごとに記録し、件数付きの全体・工程別統計を確認して、数値から根拠映像の区間へ戻れます。",
+  "version": "0.7.0",
+  "description": "Measure repeated work in a local video, review count-aware statistics and evidence, and export time-table, summary, or interval-detail CSV locally.",
+  "descriptionJa": "作業動画を工程・回ごとに記録し、件数付き統計と根拠映像を確認して、時間表・集計・区間明細CSVを端末内で出力できます。",
   "defaultLanguage": "auto",
   "repository": {
     "owner": "ttomohisa",
