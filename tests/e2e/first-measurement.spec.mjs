@@ -6,6 +6,7 @@ for (const variant of ['readable','self-extract']) {
     await expect(page.locator('#cycleState')).toHaveText('完了');
     await expect(page.locator('#phaseList .phase-row')).toHaveCount(4);
     await expect(page.locator('#cycleDuration')).toHaveText('3.4 秒');
+    await page.locator('.workspace-switch [data-page="review"]').click();
     await page.locator('#boundarySelect').selectOption({index:1});
     await page.locator('#boundaryTime').fill('0.7'); await page.locator('#applyBoundaryButton').click();
     await expect(page.locator('#phaseList .phase-duration').nth(0)).toHaveText('0.7 秒');

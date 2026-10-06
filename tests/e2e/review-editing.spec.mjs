@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 import {openApp,selectFixtureVideo,measureFirstCycle} from '../helpers/app.mjs';
-async function start(page,variant='readable'){await openApp(page,variant);await selectFixtureVideo(page);await measureFirstCycle(page);await page.locator('#intervalDetails > summary').click();}
+async function start(page,variant='readable'){await openApp(page,variant);await selectFixtureVideo(page);await measureFirstCycle(page);await page.locator('.workspace-switch [data-page="review"]').click();await page.locator('#intervalDetails > summary').click();}
 for(const variant of ['readable','self-extract'])test(`split merge reassign and delete are reversible: ${variant}`,async({page})=>{
  await start(page,variant);await page.locator('#spanSelect').selectOption({index:0});await page.locator('#splitTime').fill('0.3');await page.locator('#splitSpanButton').click();await expect(page.locator('#spanSelect option')).toHaveCount(5);
  await page.locator('#mergeSpanButton').click();await expect(page.locator('#spanSelect option')).toHaveCount(4);await expect(page.locator('#cycleDuration')).toHaveText('3.4 秒');
@@ -21,7 +21,7 @@ test('merging different assignments requires explicit confirmation and preserves
 test('adding a rework occurrence does not modify the saved procedure',async({page})=>{
  await start(page);await page.locator('#occurrenceTools summary').click();await page.locator('#insertOccurrenceButton').click();
  await expect(page.locator('#phaseList .phase-row')).toHaveCount(5);await expect(page.locator('#cycleState')).toHaveText('未完了');
- const waiting=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();const p=JSON.parse(await readFile(await (await waiting).path(),'utf8'));
+ await page.locator('.workspace-switch [data-page="results"]').click();const waiting=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();const p=JSON.parse(await readFile(await (await waiting).path(),'utf8'));
  expect(p.procedures[0].phaseIds).toHaveLength(4);expect(p.cycles[0].occurrences.at(-1).planned).toBe(false);
  await page.locator('#undoButton').click();await expect(page.locator('#cycleState')).toHaveText('完了');await expect(page.locator('#phaseList .phase-row')).toHaveCount(4);
 });

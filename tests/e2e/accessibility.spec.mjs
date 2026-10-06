@@ -9,7 +9,7 @@ test('space_does_not_mark_and_play_together',async({page})=>{
 });
 
 test('text_undo_is_not_project_undo',async({page})=>{
-  await openApp(page);await selectFixtureVideo(page);await page.locator('#projectTitle').fill('abc');await page.locator('#projectTitle').press('Tab');
+  await openApp(page);await selectFixtureVideo(page);await page.locator('#startCycleButton').click();await page.locator('.workspace-switch [data-page="results"]').click();await page.locator('#projectTitle').fill('abc');await page.locator('#projectTitle').press('Tab');
   const undoBefore=await page.locator('#undoButton').isEnabled();expect(undoBefore).toBe(true);
   await page.locator('#projectTitle').focus();await page.keyboard.type('def');await page.keyboard.press('Control+z');
   await expect(page.locator('#projectTitle')).toHaveValue('abc');
@@ -24,7 +24,7 @@ test('help_last_item_is_reachable and focus returns to its trigger',async({page}
 });
 
 test('mobile navigation exposes controlled panels and 200 percent zoom keeps the page horizontal-scroll free',async({page})=>{
-  await page.setViewportSize({width:320,height:640});await openApp(page);
+  await page.setViewportSize({width:320,height:640});await openApp(page);await selectFixtureVideo(page);await page.locator('#startCycleButton').click();
   for(const [name,id] of [['measure','measurePanel'],['review','reviewPanel'],['results','resultsWorkspace']]){
     const button=page.locator(`.mobile-tabs [data-page="${name}"]`);
     await expect(button).toHaveAttribute('aria-controls',id);await button.click();await expect(button).toHaveAttribute('aria-current','page');

@@ -24,18 +24,22 @@ test('help icon has an explicit dot and saved-analysis action is readable but se
   expect(style.color).not.toBe('rgb(242, 247, 244)');
 });
 
-test('desktop workspace uses the available width and separates measurement from records', async ({ page }) => {
+test('desktop workspace keeps measurement centered and reveals records only after evidence exists', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
   const panel = await page.locator('.player-panel').boundingBox();
-  expect(panel.width).toBeGreaterThanOrEqual(1040);
-  expect(Math.abs(panel.x - (1280 - panel.width) / 2)).toBeLessThanOrEqual(12);
-  const measureStyle = await page.locator('#measurePanel').evaluate(el => {
-    const s=getComputedStyle(el); return {marginTop:parseFloat(s.marginTop),radius:parseFloat(s.borderTopLeftRadius)};
-  });
-  expect(measureStyle.marginTop).toBeGreaterThanOrEqual(14);
-  expect(measureStyle.radius).toBeGreaterThanOrEqual(12);
-  const player = await page.locator('.player-panel').boundingBox();
-  const record = await page.locator('#recordCard').boundingBox();
-  expect(record.y - (player.y + player.height)).toBeGreaterThanOrEqual(14);
+  expect(panel.width).toBeGreaterThanOrEqual(880);
+  expect(panel.width).toBeLessThanOrEqual(1000);
+  expect(Math.abs(panel.x - (1280 - panel.width) / 2)).toBeLessThanOrEqual(14);
+  await expect(page.locator('#recordCard')).toBeHidden();
+  await page.locator('#startCycleButton').click();await page.locator('#seekBar').evaluate(input=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
+  await page.waitForFunction(()=>document.querySelector('#mediaStatus').dataset.state==='ready');await page.locator('#markBoundaryButton').click();
+  await expect(page.locator('#recordCard')).toBeHidden();
+});
+
+
+test('measurement page defers management and export cards until their dedicated screens', async ({page})=>{
+  await openApp(page);await selectFixtureVideo(page);await page.locator('#startCycleButton').click();
+  await expect(page.locator('#cyclesCard')).toBeHidden();await expect(page.locator('#analysisCard')).toBeHidden();await expect(page.locator('#sourceCard')).toBeHidden();
+  await page.locator('.workspace-switch [data-page="results"]').click();await expect(page.locator('#analysisCard')).toBeVisible();await expect(page.locator('#sourceCard')).toBeVisible();
 });

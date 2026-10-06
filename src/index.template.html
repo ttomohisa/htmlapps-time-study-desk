@@ -356,6 +356,70 @@ footer { width:min(1280px,100%); }
  .measurement,.review-editor,.results-workspace { margin:6px 10px 10px; }
  .measurement { padding-top:8px; }
 }
+
+/* v0.9.0 progressive disclosure: show the next useful action, not every capability. */
+.intro-note { display:none; }
+body:not(.has-source):not(.has-analysis) .panel-head,
+body:not(.has-source):not(.has-analysis) .transport,
+body:not(.has-source):not(.has-analysis) #measurePanel,
+body:not(.has-source):not(.has-analysis) .side-column { display:none !important; }
+body:not(.has-source) .transport { display:none; }
+body:not(.has-cycles) .workspace-switch,
+body:not(.has-cycles) .mobile-tabs { display:none !important; }
+body:not(.has-cycles) .side-column { display:none; }
+body:not(.has-source):not(.has-analysis) .desk { width:min(820px,100%); }
+body.has-source[data-current-page="measure"] .desk { width:min(980px,100%); }
+body[data-current-page="review"] .desk { width:min(1080px,100%); }
+body[data-current-page="results"] .desk { width:min(1180px,100%); }
+.empty-view .empty-secondary-button { border:0; background:transparent; color:#c4d3cd; text-decoration:underline; text-underline-offset:3px; font-weight:650; padding-inline:10px; }
+.empty-view .empty-secondary-button:hover:not(:disabled) { border:0; background:#ffffff0a; color:#fff; }
+.measure-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:14px; }
+.measure-heading h2 { margin:2px 0 0; font-size:18px; line-height:1.25; }
+.measure-kicker { display:block; color:var(--accent); font-size:11px; font-weight:800; }
+.measure-procedure { max-width:46%; color:var(--muted); font-size:12px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.active-step-card { margin:0 0 14px; padding:14px 16px; border:1px solid #bdd6ca; border-radius:12px; background:#fff; box-shadow:0 1px 2px #191c180a; }
+.active-step-meta { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:11px; }
+.active-step-card .current-step { margin-top:4px; color:var(--text); font-size:20px; line-height:1.35; font-weight:800; }
+.active-step-next { display:block; margin-top:4px; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.measure-actions { margin-top:10px; }
+.measure-actions .button { flex-basis:100%; min-height:52px; }
+.measure-actions .button.primary { font-size:16px; }
+.measure-secondary-actions { display:flex; flex-wrap:wrap; gap:4px 18px; margin-top:2px; }
+.measure-secondary-actions .text-button { min-height:40px; }
+.measurement-hint { margin:8px 0 0; }
+.cycle-complete-card { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; margin:0 0 14px; padding:14px 16px; border:1px solid #b7d6c8; border-radius:12px; background:var(--accent-soft); }
+.cycle-complete-card strong { display:block; font-size:14px; }
+.cycle-complete-card p { margin:3px 0 0; color:var(--muted); font-size:12px; }
+.cycle-complete-actions { display:flex; gap:8px; }
+.cycle-complete-copy { min-width:0; }
+.cycle-complete-summary { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-top:9px; }
+.cycle-complete-summary strong { font-size:18px; font-variant-numeric:tabular-nums; color:var(--accent); }
+.cycle-complete-summary span { color:var(--muted); font-size:11px; white-space:pre-line; }
+.cycle-complete-actions .button { min-height:42px; white-space:nowrap; }
+#recordCard { max-width:980px; margin-inline:auto; }
+
+body[data-current-page="measure"] #cyclesCard,
+body[data-current-page="measure"] #analysisCard,
+body[data-current-page="measure"] #sourceCard,
+body[data-current-page="review"] #analysisCard,
+body[data-current-page="review"] #sourceCard,
+body[data-current-page="results"] #recordCard { display:none !important; }
+body[data-current-page="measure"] #recordCard { display:none !important; }
+body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
+#recordCard[hidden],#recordHistory[hidden],#recordRenameHint[hidden] { display:none !important; }
+@media(max-width:600px) {
+  body:not(.has-source):not(.has-analysis) .main { padding-top:10px; }
+  body:not(.has-source):not(.has-analysis) .page-intro { display:block; }
+  body:not(.has-source):not(.has-analysis) .page-intro .local-badge { display:flex; margin-top:10px; }
+  .measure-heading { gap:10px; margin-bottom:10px; }
+  .measure-heading h2 { font-size:16px; }
+  .measure-procedure { max-width:48%; font-size:10px; }
+  .active-step-card { padding:11px 12px; margin-bottom:10px; }
+  .active-step-card .current-step { font-size:17px; }
+  .cycle-complete-card { grid-template-columns:1fr; gap:10px; padding:12px; }
+  .cycle-complete-actions { display:grid; grid-template-columns:1fr 1fr; }
+  .cycle-complete-actions .button { min-width:0; }
+}
 </style>
 </head>
 <body data-current-page="measure">
@@ -368,14 +432,16 @@ footer { width:min(1280px,100%); }
 <div id="errorMessage" class="notice error" role="alert" hidden></div>
 <div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
 <div id="backgroundNotice" class="notice" role="status" aria-live="polite" aria-atomic="true" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
-<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-controls="measurePanel" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" aria-controls="reviewPanel" data-i18n="tabReview">見直す</button><button type="button" data-page="results" aria-controls="resultsWorkspace" data-i18n="tabResults">結果</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" aria-keyshortcuts="Space ArrowLeft ArrowRight" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button><button id="openAnalysisInlineButton" class="button empty-secondary-button" type="button" data-i18n="openAnalysis" data-i18n-aria-label="openAnalysisStartAria" aria-label="保存した分析を開く（開始画面）">保存した分析を開く</button><button id="reconnectInlineButton" class="button primary" type="button" hidden data-i18n="reconnectOriginal">元動画を選び直す</button></div><div id="videoHost" hidden></div></div>
+<div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-controls="measurePanel" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" aria-controls="reviewPanel" data-i18n="tabReview">記録を編集</button><button type="button" data-page="results" aria-controls="resultsWorkspace" data-i18n="tabResults">結果</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" aria-keyshortcuts="Space ArrowLeft ArrowRight" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button><button id="openAnalysisInlineButton" class="button empty-secondary-button" type="button" data-i18n="openAnalysis" data-i18n-aria-label="openAnalysisStartAria" aria-label="保存した分析を開く（開始画面）">保存した分析を開く</button><button id="reconnectInlineButton" class="button primary" type="button" hidden data-i18n="reconnectOriginal">元動画を選び直す</button></div><div id="videoHost" hidden></div></div>
 <div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
 <details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
-  <div class="section-heading"><h2 id="measureTitle" data-i18n="measureTitle">最初の一回を計測</h2><strong id="currentStep" class="current-step"></strong></div>
-  <p class="measure-context"><span id="measureProcedure"></span><span id="nextStep"></span></p><div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="exceptionReturnButton" type="button" class="button primary" hidden data-i18n="resumeStep">工程へ戻る</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
-  <button id="predefineButton" class="text-button" type="button" data-i18n="predefine" disabled>工程名を先に入力</button><button id="prepareNextCycleButton" class="text-button" type="button" data-i18n="leaveIncomplete" hidden>未完了のまま次の回へ</button>
+  <div class="measure-heading"><div><span id="measureKicker" class="measure-kicker"></span><h2 id="measureTitle" data-i18n="measureTitle">作業を計測</h2></div><span id="measureProcedure" class="measure-procedure"></span></div>
+  <div id="activeStepCard" class="active-step-card" hidden><div class="active-step-meta"><span data-i18n="currentStepLabel">現在の工程</span><span id="stepProgress"></span></div><strong id="currentStep" class="current-step"></strong><span id="nextStep" class="active-step-next"></span></div>
+  <div id="cycleCompleteCard" class="cycle-complete-card" hidden><div class="cycle-complete-copy"><strong id="cycleCompleteTitle"></strong><p data-i18n="cycleCompleteBody">次の回を続けて計測するか、記録を編集・結果確認へ進めます。</p><div class="cycle-complete-summary"><strong id="cycleCompleteDuration"></strong><span id="cycleCompleteBreakdown"></span></div></div><div class="cycle-complete-actions"><button id="reviewCompletedButton" class="button" type="button" data-i18n="editCompletedRecord">記録を編集</button><button id="viewResultsButton" class="button" type="button" data-i18n="viewResults">結果を見る</button></div></div>
+  <div class="measure-actions"><button id="startCycleButton" type="button" class="button primary" data-i18n="startCycle" disabled>ここから開始</button><button id="markBoundaryButton" type="button" class="button primary" data-i18n="markBoundary" hidden>ここで区切る</button><button id="finishCycleButton" type="button" class="button" data-i18n="finishCycle" hidden>この回を終了</button><button id="exceptionReturnButton" type="button" class="button primary" hidden data-i18n="resumeStep">工程へ戻る</button><button id="resumeCycleButton" type="button" class="button primary" data-i18n="resumeCycle" hidden>最後の区切りから再開</button></div>
+  <div class="measure-secondary-actions"><button id="predefineButton" class="text-button" type="button" data-i18n="predefine" disabled>工程名を先に入力</button><button id="prepareNextCycleButton" class="text-button" type="button" data-i18n="leaveIncomplete" hidden>未完了のまま次の回へ</button></div>
   <div class="history-actions" id="measureHistory" hidden><button class="button" id="undoMeasureButton" type="button" data-i18n="undo" disabled>取り消す</button><button class="button" id="redoMeasureButton" type="button" data-i18n="redo" disabled>やり直す</button></div>
-  <p id="measurementHint" class="small-note"></p>
+  <p id="measurementHint" class="small-note measurement-hint"></p>
 <details id="exceptionsDetails" class="exception-controls" hidden><summary data-i18n="exceptionActions">その他の記録</summary><div class="exception-inner">
 <label class="field"><span data-i18n="exceptionNote">中断・未観測のメモ（任意）</span><input id="exceptionNote" type="text" autocomplete="off"></label>
 <button id="beginInterruptionButton" class="button" type="button" data-i18n="beginInterruption">中断を記録</button>
@@ -385,8 +451,8 @@ footer { width:min(1280px,100%); }
 </div></details><button id="closeIncompleteButton" type="button" class="text-button" data-i18n="closeIncomplete" hidden>この位置まで記録して中断</button>
 </div>
 <div class="review-editor app-mobile-page" data-screen="review" id="reviewPanel" aria-labelledby="reviewTitle">
-  <div class="section-heading"><h2 id="reviewTitle" data-i18n="reviewTitle">区切りを見直す</h2><span class="small-note" id="reviewCycleStatus"></span></div>
-  <label class="field" id="cycleSelectField" hidden><span data-i18n="reviewCycle">見直す回</span><select id="cycleSelect"></select></label><button id="resumeSelectedButton" class="text-button" type="button" data-i18n="resumeSelected" hidden>この未完了の回を再開</button>
+  <div class="section-heading"><h2 id="reviewTitle" data-i18n="reviewTitle">記録を編集</h2><span class="small-note" id="reviewCycleStatus"></span></div>
+  <label class="field" id="cycleSelectField" hidden><span data-i18n="reviewCycle">編集する回</span><select id="cycleSelect"></select></label><button id="resumeSelectedButton" class="text-button" type="button" data-i18n="resumeSelected" hidden>この未完了の回を再開</button>
 <div id="evidenceReviewCard" class="evidence-card" hidden><h3 data-i18n="evidenceTitle">根拠映像</h3><strong id="evidenceLabel"></strong><p id="evidenceRange"></p><p id="evidenceHint"></p><div class="evidence-actions"><label id="evidenceSegmentField" class="field" hidden><span data-i18n="evidenceSegment">区間</span><select id="evidenceSegmentSelect"></select></label><button id="playEvidenceButton" class="button primary" type="button" data-i18n="playEvidence" disabled>この区間を再生</button></div></div>
   <div class="review-finalize"><button id="completeReviewedButton" class="button primary" type="button" hidden data-i18n="completeReviewed">この回を完了にする</button><button id="deleteCycleButton" class="text-button" type="button" hidden data-i18n="deleteCycle">この回を削除</button></div>
 <p id="resolutionHint" class="small-note" hidden data-i18n="resolutionHint">未確定の工程は、工程一覧の「実施の状態を見直す」で確認してください。完了は最後の確定境界で行います。</p>
@@ -428,7 +494,7 @@ footer { width:min(1280px,100%); }
 </section>
 </section>
 <aside class="side-column">
-<section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><p id="recordBreakdown" class="small-note record-breakdown"></p><div class="history-actions"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
+<section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><p id="recordBreakdown" class="small-note record-breakdown"></p><div class="history-actions" id="recordHistory"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p id="recordRenameHint" class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
 <section class="side-card app-mobile-page" data-screen="results" id="cyclesCard"><h2 data-i18n="cyclesTitle">記録した回</h2><p class="small-note" data-i18n="gapHint">回と回の間は、どの回の作業時間にも含めません。</p><div id="cycleList"></div>
 <label class="field"><span data-i18n="nextProcedure">次の回に使う手順</span><select id="procedureSelect" disabled></select></label><p id="procedureConditions" class="small-note procedure-conditions"></p>
 <div class="procedure-buttons"><button id="editProcedureButton" class="button" type="button" data-i18n="editProcedure" disabled>工程順・条件を変更</button></div>
@@ -518,7 +584,7 @@ footer { width:min(1280px,100%); }
   const translations = {
     ja: {
       introTitle:'作業動画を工程ごとに区切って時間を比較', introBody:'動画を見ながら工程の区切りを記録し、回ごと・工程ごとの時間を比較できます。気になる数値から該当区間へ戻れます。', brandMeta:'動画から工程・回ごとの時間を記録して比較', localBadge:'完全ローカル処理', stage:"リリース候補 · v0.9.0", versionLimit:"セキュリティ、生成HTML、規模試験、資料を統合確認するリリース候補です。実機で未確認の項目は未確認のまま明記します。",
-      playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
+      playerTitle:'作業動画', choosePrompt:'動画を選んで計測を始める', dropHint:'動画は端末内で処理します。ドラッグ＆ドロップでも開けます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
       analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importReady:'.tsd.jsonを検証して開きます。元動画は別に選び直します。', savePreparation:'保存名の準備', outputFilename:'出力のベース名', outputSuffixHint:'拡張子は自動', savePlanned:"JSONとCSVは一回の操作で一ファイルずつ保存します。動画は含まれません。", saveAnalysis:'分析データを保存', csvTitle:'CSV出力', csvHint:'画面と同じ集計規則で、時間表・集計・区間明細を一つずつ保存します。', exportTimeTableCsv:'時間表CSVを保存', exportSummaryCsv:'集計CSVを保存', exportIntervalsCsv:'区間明細CSVを保存', intervalCsvScope:'区間明細の範囲', scopeSelectedProcedure:'選択手順', scopeAnalysis:'分析全体', csvExportFailed:'CSVを保存できませんでした。現在の分析は保持しています。', nextStage:"現在：v0.9.0 リリース候補", nextStageBody:"自動検証を統合し、残る実機・ブラウザ差・大容量素材は結果を分けて記録します。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
@@ -531,15 +597,15 @@ footer { width:min(1280px,100%); }
       FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。',
       screenNavigation:"分析画面",
       tabMeasure:"計測",
-      tabReview:"見直す",
+      tabReview:"記録を編集",
       tabResults:"結果",
-      measureTitle:"作業を計測",
+      measureTitle:"作業を計測", currentStepLabel:"現在の工程", firstMeasureKicker:"まず1回目を記録", repeatMeasureKicker:"繰り返しを記録", stepProgress:"工程 {current} / {total}", stepNumber:"工程 {current}", cycleRecorded:"{n}回目を記録しました", cycleCompleteBody:"次の回を続けて計測するか、記録を編集・結果確認へ進めます。", editCompletedRecord:"記録を編集", viewResults:"結果を見る",
       startCycle:"ここから開始",
       markBoundary:"ここで区切る",
       finishCycle:"この回を終了",
       resumeCycle:"最後の区切りから再開",
       closeIncomplete:"この位置まで記録して中断",
-      reviewTitle:"区切りを見直す",
+      reviewTitle:"記録を編集",
       precisionNote:"動画内の秒数で調整します",
       reviewEmpty:"計測を始めると、ここで境界を修正できます。",
       selectedBoundary:"修正する境界",
@@ -569,7 +635,7 @@ footer { width:min(1280px,100%); }
       incompleteRecord:"未完了",
       firstHint:"開始位置へ移動して「ここから開始」を押してください。",
       markHint:"工程が変わる位置で区切ります。最後は「この回を終了」。",
-      completeHint:"この回は終了しました。見直すか、計測画面で次の回を始められます。",
+      completeHint:"この回は終了しました。記録を編集するか、このまま次の回を始められます。",
       incompleteHint:"終了は未確定です。続きから再開するか、取り消して境界を修正してください。",
       suspendedHint:"最後の確定境界から再開して、未確定の続きを見直してください。",
       recordedOnly:"表示は確定した区間の合計です。未確定の続きは含みません。",
@@ -719,10 +785,10 @@ footer { width:min(1280px,100%); }
     },
     en: {
       introTitle:'Compare work times by splitting a video into steps', introBody:'Mark step boundaries while watching a video, compare cycles and step times, and jump from a result back to its evidence.', brandMeta:'Record and compare step and cycle times from a local video', localBadge:'Fully local processing', stage:"Release candidate · v0.9.0", versionLimit:"This candidate integrates security, generated-HTML, scale and documentation checks. Items not verified on real devices remain explicitly unverified.",
-      playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
+      playerTitle:'Work video', choosePrompt:'Choose a video to start measuring', dropHint:'The video stays on this device. You can also drag and drop it here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
       analysisTitle:'Analysis data', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Output base name', outputSuffixHint:'Extension is automatic', savePlanned:"JSON and CSV are downloaded one file per action and never include the video.", saveAnalysis:'Save analysis', csvTitle:'CSV export', csvHint:'Save the time table, summary, or interval details one file at a time using the same aggregation rules as the screen.', exportTimeTableCsv:'Save time-table CSV', exportSummaryCsv:'Save summary CSV', exportIntervalsCsv:'Save interval-detail CSV', intervalCsvScope:'Interval detail scope', scopeSelectedProcedure:'Selected procedure', scopeAnalysis:'Whole analysis', csvExportFailed:'Could not save the CSV. The current analysis has been kept.', nextStage:"Next stage: release-candidate integration", nextStageBody:"v0.9.0 will integrate security, generated-HTML, real-device, large-media and release-document checks.",
-      buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
+      buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Video and analysis stay on this device', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
       confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
       helpBasicsTitle:'What this release candidate does', helpBasicsBody:"v0.9.0 keeps measurement, exception recording, save/resume, count-aware results, video evidence and CSV export while integrating security, generated-HTML, scale and documentation checks. Real Android/iPhone and screen-reader items stay explicitly unverified until they are tested.",
       helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping. Pausing video playback and marking a work interruption are separate operations.",
@@ -732,15 +798,15 @@ footer { width:min(1280px,100%); }
       FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.',
       screenNavigation:"Analysis screens",
       tabMeasure:"Measure",
-      tabReview:"Review",
+      tabReview:"Edit records",
       tabResults:"Results",
-      measureTitle:"Measure work",
+      measureTitle:"Measure work", currentStepLabel:"Current step", firstMeasureKicker:"Record the first cycle", repeatMeasureKicker:"Record another cycle", stepProgress:"Step {current} / {total}", stepNumber:"Step {current}", cycleRecorded:"Cycle {n} recorded", cycleCompleteBody:"Continue with the next cycle, edit the record, or review results.", editCompletedRecord:"Edit record", viewResults:"View results",
       startCycle:"Start cycle here",
       markBoundary:"Mark boundary",
       finishCycle:"Finish cycle here",
       resumeCycle:"Resume from last boundary",
       closeIncomplete:"Record to here and suspend",
-      reviewTitle:"Review boundaries",
+      reviewTitle:"Edit records",
       precisionNote:"Adjust seconds within the video",
       reviewEmpty:"Start measuring to edit boundaries here.",
       selectedBoundary:"Boundary to edit",
@@ -770,7 +836,7 @@ footer { width:min(1280px,100%); }
       incompleteRecord:"Incomplete",
       firstHint:"Seek to the starting position and select Start cycle here.",
       markHint:"Mark each step change. For the final step, select Finish cycle here.",
-      completeHint:"This cycle is finished. Review it, or start the next one from Measure.",
+      completeHint:"This cycle is finished. Edit the record, or continue with the next cycle from Measure.",
       incompleteHint:"The end is not confirmed. Resume or undo to correct the boundaries.",
       suspendedHint:"Resume from the last confirmed boundary to review the unfinished part.",
       recordedOnly:"Only confirmed spans are totaled. The unfinished continuation is not included.",
@@ -782,7 +848,7 @@ footer { width:min(1280px,100%); }
       edited:"Change applied",
       endReached:"Video ended. The cycle was kept as incomplete.",
       boundaryApplied:"Boundary updated",
-      BOUNDARY_ORDER:"Move after the previous boundary, or correct it in Review. Boundaries cannot cross their neighbors.",
+      BOUNDARY_ORDER:"Move after the previous boundary, or correct it in Edit records. Boundaries cannot cross their neighbors.",
       INVALID_TIME_INPUT:"Enter non-negative seconds with up to six decimal places.",
       INVALID_PROJECT:"Analysis validation failed. Your current data has been kept.",
       INVALID_TARGET:"Select the record again.",
@@ -859,7 +925,7 @@ footer { width:min(1280px,100%); }
       completeReviewed:"Mark this cycle complete",
       deleteCycle:"Delete this cycle",
       cycleDeleted:"Cycle deleted",
-      resolutionHint:"Review unresolved steps under Review occurrence state. Completion uses the last confirmed boundary.",
+      resolutionHint:"Resolve unfinished steps under occurrence state in Edit records. Completion uses the last confirmed boundary.",
       intervalReview:"Split, merge and assign intervals",
       intervalHint:"Correct the assignment without deleting time. A step that loses its evidence becomes unresolved.",
       selectSpan:"Interval to edit",
@@ -1978,6 +2044,7 @@ footer { width:min(1280px,100%); }
     const procedure=cycle ? project.procedures.find(p=>p.id===cycle.procedureId) : nextProcedure();
     const overlap=ready && project.cycles.some(c=>position.value===c.boundaries[0].timeUs || (position.value>c.boundaries[0].timeUs && position.value<c.boundaries.at(-1).timeUs));
     $('#measureTitle').textContent=message('measureN',{n:number});
+    $('#measureKicker').textContent=translate(project?.cycles.length ? 'repeatMeasureKicker' : 'firstMeasureKicker');
     $('#startCycleButton').hidden=Boolean(cycle);
     $('#startCycleButton').textContent=translate(project?.cycles.length ? 'nextCycle':'startCycle');
     $('#startCycleButton').disabled=!ready || overlap || project.cycles.length>=1000 || position.value>=project.source.durationUs;
@@ -1993,11 +2060,21 @@ footer { width:min(1280px,100%); }
     const phase=occurrence ? project.phases.find(p=>p.id===occurrence.phaseId) : null;
     $('#currentStep').textContent=(exceptionActive ? translate(cycle.cursor.kind==='interruption'?'kindInterruption':'kindUnobserved')+' · ' : '')+(phase?.label || '');
     $('#currentStep').title=$('#currentStep').textContent;
+    const occurrenceIndex=occurrence ? cycle.occurrences.findIndex(o=>o.id===occurrence.id)+1 : 0;
+    $('#stepProgress').textContent=occurrence ? (cycle?.procedureId ? message('stepProgress',{current:occurrenceIndex,total:cycle.occurrences.length}) : message('stepNumber',{current:occurrenceIndex})) : '';
+    $('#activeStepCard').hidden=!occurrence;
     const following=occurrence && cycle.occurrences.slice(cycle.occurrences.indexOf(occurrence)+1).find(o=>o.resolution!=='not-performed');
     $('#nextStep').textContent=following ? message('nextStepName',{name:project.phases.find(p=>p.id===following.phaseId)?.label}) : cycle?.procedureId ? translate('lastStep') : '';
     $('#nextStep').title=$('#nextStep').textContent;
     $('#measureProcedure').textContent=procedure ? message('procedureShort',{name:procedure.label,n:procedure.phaseIds.length}) : translate('firstProcedure');
     $('#measureProcedure').title=$('#measureProcedure').textContent;
+    const lastCycle=project?.cycles.at(-1), lastRow=lastCycle ? rows.find(row=>row.id===lastCycle.id) : null;
+    const showComplete=Boolean(!cycle && lastCycle?.status==='complete');
+    $('#cycleCompleteCard').hidden=!showComplete;
+    $('#cycleCompleteTitle').textContent=showComplete ? message('cycleRecorded',{n:lastRow?.number || project.cycles.length}) : '';
+    const completedBreakdown=showComplete && lastCycle ? TsdCore.cycleBreakdown(lastCycle) : null;
+    $('#cycleCompleteDuration').textContent=completedBreakdown ? durationText(completedBreakdown.elapsedUs) : '';
+    $('#cycleCompleteBreakdown').textContent=completedBreakdown ? message('recordBreakdown',{phase:durationText(completedBreakdown.phaseUs),interruption:durationText(completedBreakdown.interruptionUs),unobserved:durationText(completedBreakdown.unobservedUs)}) : '';
     let hint=!project ? 'choosePrompt' : !cycle ? (overlap?'CYCLE_OVERLAP':project.cycles.length?'readyNextHint':'firstHint') : suspended?'suspendedHint':cycle.status==='incomplete'?'incompleteHint':!ready?position.error.code:!after?'BOUNDARY_ORDER':cycle.procedureId?'repeatHint':'markHint';
     if(active && !cycle.procedureId && project.phases.length>=50 && after) hint='PHASE_LIMIT';
     if(exceptionActive)hint=cycle.cursor.kind==='interruption'?'interruptionHint':'unobservedHint';
@@ -2035,7 +2112,6 @@ footer { width:min(1280px,100%); }
     if (type==='markBoundary' && isLastRepeatedStep(cycle)) type='finishCycle';
     if (execute({type,timeUs:position.value,cycleId:cycle?.id,procedureId:nextProcedure()?.id || null})) {
       if (type === 'finishCycle' || type === 'closeIncomplete') media.pause();
-      if (type === 'finishCycle') selectPage('review');
     }
   }
   function runException(type) {
@@ -2086,6 +2162,8 @@ footer { width:min(1280px,100%); }
   function renderProject() {
     const cycle = cycleNow();
     selectedCycleId=cycle?.id || null;
+    const hasCycles=Boolean(project?.cycles.length);
+    document.body.classList.toggle('has-cycles',hasCycles);
     renderCycleList(); renderProcedures();
     $('#cycleState').textContent = translate(!cycle ? 'emptyRecord' : cycle.status+'Record');
     $('#cycleDuration').textContent = cycle ? durationText(cycle.boundaries.at(-1).timeUs-cycle.boundaries[0].timeUs) : '—';
@@ -2098,6 +2176,10 @@ footer { width:min(1280px,100%); }
     $('#deleteCycleButton').hidden=!cycle;
     $('#resolutionHint').hidden=!cycle || cycle.status!=='incomplete';
 
+    const recordHasEvidence=Boolean(cycle && (cycle.spans.length || cycle.status!=='open'));
+    $('#recordCard').hidden=!recordHasEvidence;
+    $('#recordHistory').hidden=history.undoCount===0 && history.redoCount===0;
+    $('#recordRenameHint').hidden=!cycle?.occurrences.length;
     $('#undoButton').disabled = history.undoCount===0; $('#redoButton').disabled=history.redoCount===0;
     $('#undoMeasureButton').disabled=history.undoCount===0; $('#redoMeasureButton').disabled=history.redoCount===0;
     $('#measureHistory').hidden=!cycle && history.redoCount===0;
@@ -2571,6 +2653,8 @@ footer { width:min(1280px,100%); }
   }
   $('#resumeCycleButton').addEventListener('click',()=>resumeMeasurement());
   $('#resumeSelectedButton').addEventListener('click',()=>resumeMeasurement(cycleNow()));
+  $('#reviewCompletedButton').addEventListener('click',()=>selectPage('review'));
+  $('#viewResultsButton').addEventListener('click',()=>selectPage('results'));
   $('#prepareNextCycleButton').addEventListener('click',()=>{recordingCycleId=null;suspended=false;renderMeasurementControls();});
   for(const selector of ['#undoButton','#undoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('undo'));
   for(const selector of ['#redoButton','#redoMeasureButton']) $(selector).addEventListener('click',()=>travelHistory('redo'));

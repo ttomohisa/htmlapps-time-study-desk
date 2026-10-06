@@ -3,12 +3,12 @@ import {openApp,selectFixtureVideo,measureFirstCycle} from '../helpers/app.mjs';
 import {makeFixture} from '../helpers/fixtures.mjs';
 
 test('failed download reports an analysis-save error and keeps the measured record',async ({page})=>{
- await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);
+ await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);await page.locator('.workspace-switch [data-page="results"]').click();
  await page.evaluate(()=>{URL.createObjectURL=()=>{throw new DOMException('Denied','SecurityError');};});
  await page.locator('#saveAnalysisButton').click();
  await expect(page.locator('#saveStatus')).toContainText('分析データを保存できませんでした');
  await expect(page.locator('#errorMessage')).toContainText('分析データを保存できませんでした');
- await expect(page.locator('#cycleState')).toHaveText('完了');await expect(page.locator('#phaseList .phase-row')).toHaveCount(4);
+ await page.locator('.workspace-switch [data-page="review"]').click();await expect(page.locator('#cycleState')).toHaveText('完了');await expect(page.locator('#phaseList .phase-row')).toHaveCount(4);
 });
 
 test('failed CSV handoff reports an export error and preserves the result table',async({page})=>{
@@ -21,7 +21,7 @@ test('failed CSV handoff reports an export error and preserves the result table'
 });
 
 test('a later edit dismisses an older boundary Undo notification',async ({page})=>{
- await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);
+ await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);await page.locator('.workspace-switch [data-page="review"]').click();
  await page.locator('#boundarySelect').selectOption({index:1});await page.locator('#boundaryTime').fill('0.7');await page.locator('#applyBoundaryButton').click();
  await expect(page.locator('#appToast')).toHaveClass(/show/);
  const name=page.locator('#phaseList .phase-name').first();await name.fill('準備');await name.press('Tab');
@@ -29,7 +29,7 @@ test('a later edit dismisses an older boundary Undo notification',async ({page})
 });
 
 test('an unchanged boundary does not offer Undo for an earlier command',async ({page})=>{
- await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);
+ await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);await page.locator('.workspace-switch [data-page="review"]').click();
  await page.locator('#boundarySelect').selectOption({index:0});await page.locator('#boundaryTime').fill('0');await page.locator('#applyBoundaryButton').click();
  expect(await page.locator('#appToast').getAttribute('class')).not.toMatch(/\bshow\b/);
 });

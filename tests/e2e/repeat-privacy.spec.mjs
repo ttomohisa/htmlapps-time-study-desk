@@ -17,8 +17,8 @@ for(const variant of ['readable','self-extract']) test(`repeat, procedure editin
  });
  await selectFixtureVideo(page);await page.locator('#startCycleButton').click();await seekVideo(page,.4);await page.locator('#markBoundaryButton').click();await seekVideo(page,.8);await page.locator('#finishCycleButton').click();
  await page.locator('.workspace-switch [data-page="measure"]').click();await seekVideo(page,1);await page.locator('#startCycleButton').click();await seekVideo(page,1.4);await page.locator('#markBoundaryButton').click();await seekVideo(page,1.8);await page.locator('#markBoundaryButton').click();
- await page.locator('#editProcedureButton').click();await page.locator('#procedureDraftName').fill('<img src=https://example.invalid/pixel>');await page.locator('#startCondition').fill('literal condition');await page.locator('#saveProcedureButton').click();
- const pending=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();await pending;
+ await page.locator('.workspace-switch [data-page="results"]').click();await page.locator('#editProcedureButton').click();await page.locator('#procedureDraftName').fill('<img src=https://example.invalid/pixel>');await page.locator('#startCondition').fill('literal condition');await page.locator('#saveProcedureButton').click();
+ await page.locator('.workspace-switch [data-page="results"]').click();const pending=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();await pending;
  await expect(page.locator('#procedureConditions')).toContainText('literal condition');expect(requests).toEqual([]);expect(errors).toEqual([]);
  expect(await page.evaluate(()=>window.__testCsp)).toEqual([]);expect(await page.evaluate(()=>window.__testNetworkAttempts)).toEqual([]);
 });
