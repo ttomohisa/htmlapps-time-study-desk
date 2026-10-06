@@ -2,9 +2,9 @@
 
 [日本語](README.ja.md)
 
-Measure repeated work cycles in one local video, edit their step boundaries, and save the analysis as JSON. No registration, installation, video upload, or runtime third-party library is required.
+Mark step boundaries while watching a work video, compare repeated cycles and step times, and jump from a result back to its evidence. No registration or installation is required; video and analysis data are processed fully locally. No runtime third-party library is used.
 
-**v0.7.0 — development build.** Measure and edit repeated cycles, reopen saved analysis, use count-aware statistics and video evidence, and export the time table, summary, or interval detail as CSV. It is not a v1.0 release.
+**v0.9.0 — release candidate.** It retains the v0.8.0 workflow, refines the information hierarchy and desktop layout, and integrates CSP/network, readable/self-extracting standalone, scale-data and documentation checks. Real Android/iPhone, screen-reader, published-HTTPS and large-real-media checks remain explicitly unverified.
 
 ## Screenshot
 
@@ -26,7 +26,12 @@ The app tests capture the actual Japanese, English and phone-width UI in `test-r
 - Reconnect the original video separately. Size, dimensions and duration (within 100 ms) are checked; matching metadata never claims identity and still requires explicit confirmation. A candidate shorter than recorded evidence is rejected.
 - Autosave analysis data only to IndexedDB with a device-side on/off setting (default on). Successful transactions advance a revision; a stale tab reports a conflict instead of overwriting a newer revision. Browser-stored analysis can be restored or explicitly deleted.
 - Japanese/English, light UI and phone navigation: Measure / Review / Results. Results summarizes one procedure at a time with recorded/included/excluded/incomplete counts, cycle statistics, per-step means with their own n, a zero-origin SVG bar chart, and a step × cycle table. Not-performed, unobserved and incomplete records are not treated as zero.
+- Phone layouts use one fixed bottom navigation bar with focus-safe clearance. The buttons expose the screen they control, screen changes get a restrained status announcement, Space on a measurement button does not also toggle playback, text-field Undo stays native, and dialogs return focus to their trigger when closed.
 - Export one CSV at a time: time table, summary, or interval detail. CSV uses UTF-8 BOM, CRLF, quoted cells, explicit missing values and state/reason columns. Spreadsheet-formula-like user text is exported as literal text rather than a formula.
+
+### v0.9.0 UI pass
+
+The opening screen now follows the same information hierarchy as other Browser Kitty apps: what the tool does, what the user can do, and where processing happens. On desktop the video/measurement workspace uses one wide centered column instead of leaving an empty right rail. Measure / Review / Results stay inside the same workspace, measurement and record areas have explicit spacing, and Open analysis is a secondary action below Choose video.
 
 ## Usage
 
@@ -84,7 +89,7 @@ Times are read from the video's `currentTime` and stored as integer microseconds
 
 The repository's Windows Actions workflow tests generated readable and self-extracting HTML directly through `file://` in Chromium for the main standalone workflow. Persistence tests use the same generated HTML from a loopback-only development server so IndexedDB has a stable origin; the app does not require that server at runtime. `file://` storage support is feature-detected rather than promised. Exact tested revisions belong to their Actions run/PR.
 
-Android/iPhone real devices, macOS Safari, Edge, Firefox, published HTTPS hosting and large real video files remain unverified. Phone-width emulation does not verify the mobile OS file picker or download flow. The self-extracting variant requires `DecompressionStream`.
+Windows CI and supplementary Chromium cover 320/360/390/430 px, short landscape layouts, 200%-equivalent narrow rendering, keyboard interaction, dialog-end reachability and focus return. Android/iPhone hardware, soft keyboards, screen-reader user testing, macOS Safari, Edge, Firefox, published HTTPS hosting and large real video files remain unverified. Emulation does not verify the mobile OS file picker or download flow. The self-extracting variant requires `DecompressionStream`.
 
 ## Development and build
 
@@ -119,7 +124,7 @@ Unit tests extract the real `TSD:CORE` block, not a copy of its implementation. 
 
 ## Save format and project status
 
-[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected rather than silently discarded. v0.7.0 imports schema 1, keeps the v0.2.0 fixture as a compatibility regression, and requires explicit original-video reconnection. Autosave stores schema-1 analysis data only; statistics, evidence ranges and CSV are derived at runtime and are not serialized.
+[Schema 1](docs/SAVE_FORMAT.md) is independent of the app version and is intended to stay readable through v1.0.0. The v0.2.0 `.tsd.json` compatibility fixture is retained under `tests/fixtures/`. Unknown fields and invalid references are rejected rather than silently discarded. v0.9.0 imports schema 1, keeps the v0.2.0 fixture as a compatibility regression, and requires explicit original-video reconnection. Autosave stores schema-1 analysis data only; statistics, evidence ranges and CSV are derived at runtime and are not serialized.
 
 This work does not publish a release, merge the PR, or add the app to the Browser Kitty site. The user merges the PR.
 

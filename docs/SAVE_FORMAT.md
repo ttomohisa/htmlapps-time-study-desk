@@ -1,6 +1,6 @@
 # Time Study Desk analysis JSON — schema 1
 
-The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.7.0 exporter/importer, browser-local recovery, derived-results and CSV-export behavior.
+The normative model and invariants are in [APP_SPEC.md](../APP_SPEC.md), sections 9–11 and appendix B. This document describes the v0.9.0 exporter/importer, browser-local recovery, derived-results and CSV-export behavior.
 
 ## Envelope
 
@@ -9,7 +9,7 @@ UTF-8 compact JSON, extension `.tsd.json`:
 ```text
 format: "time-study-desk"
 schemaVersion: 1
-appVersion: "0.7.0"
+appVersion: "0.9.0"
 projectId, createdAt, updatedAt, title, note
 source: { name, size, lastModified, durationUs, width, height }
 phases: []
@@ -36,7 +36,7 @@ Validation builds a fresh allow-listed JSON object. Commands commit only validat
 
 ## Export, import and source reconnection
 
-v0.7.0 can reopen schema-1 `.tsd.json`. It checks the raw file size before reading, then parses and validates the full allow-listed object. Malformed JSON, unsupported schema versions, unknown fields, invalid references/states, or values beyond the existing limits reject the whole import and leave the current analysis unchanged. Import never executes embedded text or treats JSON as HTML.
+v0.9.0 can reopen schema-1 `.tsd.json`. It checks the raw file size before reading, then parses and validates the full allow-listed object. Malformed JSON, unsupported schema versions, unknown fields, invalid references/states, or values beyond the existing limits reject the whole import and leave the current analysis unchanged. Import never executes embedded text or treats JSON as HTML.
 
 A successful import opens detached from video. Measurement and evidence seeking remain unavailable until the source is explicitly reconnected. The app compares saved metadata against the candidate: size and dimensions must match, duration difference must be at most 100,000 µs, and the candidate must reach every recorded boundary. Filename/mtime changes are warnings. A metadata match is not proof of identity and always requires confirmation. Reconnection never autoplays or rewrites saved times.
 
@@ -50,7 +50,7 @@ Each stored project has a monotonically increasing revision. `save(project, expe
 
 The restore card never automatically replaces a new session's state. Browser-data deletion clears only this app's stores. Pending timers are invalidated and any in-flight save is awaited before clear so an older queued write cannot recreate deleted recovery data. `file://` storage behavior is not assumed; the app probes the environment and falls back to manual JSON saving when persistence is unavailable.
 
-## v0.7.0 derived results and CSV
+## v0.9.0 derived results and CSV
 
 The file schema is unchanged. Counts, means, medians, minima/maxima, phase denominators, cycle table values, chart geometry and evidence selections are derived from validated `cycles`, `boundaries`, `spans`, `occurrences`, `phases` and `procedures`; these derived values are **not serialized**.
 

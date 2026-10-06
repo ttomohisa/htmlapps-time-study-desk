@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.7.0 is a development build, not a security certification or a formal release.
+This repository contains a static browser app. v0.9.0 is a release candidate, not a security certification or a formal release.
 
 ## Data boundary
 
@@ -35,6 +35,10 @@ A merge that changes assignments or notes is confirmed and guarded by project id
 CSV downloads are generated locally from validated analysis state. They use fixed suffixes and sanitized base filenames, never a user-supplied filesystem path. A download-handoff message does not claim disk persistence or safe behavior after arbitrary third-party re-save/reinterpretation. No CSV is uploaded.
 
 Result statistics are derived only from validated integer boundaries and explicit states. Incomplete, not-performed, unobserved and excluded records are not coerced into zero values. Result links carry only in-memory cycle/phase identifiers and saved time ranges; selecting evidence does not upload data or autoplay the video. Derived statistics and chart values are not persisted separately in JSON or IndexedDB.
+
+## Interaction and accessibility boundary
+
+v0.9.0 adds no runtime network or persistence capability. It consolidates generated-HTML network/CSP/standalone regressions and the v0.8 mobile/focus behavior. UI layout changes do not alter the saved schema or the local-data boundary. The application does not announce continuously changing media time through `aria-live`. Backgrounding pauses playback and requires explicit resume; it does not synthesize a work interruption. Automated browser checks are not a substitute for Android/iPhone hardware, soft-keyboard or screen-reader user testing.
 
 ## Verification
 
