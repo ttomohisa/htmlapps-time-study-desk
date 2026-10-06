@@ -1,4 +1,23 @@
-# QA results — v0.7.0 CSV / Export
+# QA results — v0.8.0 Mobile / Accessibility
+
+## Current milestone — v0.8.0
+
+Scope: T15–T16. The v0.8 work is stacked on the verified v0.7 branch until v0.7 is merged. It preserves schema 1, measurement/statistics/CSV behavior and the local-only runtime boundary.
+
+### Local evidence
+
+- Node 22.16.0: actual-source unit suite **78/78 passed** after adding an exact approved-icon regression.
+- New browser regressions cover phone primary-control clearance, safe scrolling above the fixed bottom navigation, background pause without synthetic interruption, Space-vs-measurement separation, text Undo vs project Undo, Help/dialog focus return, controlled mobile panels, keyboard-only save reachability and 200%-equivalent narrow rendering.
+- Supplementary Chromium with Japanese locale passed the new v0.8 status/navigation/icon assertions at 320×568, including no page horizontal overflow and no page errors. This supplementary in-memory rendering is not the canonical generated-HTML CI.
+- The user-provided `Time Study Desk_light_optimized.svg` is used byte-for-byte as `assets/favicon.svg`; its SHA-256 is `f29a9790b5a9272b065bd13dcf59d9d4da5fc29bf7430c3881670d63e1766f45`. The build uses the same source for favicon and the upper-left brand image.
+
+### Explicit limits
+
+Android/iPhone hardware, soft keyboards, screen-reader user testing, Safari/Firefox/Edge, published HTTPS, large real media and release-scale performance remain unverified. 320–430px/short-landscape/zoom automation does not establish real-device accessibility conformance. Canonical Windows generated-HTML results and artifacts belong to the v0.8 Draft PR CI once created.
+
+---
+
+## Historical QA results — v0.7.0 CSV / Export
 
 ## Current milestone — v0.7.0 CSV / Export
 
