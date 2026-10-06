@@ -9,7 +9,7 @@ test('autosave appears only after a successful transaction and restores analysis
 });
 
 test('autosave can be disabled before editing and manual save remains available',async({page})=>{
- await openHttpApp(page);await page.locator('#autosaveToggle').uncheck();await selectFixtureVideo(page);await page.locator('#startCycleButton').click();
+ await openHttpApp(page);await page.locator('#startStorageSettings > summary').click();await page.locator('#autosaveStartToggle').uncheck();await selectFixtureVideo(page);await page.locator('#startCycleButton').click();
  await page.waitForTimeout(1100);await page.reload();await page.locator('#versionBadge').waitFor();await expect(page.locator('#restoreCard')).toBeHidden();
 });
 

@@ -7,7 +7,7 @@ for (const variant of ['readable', 'self-extract']) {
     await openApp(page, variant);
     await expect(page.locator('#brandName')).toContainText('Time Study Desk');
     await expect(page.getByRole('button', { name: '動画を選択', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '保存した分析を開く', exact: true })).toBeEnabled();
+    await expect(page.locator('#openAnalysisInlineButton')).toBeEnabled();
     await expect(page.locator('#editor')).toHaveCount(0);
     await expect(page.locator('html')).toHaveCSS('color-scheme', 'light');
     await page.locator('#languageButton').click();
