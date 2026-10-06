@@ -8,7 +8,7 @@ test('root HTML is byte-identical to readable standalone and self-extract declar
   const root=await readFile(resolve('time-study-desk.html'));
   expect(Buffer.compare(readable,root)).toBe(0);
   const manifest=JSON.parse(await readFile(resolve('dist/self-extract-manifest.json'),'utf8'));
-  expect(manifest.networkRequired).toBe(false);
+  expect(manifest.runtime?.networkRequired).toBe(false);
 });
 
 for (const variant of ['readable','self-extract']) {

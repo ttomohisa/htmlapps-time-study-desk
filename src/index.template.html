@@ -345,10 +345,12 @@ footer { width:min(1280px,100%); }
  .side-column { grid-template-columns:minmax(0,1fr); gap:12px; }
  .panel-head { padding:10px 12px; }
  .preview { min-height:160px; }
+ .has-source .preview { min-height:100px; }
 }
 @media(max-width:600px) and (max-height:620px) {
  .has-source .intro-note { display:none; }
  .has-source #videoHost video { height:min(14dvh,96px); min-height:72px; }
+ .has-source .preview { min-height:72px; }
  .panel-head { padding:8px 12px; }
  .transport { padding:6px 12px; }
  .adjustment { margin-top:3px; }
@@ -425,7 +427,6 @@ footer { width:min(1280px,100%); }
 <section class="result-section"><h3 data-i18n="selectedCycleTitle">選択回の内訳・除外</h3><label class="field"><span data-i18n="selectedCycle">対象の回</span><select id="resultsCycleSelect"></select></label><div class="result-breakdown"><div class="result-stat"><span data-i18n="elapsedLabel">全体</span><strong id="selectedElapsed">—</strong></div><div class="result-stat"><span data-i18n="recordedPhaseLabel">記録済み工程</span><strong id="selectedRecordedPhase">—</strong></div><div class="result-stat"><span data-i18n="interruptionLabel">中断</span><strong id="selectedInterruption">—</strong></div><div class="result-stat"><span data-i18n="unobservedLabel">未観測</span><strong id="selectedUnobserved">—</strong></div></div><div id="resultExclusionBox" class="exclusion-box" hidden><label class="toggle-row"><input id="resultExclusionToggle" type="checkbox"><span data-i18n="excludeCycle">この回を集計から外す</span></label><label class="field"><span data-i18n="exclusionReason">除外理由</span><input id="resultExclusionReason" type="text" maxlength="1000"></label><button id="applyExclusionButton" class="button" type="button" data-i18n="applyExclusion">除外設定を適用</button><p id="exclusionError" class="field-error" role="alert" hidden></p></div></section>
 </div>
 </section>
-</div>
 </section>
 <aside class="side-column">
 <section class="side-card" id="recordCard" aria-labelledby="recordTitle"><h2 id="recordTitle" data-i18n="recordTitle">今回の記録</h2><div class="record-status"><strong id="cycleState" role="status"></strong><strong id="cycleDuration"></strong></div><p id="recordHint" class="small-note"></p><p id="recordBreakdown" class="small-note record-breakdown"></p><div class="history-actions"><button id="undoButton" type="button" class="button" data-i18n="undo" disabled>取り消す</button><button id="redoButton" type="button" class="button" data-i18n="redo" disabled>やり直す</button></div><p class="small-note" data-i18n="renameHint">工程名は後から変更できます。名前の変更も取り消せます。</p><div id="phaseList"></div></section>
