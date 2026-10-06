@@ -226,6 +226,14 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 .restore-actions { display:flex; gap:8px; flex:none; }
 .restore-actions .button { min-height:44px; }
 .autosave-box { margin:10px 0 14px; padding:12px; border:1px solid var(--line); border-radius:11px; background:var(--surface-muted); }
+.csv-export-box { margin:14px 0 0; padding-top:14px; border-top:1px solid var(--line); }
+.csv-export-box h3 { margin:0 0 6px; font-size:13px; }
+.csv-export-actions { display:grid; gap:8px; }
+.csv-export-actions .button { width:100%; min-height:44px; }
+.csv-scope-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; align-items:end; }
+.csv-scope-row .field { margin:0; }
+@media(max-width:520px){ .csv-scope-row { grid-template-columns:1fr; } }
+
 .toggle-row { display:flex; align-items:flex-start; gap:9px; min-height:44px; font-size:12px; font-weight:700; }
 .toggle-row input { width:20px; height:20px; margin:1px 0 0; accent-color:var(--accent); flex:none; }
 .storage-status[data-state="saved"] { color:var(--accent); }
@@ -299,11 +307,11 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 </style>
 </head>
 <body data-current-page="measure">
-<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.6.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v0.7.0</span></p><p class="brand-meta" data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1M12 17h.01"/></svg></button></div></div></header>
 <main class="main">
 <section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">動画作業分析</h1><p data-i18n="lead">動画を工程ごとに区切り、作業時間を比較します。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">動画をアップロードしません</span></div></section>
 <!-- APP:BEGIN Time Study Desk First Measurement -->
-<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · 結果・根拠映像</span><span data-i18n="versionLimit">件数付き統計、工程×回の時間表、数値から根拠映像へ戻る見直しに対応しています。</span></div>
+<div class="intro-note"><span class="stage-tag" data-i18n="stage">開発版 · CSV出力</span><span data-i18n="versionLimit">時間表・集計・区間明細CSVを、安全な一ファイルずつの保存で出力できます。</span></div>
 <section id="restoreCard" class="restore-card" hidden aria-labelledby="restoreTitle"><div><strong id="restoreTitle" data-i18n="restoreTitle">前回の分析があります</strong><p id="restoreSummary"></p></div><div class="restore-actions"><button id="restoreAnalysisButton" class="button primary" type="button" data-i18n="restoreAnalysis">前回の分析を復元</button><button id="discardRestoreButton" class="button" type="button" data-i18n="deleteBrowserData">ブラウザ内の分析データを削除</button></div></section>
 <div id="errorMessage" class="notice error" role="alert" hidden></div>
 <div id="loadingNotice" class="notice loading-note" hidden><span data-i18n="loadingHint">動画を確認しています。現在の動画は交換するまで保持されます。</span><button id="cancelLoadButton" class="button" type="button" data-i18n="cancel">キャンセル</button></div>
@@ -378,9 +386,10 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
 <div class="autosave-box"><label class="toggle-row"><input id="autosaveToggle" type="checkbox" checked><span data-i18n="autosaveLabel">分析データをこのブラウザに自動保存する</span></label><p id="autosaveStatus" class="small-note storage-status" role="status" data-state="checking" data-i18n="autosaveChecking">自動保存を確認しています。</p><button id="clearBrowserDataButton" class="text-button" type="button" data-i18n="deleteBrowserData">ブラウザ内の分析データを削除</button></div>
 <label class="field"><span data-i18n="projectTitle">分析タイトル（任意）</span><input id="projectTitle" type="text" autocomplete="off"></label>
 <details class="notes-details"><summary data-i18n="notesTitle">分析・今回のメモ</summary><label class="field"><span data-i18n="projectNote">分析メモ</span><textarea id="projectNote" rows="3"></textarea></label><label class="field"><span data-i18n="cycleNote">今回のメモ</span><textarea id="cycleNote" rows="2" disabled></textarea></label></details>
-<label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">分析データの保存名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension">.tsd.json</span></span></label>
-<p id="savePlanned" data-i18n="savePlanned">分析データだけを保存します。動画は含まれません。自動保存も動画を保存しません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
-<button id="openAnalysisButton" class="button" type="button" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importReady">.tsd.jsonを検証して開きます。元動画は別に選び直します。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：CSV出力</strong><span data-i18n="nextStageBody">v0.7.0で時間表・集計・区間明細のCSV出力を追加予定です。</span></p></section>
+<label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">出力のベース名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension" data-i18n="outputSuffixHint">拡張子は自動</span></span></label>
+<p id="savePlanned" data-i18n="savePlanned">JSONとCSVは一回の操作で一ファイルずつ保存します。動画は含まれません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
+<div class="csv-export-box"><h3 data-i18n="csvTitle">CSV出力</h3><p class="small-note" data-i18n="csvHint">画面と同じ集計規則で、時間表・集計・区間明細を一つずつ保存します。</p><div class="csv-export-actions"><button id="exportTimeTableCsvButton" class="button" type="button" disabled data-i18n="exportTimeTableCsv">時間表CSVを保存</button><button id="exportSummaryCsvButton" class="button" type="button" disabled data-i18n="exportSummaryCsv">集計CSVを保存</button><div class="csv-scope-row"><label class="field"><span data-i18n="intervalCsvScope">区間明細の範囲</span><select id="intervalCsvScope"><option value="selected-procedure" data-i18n="scopeSelectedProcedure">選択手順</option><option value="analysis" data-i18n="scopeAnalysis">分析全体</option></select></label><button id="exportIntervalsCsvButton" class="button" type="button" disabled data-i18n="exportIntervalsCsv">区間明細CSVを保存</button></div></div><p id="csvStatus" class="save-status" role="status"></p></div>
+<button id="openAnalysisButton" class="button" type="button" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importReady">.tsd.jsonを検証して開きます。元動画は別に選び直します。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：モバイル・アクセシビリティ総点検</strong><span data-i18n="nextStageBody">v0.8.0でスマートフォン操作、キーボード、フォーカス、日英文言を総点検します。</span></p></section>
 <section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><p id="sourceConnectionState" class="small-note source-connection"></p><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><div class="source-actions"><button id="reconnectOriginalButton" type="button" class="button primary" hidden data-i18n="reconnectOriginal">元動画を選び直す</button><button id="replaceVideoButton" type="button" class="button" data-i18n="newAnalysisVideo">別の動画で新しい分析を始める</button></div><p id="sourceMatchError" class="field-error" role="alert" hidden></p></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
 <input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
 <input id="reconnectVideoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
@@ -456,10 +465,10 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   // I18N
   const translations = {
     ja: {
-      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · 結果・根拠映像", versionLimit:"件数付き統計、工程×回の時間表、数値から根拠映像へ戻る見直しに対応しています。",
+      introTitle:'動画作業分析', lead:'動画を工程ごとに区切り、作業時間を比較します。', localBadge:'動画をアップロードしません', stage:"開発版 · CSV出力", versionLimit:"時間表・集計・区間明細CSVを、安全な一ファイルずつの保存で出力できます。",
       playerTitle:'作業動画', choosePrompt:'まず、作業を撮影した動画を開く', dropHint:'ファイルをここへドラッグ＆ドロップすることもできます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
-      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importReady:'.tsd.jsonを検証して開きます。元動画は別に選び直します。', savePreparation:'保存名の準備', outputFilename:'分析データの保存名', savePlanned:"分析データだけを保存します。動画は含まれません。自動保存も動画を保存しません。", saveAnalysis:'分析データを保存', nextStage:"次の段階：CSV出力", nextStageBody:"v0.7.0で時間表・集計・区間明細のCSV出力を追加予定です。",
+      analysisTitle:'分析データ', openAnalysis:'保存した分析を開く', importReady:'.tsd.jsonを検証して開きます。元動画は別に選び直します。', savePreparation:'保存名の準備', outputFilename:'出力のベース名', outputSuffixHint:'拡張子は自動', savePlanned:"JSONとCSVは一回の操作で一ファイルずつ保存します。動画は含まれません。", saveAnalysis:'分析データを保存', csvTitle:'CSV出力', csvHint:'画面と同じ集計規則で、時間表・集計・区間明細を一つずつ保存します。', exportTimeTableCsv:'時間表CSVを保存', exportSummaryCsv:'集計CSVを保存', exportIntervalsCsv:'区間明細CSVを保存', intervalCsvScope:'区間明細の範囲', scopeSelectedProcedure:'選択手順', scopeAnalysis:'分析全体', csvExportFailed:'CSVを保存できませんでした。現在の分析は保持しています。', nextStage:"次の段階：モバイル・アクセシビリティ総点検", nextStageBody:"v0.8.0でスマートフォン操作、キーボード、フォーカス、日英文言を総点検します。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
       confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
       helpBasicsTitle:'この開発版でできること', helpBasicsBody:"v0.6.0では、これまでの計測・例外記録・保存再開に加えて、選択した手順の完了回を件数付きで集計できます。工程×回の時間表、工程別平均、全体時間と内訳を同じ集計結果から表示し、数値から根拠区間へ戻れます。未完了・実施なし・未観測・除外を0秒として扱いません。CSVはまだありません。",
@@ -657,13 +666,13 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       STALE_EDIT:"編集中に分析が変更されました。対象を選び直してから操作してください。"
     },
     en: {
-      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · Results & evidence", versionLimit:"Count-aware statistics, step × cycle tables and navigation from results back to video evidence are available.",
+      introTitle:'Video work analysis', lead:'Mark video steps and compare observed work times.', localBadge:'No video uploads', stage:"Development · CSV export", versionLimit:"Time-table, summary and interval-detail CSV exports are available one file at a time.",
       playerTitle:'Work video', choosePrompt:'Start with a video of the work', dropHint:'You can also drag and drop one local video here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
-      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Analysis filename', savePlanned:"Saves analysis data only, without the video. Autosave also excludes the video.", saveAnalysis:'Save analysis', nextStage:"Next stage: CSV export", nextStageBody:"v0.7.0 will add CSV exports for time tables, summaries and interval details.",
+      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Output base name', outputSuffixHint:'Extension is automatic', savePlanned:"JSON and CSV are downloaded one file per action and never include the video.", saveAnalysis:'Save analysis', csvTitle:'CSV export', csvHint:'Save the time table, summary, or interval details one file at a time using the same aggregation rules as the screen.', exportTimeTableCsv:'Save time-table CSV', exportSummaryCsv:'Save summary CSV', exportIntervalsCsv:'Save interval-detail CSV', intervalCsvScope:'Interval detail scope', scopeSelectedProcedure:'Selected procedure', scopeAnalysis:'Whole analysis', csvExportFailed:'Could not save the CSV. The current analysis has been kept.', nextStage:"Next stage: mobile & accessibility review", nextStageBody:"v0.8.0 will review phone workflows, keyboard and focus behavior, and bilingual copy.",
       buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Review videos without uploading them', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
       confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
-      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.6.0 keeps measurement, exception recording and save/resume, and adds count-aware summaries for one selected procedure. The step × cycle table, step means, cycle totals and breakdown share one summary model. Missing, unobserved, incomplete and excluded records are never treated as zero, and result numbers can open their video evidence. CSV is not available yet.",
+      helpBasicsTitle:'What this development version does', helpBasicsBody:"v0.7.0 keeps measurement, exception recording, save/resume and count-aware results, and adds time-table, summary and interval-detail CSV exports. CSV uses the same summary rules as the screen, preserves missing values separately from zero, and protects dangerous leading spreadsheet formula characters as text. Downloads are handed to the browser one file at a time.",
       helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping.",
       helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Analysis can be saved manually as JSON or locally in IndexedDB; neither includes video. Autosave is a device-side setting. Browser storage is not a guarantee of permanent or encrypted retention. Original videos are never modified or deleted.",
       helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
@@ -1069,7 +1078,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     }
     function createProject(source,context) {
       const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
-      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.6.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'0.7.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
       assert(validateProject(project).ok); return project;
     }
     // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
@@ -1413,13 +1422,108 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       });
       return {procedureId,phaseIds,counts:{recorded:cycles.length,included:included.length,excluded:cycles.filter(c=>c.status==='complete'&&c.excluded).length,incomplete:cycles.filter(c=>c.status!=='complete').length},cycleTotals,phaseStats,cycleRows,intervalRows};
     }
+    function csvSeconds(timeUs) {
+      if(timeUs===null || timeUs===undefined || !Number.isFinite(timeUs)) return '';
+      const value=timeUs/1000000;
+      return value.toFixed(6).replace(/0+$/,'').replace(/\.$/,'') || '0';
+    }
+    function csvSafeText(value) {
+      const raw=value===null || value===undefined ? '' : String(value);
+      const visible=raw.replace(/^[\u0000-\u0020\u007f\ufeff]+/,'');
+      return (/^[\t\r\n]/.test(raw) || /^[=+\-@＝＋－＠−]/.test(visible)) ? "'"+raw : raw;
+    }
+    function csvCell(value) { return `"${csvSafeText(value).replace(/"/g,'""')}"`; }
+    function csvDocument(rows) { return '\ufeff'+rows.map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n'; }
+    function shortPhaseIds(ids) {
+      const output={};
+      for(const id of ids) {
+        let length=Math.min(6,id.length);
+        while(length<id.length && ids.some(other=>other!==id && other.slice(0,length)===id.slice(0,length))) length++;
+        output[id]=id.slice(0,length);
+      }
+      return output;
+    }
+    function buildCsv(project,options={}) {
+      const validation=validateProject(project);assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
+      const source=validation.value,type=options.type,language=options.language==='en'?'en':'ja';
+      assert(['time-table','summary','intervals'].includes(type),'INVALID_TARGET');
+      const procedureId=options.procedureId || source.settings.selectedProcedureId;
+      const procedure=procedureId ? source.procedures.find(p=>p.id===procedureId) : null;
+      if(type!=='intervals' || (options.scope||'selected-procedure')==='selected-procedure') assert(procedure,'INVALID_TARGET');
+      const phaseById=new Map(source.phases.map(p=>[p.id,p]));
+      const cycleById=new Map(source.cycles.map(c=>[c.id,c]));
+      const cycleStatus={ja:{open:'計測中',complete:'完了',incomplete:'未完了'},en:{open:'Measuring',complete:'Complete',incomplete:'Incomplete'}}[language];
+      const phaseState={
+        ja:{value:'観測済み','not-performed':'実施なし',unobserved:'未観測',pending:'未確定','not-in-procedure':'手順外'},
+        en:{value:'Measured','not-performed':'Not performed',unobserved:'Not observed',pending:'Unresolved','not-in-procedure':'Not in procedure'}
+      }[language];
+      if(type==='time-table') {
+        const summary=summarize(source,procedure.id),short=shortPhaseIds(summary.phaseIds);
+        const fixed=language==='ja'
+          ? ['手順ID','手順名','開始条件','終了条件','回ID','回番号','状態','集計対象','除外理由','開始秒','終了秒','全体秒','記録済み工程秒','中断秒','未観測秒']
+          : ['Procedure ID','Procedure name','Start condition','End condition','Cycle ID','Cycle number','Status','Included in statistics','Exclusion reason','Start seconds','End seconds','Elapsed seconds','Recorded phase seconds','Interruption seconds','Unobserved seconds'];
+        const headers=[...fixed];
+        for(const id of summary.phaseIds) {
+          const label=phaseById.get(id)?.label || id,stem=`${label} [${short[id]}]`;
+          headers.push(language==='ja'?`${stem} 秒`:`${stem} seconds`,language==='ja'?`${stem} 状態`:`${stem} status`);
+        }
+        const rows=[headers];
+        for(const row of summary.cycleRows) {
+          const included=row.status==='complete'&&!row.excluded;
+          const values=[procedure.id,procedure.label,procedure.startCondition,procedure.endCondition,row.cycleId,row.number,cycleStatus[row.status],language==='ja'?(included?'対象':'対象外'):(included?'Included':'Excluded'),row.exclusionReason,csvSeconds(row.startUs),csvSeconds(row.endUs),csvSeconds(row.elapsedUs),csvSeconds(row.recordedPhaseUs),csvSeconds(row.interruptionUs),csvSeconds(row.unobservedUs)];
+          for(const id of summary.phaseIds) {
+            const v=row.phaseValues[id];
+            values.push(v.status==='value'?csvSeconds(v.recordedUs):'',v.status==='unobserved'&&v.recordedUs>0?`${phaseState[v.status]} (${language==='ja'?'記録済み':'recorded'} ${csvSeconds(v.recordedUs)} ${language==='ja'?'秒':'s'})`:phaseState[v.status]);
+          }
+          rows.push(values);
+        }
+        return csvDocument(rows);
+      }
+      if(type==='summary') {
+        const summary=summarize(source,procedure.id);
+        const headers=language==='ja'
+          ? ['行種別','手順ID','手順名','指標 / 工程ID','指標 / 工程名','n','平均秒','中央値秒','最小秒','最大秒','実施なし件数','未観測件数','手順外件数']
+          : ['Row type','Procedure ID','Procedure name','Metric / phase ID','Metric / phase name','n','Mean seconds','Median seconds','Min seconds','Max seconds','Not performed count','Unobserved count','Not in procedure count'];
+        const names={ja:{elapsed:'全体時間',recordedPhase:'記録済み工程時間',interruption:'中断',unobserved:'未観測'},en:{elapsed:'Elapsed time',recordedPhase:'Recorded phase time',interruption:'Interruption',unobserved:'Not observed'}}[language];
+        const rows=[headers];
+        for(const id of ['elapsed','recordedPhase','interruption','unobserved']) {
+          const stat=summary.cycleTotals[id];rows.push(['overall',procedure.id,procedure.label,id,names[id],stat.n,csvSeconds(stat.meanUs),csvSeconds(stat.medianUs),csvSeconds(stat.minUs),csvSeconds(stat.maxUs),'','','']);
+        }
+        for(const id of summary.phaseIds) {
+          const stat=summary.phaseStats[id];rows.push(['phase',procedure.id,procedure.label,id,phaseById.get(id)?.label || id,stat.n,csvSeconds(stat.meanUs),csvSeconds(stat.medianUs),csvSeconds(stat.minUs),csvSeconds(stat.maxUs),stat.notPerformedCount,stat.unobservedCount,stat.outOfProcedureCount]);
+        }
+        return csvDocument(rows);
+      }
+      const scope=options.scope || 'selected-procedure';assert(['selected-procedure','analysis'].includes(scope),'INVALID_TARGET');
+      const headers=['row_type','procedure_id','cycle_id','cycle_number','cycle_status','included_in_cycle_stats','exclusion_reason','span_id','occurrence_id','phase_id','phase_name','span_kind','start_seconds','end_seconds','duration_seconds','occurrence_state','note'];
+      const rows=[headers],allOrdered=[...source.cycles].sort((a,b)=>a.boundaries[0].timeUs-b.boundaries[0].timeUs),globalNumber=new Map(allOrdered.map((c,i)=>[c.id,i+1]));
+      const scoped=scope==='analysis'?allOrdered:allOrdered.filter(c=>c.procedureId===procedure.id),scopedIds=new Set(scoped.map(c=>c.id));
+      const selectedSummary=scope==='selected-procedure'?summarize(source,procedure.id):null,selectedNumber=new Map((selectedSummary?.cycleRows||[]).map(r=>[r.cycleId,r.number]));
+      for(const cycle of scoped) {
+        const proc=source.procedures.find(p=>p.id===cycle.procedureId),number=scope==='selected-procedure'?selectedNumber.get(cycle.id):globalNumber.get(cycle.id),included=cycle.status==='complete'&&!cycle.excluded,usedOccurrences=new Set();
+        cycle.spans.forEach((span,index)=>{
+          const occurrence=span.occurrenceId?cycle.occurrences.find(o=>o.id===span.occurrenceId):null,phase=occurrence?phaseById.get(occurrence.phaseId):null,startUs=cycle.boundaries[index].timeUs,endUs=cycle.boundaries[index+1].timeUs;
+          if(occurrence) usedOccurrences.add(occurrence.id);
+          rows.push(['span',proc?.id||'',cycle.id,number,cycle.status,String(included),cycle.exclusionReason,span.id,occurrence?.id||'',phase?.id||'',phase?.label||'',span.kind,csvSeconds(startUs),csvSeconds(endUs),csvSeconds(endUs-startUs),occurrence?.resolution||'',span.note]);
+        });
+        for(const occurrence of cycle.occurrences) if(!usedOccurrences.has(occurrence.id)) {
+          const phase=phaseById.get(occurrence.phaseId);rows.push(['occurrence-status',proc?.id||'',cycle.id,number,cycle.status,String(included),cycle.exclusionReason,'',occurrence.id,occurrence.phaseId,phase?.label||'','','','','',occurrence.resolution,occurrence.note]);
+        }
+      }
+      for(let i=1;i<allOrdered.length;i++) {
+        const previous=allOrdered[i-1],current=allOrdered[i];if(!scopedIds.has(previous.id)||!scopedIds.has(current.id))continue;
+        const startUs=previous.boundaries.at(-1).timeUs,endUs=current.boundaries[0].timeUs,sharedProcedure=previous.procedureId===current.procedureId?current.procedureId:'';
+        rows.push(['between-cycles',sharedProcedure,'','','','false','','','','','','',csvSeconds(startUs),csvSeconds(endUs),csvSeconds(endUs-startUs),'','']);
+      }
+      return csvDocument(rows);
+    }
     function serializeProject(project,appVersion) {
       const output = clone(project); output.appVersion=appVersion;
       const validation = validateProject(output); assert(validation.ok,validation.issues?.[0]?.code || 'INVALID_PROJECT');
       // Compact output keeps the exported UTF-8 byte budget identical to validation.
       return JSON.stringify(validation.value);
     }
-    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,parseProject,matchSource,createProject,validateProject,applyCommand,createHistory,listCycles,createNamedProcedure,occurrenceEvidence,cycleBreakdown,summarize,serializeProject});
+    return Object.freeze({toTimeUs,validateFile,validateMetadata,sanitizeFilename,parseTimeInput,parseProject,matchSource,createProject,validateProject,applyCommand,createHistory,listCycles,createNamedProcedure,occurrenceEvidence,cycleBreakdown,summarize,buildCsv,serializeProject});
   })();
   // TSD:CORE:END
 
@@ -1979,7 +2083,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
       row.querySelector('.notes-details summary').textContent=translate('stepNote'); row.querySelector('.notes-details label span').textContent=translate('stepNote'); syncInput(row.querySelector('textarea'),occurrence.note);
     }
     for (const row of [...list.children]) if (!wanted.has(row.dataset.occurrenceId)) row.remove();
-    renderBoundaryEditor(); renderIntervalEditor(); renderMeasurementControls(); renderResults(); renderEvidenceReview();
+    renderBoundaryEditor(); renderIntervalEditor(); renderMeasurementControls(); renderResults(); renderCsvControls(); renderEvidenceReview();
   }
   function statText(value) { return value==null?'—':durationText(value); }
   function selectedResultsProcedure() {
@@ -1987,6 +2091,16 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     let p=project.procedures.find(item=>item.id===resultsProcedureId);
     if(!p)p=project.procedures.find(item=>item.id===project.settings.selectedProcedureId) || project.procedures[0] || null;
     resultsProcedureId=p?.id || null;return p;
+  }
+  function renderCsvControls() {
+    const timeButton=$('#exportTimeTableCsvButton'),summaryButton=$('#exportSummaryCsvButton'),detailButton=$('#exportIntervalsCsvButton'),scopeSelect=$('#intervalCsvScope');
+    if(!timeButton||!summaryButton||!detailButton||!scopeSelect)return;
+    const procedure=selectedResultsProcedure();let summary=null;
+    try{if(project&&procedure)summary=TsdCore.summarize(project,procedure.id);}catch{/* Invalid projects are rejected before becoming runtime state. */}
+    timeButton.disabled=!summary || summary.counts.recorded<1;
+    summaryButton.disabled=!summary || summary.counts.included<1;
+    scopeSelect.disabled=!project;
+    detailButton.disabled=!project || (scopeSelect.value==='analysis' ? project.cycles.length<1 : (!summary || summary.counts.recorded<1));
   }
   function phaseLabel(phaseId) { return project?.phases.find(p=>p.id===phaseId)?.label || phaseId; }
   function phaseStatusText(value) {
@@ -2319,19 +2433,43 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
     const target=Math.max(0,Math.min(media.source.durationUs,Math.round((media.video.currentTime+delta)*1000000)));
     media.seekTo(target).catch(setError);
   }
+  function normalizeOutputBaseName() {
+    let base=String(outputFilename.value||'').trim().replace(/(?:\.tsd\.json|-time-table\.csv|-summary\.csv|-intervals\.csv)$/i,'');
+    base=TsdCore.sanitizeFilename(base,'');outputFilename.value=base;
+    if(project && project.settings.outputBaseName!==base){project.settings.outputBaseName=base;projectRevision++;scheduleAutosave();}
+    return base;
+  }
+  function handoffTextDownload(text,filename,mime) {
+    let url=null;
+    try {
+      const blob=new Blob([text],{type:mime});url=URL.createObjectURL(blob);const link=element('a');link.href=url;link.download=filename;document.body.append(link);try{link.click();}finally{link.remove();}
+    } finally { if(url)setTimeout(()=>URL.revokeObjectURL(url),30000); }
+  }
+  function exportCsv(type) {
+    if(!project)return;
+    const procedure=selectedResultsProcedure(),scope=$('#intervalCsvScope').value;
+    try {
+      clearError();const base=normalizeOutputBaseName();
+      const text=TsdCore.buildCsv(project,{type,procedureId:procedure?.id||null,scope:type==='intervals'?scope:'selected-procedure',language});
+      const suffix=type==='time-table'?'-time-table':type==='summary'?'-summary':'-intervals';
+      handoffTextDownload(text,TsdCore.sanitizeFilename(base+suffix,'.csv'),'text/csv;charset=utf-8');$('#csvStatus').textContent=translate('downloadStarted');
+    } catch(error) {
+      $('#csvStatus').textContent=translate('csvExportFailed');setError({code:'csvExportFailed'});
+    }
+  }
   function saveAnalysis() {
     if(!project) return;
     const invalid=[...document.querySelectorAll('input,textarea')].find(input=>!input.checkValidity());
     if(invalid) { setError({code:'TEXT_LIMIT'}); invalid.reportValidity(); return; }
     let url=null;
     try {
-      outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);
-      const settingsChanged=project.settings.outputBaseName!==outputFilename.value || project.settings.language!==language;
-      project.settings.outputBaseName=outputFilename.value;project.settings.language=language;if(settingsChanged)projectRevision++;
+      const base=normalizeOutputBaseName();
+      const settingsChanged=project.settings.language!==language;
+      project.settings.language=language;if(settingsChanged)projectRevision++;
       const text=TsdCore.serializeProject(project,APP_CONFIG.version);
       const blob=new Blob([text],{type:'application/json;charset=utf-8'});
       if(blob.size>10*1024*1024) throw Object.assign(new Error('SAVE_LIMIT'),{code:'SAVE_LIMIT'});
-      url=URL.createObjectURL(blob); const link=element('a'); link.href=url; link.download=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json');
+      url=URL.createObjectURL(blob); const link=element('a'); link.href=url; link.download=TsdCore.sanitizeFilename(base,'.tsd.json');
       document.body.append(link); try {link.click();} finally {link.remove();}
       savedSnapshot=JSON.stringify(project);$('#saveStatus').textContent=translate('downloadStarted');if(settingsChanged)scheduleAutosave();
     } catch(error) { $('#saveStatus').textContent=translate('saveFailed'); setError({code:typeof error.code==='string' && translations.en[error.code] ? error.code : 'saveFailed'}); }
@@ -2398,14 +2536,18 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
   $('#projectNote').addEventListener('change',event=>commitInput(event.target,{type:'updateProjectMeta',title:$('#projectTitle').value,note:event.target.value}));
   $('#cycleNote').addEventListener('change',event=>{const c=cycleNow();if(c) commitInput(event.target,{type:'editNote',targetType:'cycle',cycleId:c.id,targetId:c.id,note:event.target.value});});
   $('#spanNote').addEventListener('change',event=>{const c=cycleNow();if(c && event.target.dataset.spanId) commitInput(event.target,{type:'editNote',targetType:'span',cycleId:c.id,targetId:event.target.dataset.spanId,note:event.target.value});});
-  $('#resultsProcedureSelect').addEventListener('change',event=>{resultsProcedureId=event.target.value;resultsCycleId=null;renderResults();});
+  $('#resultsProcedureSelect').addEventListener('change',event=>{resultsProcedureId=event.target.value;resultsCycleId=null;renderResults();renderCsvControls();});
   $('#resultsCycleSelect').addEventListener('change',event=>{resultsCycleId=event.target.value;renderResults();});
   $('#resultExclusionToggle').addEventListener('change',()=>{$('#resultExclusionReason').disabled=!$('#resultExclusionToggle').checked;$('#exclusionError').hidden=true;});
   $('#applyExclusionButton').addEventListener('click',()=>{const excluded=$('#resultExclusionToggle').checked,reason=$('#resultExclusionReason').value;if(excluded&&!reason.trim()){$('#exclusionError').textContent=translate('EXCLUSION_REASON_REQUIRED');$('#exclusionError').hidden=false;return;}$('#exclusionError').hidden=true;if(editRecord({type:'setCycleExclusion',cycleId:resultsCycleId,excluded,reason:excluded?reason.trim():''}))renderResults();});
   $('#evidenceSegmentSelect').addEventListener('change',event=>{if(!selectedEvidence)return;selectedEvidence.segmentIndex=Number(event.target.value);renderEvidenceReview();seekEvidenceStart();});
   $('#playEvidenceButton').addEventListener('click',playSelectedEvidence);
   $('#saveAnalysisButton').addEventListener('click',saveAnalysis);
-  outputFilename.addEventListener('blur',()=>{outputFilename.value=TsdCore.sanitizeFilename(outputFilename.value,'.tsd.json').slice(0,-9);if(project && project.settings.outputBaseName!==outputFilename.value){project.settings.outputBaseName=outputFilename.value;projectRevision++;scheduleAutosave();}});
+  $('#exportTimeTableCsvButton').addEventListener('click',()=>exportCsv('time-table'));
+  $('#exportSummaryCsvButton').addEventListener('click',()=>exportCsv('summary'));
+  $('#exportIntervalsCsvButton').addEventListener('click',()=>exportCsv('intervals'));
+  $('#intervalCsvScope').addEventListener('change',renderCsvControls);
+  outputFilename.addEventListener('blur',normalizeOutputBaseName);
   document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>selectPage(button.dataset.page)));
   $('#languageButton').addEventListener('click',()=>{language=language==='ja'?'en':'ja';try{localStorage.setItem('time-study-desk:language',language);}catch{/* Session-only setting. */}applyLanguage();});
   const helpDialog=$('#helpDialog');

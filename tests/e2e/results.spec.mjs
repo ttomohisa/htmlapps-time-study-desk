@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {openApp} from '../helpers/app.mjs';
 import {makeFixture} from '../helpers/fixtures.mjs';
 
-async function loadFixture(page,id,{replace=false}={}) {
+async function loadFixture(page,id,{replace=false}={}){
   await page.locator('#analysisInput').setInputFiles({name:`${id}.tsd.json`,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(makeFixture(id)))});
   if(replace){await expect(page.locator('#appConfirmDialog')).toBeVisible();await page.locator('#appConfirmOk').click();}
   await expect(page.locator('#resultsWorkspace')).toBeVisible();
@@ -24,10 +24,10 @@ test('results_use_same_summary_as_core_fixture and show transparent denominators
 
 test('missing, unobserved, incomplete and excluded records keep their meaning',async({page})=>{
   await openFixture(page,'F2');
-  await expect(page.locator('#timeTableRows [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('実施なし');
+  await expect(page.locator('#timeTableRows > [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('実施なし');
   await loadFixture(page,'F3',{replace:true});
-  await expect(page.locator('#timeTableRows [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('未観測');
-  await expect(page.locator('#timeTableRows [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('4.0');
+  await expect(page.locator('#timeTableRows > [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('未観測');
+  await expect(page.locator('#timeTableRows > [data-cycle-id="cycle-4"] [data-phase-id="phase-3"]')).toContainText('4.0');
   await loadFixture(page,'F4',{replace:true});
   await expect(page.locator('#resultIncompleteCount')).toHaveText('1');
   await expect(page.locator('#resultOverallMean')).toContainText('39.0');
@@ -35,7 +35,7 @@ test('missing, unobserved, incomplete and excluded records keep their meaning',a
   await expect(page.locator('#resultIncludedCount')).toHaveText('2');
   await expect(page.locator('#resultExcludedCount')).toHaveText('1');
   await expect(page.locator('#resultOverallMean')).toContainText('33.5');
-  await expect(page.locator('#timeTableRows [data-cycle-id="cycle-3"]')).toContainText('条件が異なる');
+  await expect(page.locator('#timeTableRows > [data-cycle-id="cycle-3"]')).toContainText('条件が異なる');
 });
 
 test('cycle exclusion requires a reason and updates the same summary immediately',async({page})=>{
@@ -48,7 +48,7 @@ test('cycle exclusion requires a reason and updates the same summary immediately
   await page.locator('#applyExclusionButton').click();
   await expect(page.locator('#resultIncludedCount')).toHaveText('2');
   await expect(page.locator('#resultOverallMean')).toContainText('33.5');
-  await expect(page.locator('#timeTableRows [data-cycle-id="cycle-3"]')).toContainText('条件が異なる');
+  await expect(page.locator('#timeTableRows > [data-cycle-id="cycle-3"]')).toContainText('条件が異なる');
   await page.locator('#resultExclusionToggle').uncheck();
   await page.locator('#applyExclusionButton').click();
   await expect(page.locator('#resultIncludedCount')).toHaveText('3');

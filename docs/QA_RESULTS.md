@@ -1,4 +1,29 @@
-# QA results — v0.6.0 Results / Review
+# QA results — v0.7.0 CSV / Export
+
+## Current milestone — v0.7.0 CSV / Export
+
+Base: merged main `add3cf7eb5480d6f6625b0f1a26cbddc9700286a`. The v0.7 branch starts from that exact commit.
+
+### Important inherited finding
+
+PR #5 was merged with its standalone build green and unit suite green, but its final Windows app-test workflow had **4 Chromium E2E failures**. The failures were in the newly added Results/evidence tests: responsive desktop-table and phone-card renderings shared data attributes, so broad Playwright selectors matched both; the connected-evidence test also attempted to click a Results value while the desktop workspace was still on Review. Summary mathematics were not failing. v0.7 narrows those tests to the desktop table and explicitly switches to Results before evidence interaction. These repairs must pass in the v0.7 canonical CI and are not retroactively reported as a v0.6 pass.
+
+### T13–T14 local evidence
+
+- Node 22.16.0: full actual-source unit suite **75 passed, 0 failed, 0 skipped** after CSV implementation and v0.7 version alignment.
+- New unit coverage verifies UTF-8 BOM, CRLF, all-cell quoting, independent CSV parsing, Unicode/newlines/quotes, blank versus real zero, F1 between-cycle gaps, F2 not-performed status/denominator, F5 exclusion reason, fixed ASCII interval-detail keys and occurrence-status rows.
+- Spreadsheet-formula-like text (`=`, spaced `@`, full-width symbols, leading tab/newline class) is prefixed in CSV only; original project/JSON text remains unchanged. Existing filename sanitization is tested with path-like, reserved and empty names.
+- Supplemental Chromium rendering verified actual time-table/summary/interval downloads, edited safe filenames, Japanese/English headers, F5 exclusion reason, formula-like text in downloaded CSV, CSV preparation failure without analysis loss, and no observed HTTP request from app operations.
+- Supplemental 320 px rendering had no page-level horizontal overflow in the CSV Results area.
+- Supplemental v0.6 evidence regression: detached 77–127 s evidence remained readable; connected evidence explicitly switched to Results, sought paused and explicit interval playback stopped near the saved 3.4 s end.
+
+The supplemental browser checks use locally substituted generated HTML because direct local `file://` navigation is administratively blocked. They are **not** the canonical Windows PowerShell build/self-extract/direct-file evidence. The v0.7 Draft PR CI is the release evidence for generated variants and all E2E.
+
+### Remaining gates
+
+Excel and a second spreadsheet application's initial import have not been manually verified in this environment and must not be claimed. Android/iPhone real devices, Safari/Firefox/Edge, published HTTPS, actual large media, screen readers, soft-keyboard behavior, 200% zoom and release-scale performance remain later gates. No merge, tag/release publication or Browser Kitty site change is part of this milestone.
+
+---
 
 ## Current milestone — v0.6.0 Results / Review
 
