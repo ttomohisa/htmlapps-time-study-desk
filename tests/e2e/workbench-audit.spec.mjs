@@ -55,3 +55,19 @@ test('visiting Edit records and Results during an open cycle does not invent bou
   expect(await page.locator('#boundarySelect option').count()).toBe(before);
   await expect(page.locator('#cycleState')).toHaveText('計測中');
 });
+
+
+for(const width of [601,768,820]){
+  test(`mid-width ${width}px keeps Review deduplicated and Results metadata full-width`,async({page})=>{
+    await page.setViewportSize({width,height:740});await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);
+    await page.locator('.workspace-switch [data-page="review"]').click();
+    await expect(page.locator('#recordCard')).toBeVisible();
+    await expect(page.locator('#cyclesCard')).toBeHidden();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await page.locator('.workspace-switch [data-page="results"]').click();
+    const rail=await page.locator('.side-column').boundingBox();
+    const source=await page.locator('#sourceCard').boundingBox();
+    expect(source.width).toBeGreaterThanOrEqual(rail.width-4);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  });
+}
