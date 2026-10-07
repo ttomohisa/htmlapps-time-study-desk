@@ -50,11 +50,14 @@ test('finishing a cycle stays in measurement and offers next, edit and results c
   await expect(page.locator('#reviewTitle')).toContainText('記録を編集');
 });
 
-test('measurement workspace stays visually focused instead of stretching across the desktop', async ({ page }) => {
+test('measurement workspace uses the desktop width for a video-plus-action workbench', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
   const panel=await page.locator('.player-panel').boundingBox();
-  expect(panel.width).toBeGreaterThanOrEqual(880);
-  expect(panel.width).toBeLessThanOrEqual(1000);
-  expect(Math.abs(panel.x-(1280-panel.width)/2)).toBeLessThanOrEqual(14);
+  const player=await page.locator('#playerRegion').boundingBox();
+  const measure=await page.locator('#measurePanel').boundingBox();
+  expect(panel.width).toBeGreaterThanOrEqual(1180);
+  expect(panel.width).toBeLessThanOrEqual(1240);
+  expect(player.width).toBeGreaterThan(measure.width);
+  expect(measure.x).toBeGreaterThan(player.x);
 });

@@ -24,13 +24,15 @@ test('help icon has an explicit dot and saved-analysis action is readable but se
   expect(style.color).not.toBe('rgb(242, 247, 244)');
 });
 
-test('desktop workspace keeps measurement centered and reveals records only after evidence exists', async ({ page }) => {
+test('desktop workspace keeps measurement focused while using the full workbench width', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
   const panel = await page.locator('.player-panel').boundingBox();
-  expect(panel.width).toBeGreaterThanOrEqual(880);
-  expect(panel.width).toBeLessThanOrEqual(1000);
-  expect(Math.abs(panel.x - (1280 - panel.width) / 2)).toBeLessThanOrEqual(14);
+  const player = await page.locator('#playerRegion').boundingBox();
+  const measure = await page.locator('#measurePanel').boundingBox();
+  expect(panel.width).toBeGreaterThanOrEqual(1180);
+  expect(player.width).toBeGreaterThan(700);
+  expect(measure.width).toBeGreaterThan(300);
   await expect(page.locator('#recordCard')).toBeHidden();
   await page.locator('#startCycleButton').click();await page.locator('#seekBar').evaluate(input=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
   await page.waitForFunction(()=>document.querySelector('#mediaStatus').dataset.state==='ready');await page.locator('#markBoundaryButton').click();
@@ -45,7 +47,7 @@ test('measurement page defers management and export cards until their dedicated 
 });
 
 
-test('desktop review is one coherent editor instead of narrow detached cards', async ({ page }) => {
+test('desktop review keeps record details in a dedicated inspector beside the editor', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
   const { measureFirstCycle } = await import('../helpers/app.mjs');
@@ -55,14 +57,13 @@ test('desktop review is one coherent editor instead of narrow detached cards', a
   await expect(page.locator('#recordCard')).toBeVisible();
   const player=await page.locator('.player-panel').boundingBox();
   const record=await page.locator('#recordCard').boundingBox();
-  expect(record.width).toBeGreaterThanOrEqual(850);
-  expect(Math.abs(record.x-player.x)).toBeLessThanOrEqual(18);
-  const note=await page.locator('#phaseList .phase-row').first().locator('.notes-details').boundingBox();
-  const resolution=await page.locator('#phaseList .phase-row').first().locator('.resolution-details').boundingBox();
-  expect(Math.abs(note.y-resolution.y)).toBeLessThanOrEqual(4);
+  expect(record.x).toBeGreaterThan(player.x+player.width);
+  expect(record.width).toBeGreaterThanOrEqual(350);
+  expect(record.width).toBeLessThanOrEqual(430);
+  expect(await page.locator('.side-column').evaluate(el=>getComputedStyle(el).overflowY)).toBe('auto');
 });
 
-test('desktop results management uses balanced columns without half-width orphan cards', async ({ page }) => {
+test('desktop results keeps management cards in a narrow rail beside the statistics', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
   const { measureFirstCycle } = await import('../helpers/app.mjs');
@@ -71,10 +72,12 @@ test('desktop results management uses balanced columns without half-width orphan
   const cycles=await page.locator('#cyclesCard').boundingBox();
   const analysis=await page.locator('#analysisCard').boundingBox();
   const source=await page.locator('#sourceCard').boundingBox();
-  expect(cycles.width).toBeGreaterThan(430);
-  expect(analysis.width).toBeGreaterThan(430);
-  expect(Math.abs(cycles.y-analysis.y)).toBeLessThanOrEqual(4);
-  expect(source.width).toBeGreaterThan(900);
+  expect(cycles.width).toBeGreaterThanOrEqual(310);
+  expect(cycles.width).toBeLessThanOrEqual(370);
+  expect(Math.abs(cycles.width-analysis.width)).toBeLessThanOrEqual(4);
+  expect(Math.abs(cycles.width-source.width)).toBeLessThanOrEqual(4);
+  expect(analysis.y).toBeGreaterThan(cycles.y);
+  expect(source.y).toBeGreaterThan(analysis.y);
 });
 
 
