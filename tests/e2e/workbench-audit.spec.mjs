@@ -38,3 +38,20 @@ test('desktop-to-phone resize preserves the active Results screen without overfl
   await expect(page.locator('body')).toHaveAttribute('data-current-page','results');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+
+test('visiting Edit records and Results during an open cycle does not invent boundaries or close the cycle',async({page})=>{
+  await openApp(page);await selectFixtureVideo(page);await page.locator('#startCycleButton').click();
+  await page.locator('#seekBar').evaluate(input=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
+  await page.waitForFunction(()=>document.querySelector('#mediaStatus').dataset.state==='ready');
+  const before=await page.locator('#boundarySelect option').count();
+  await page.locator('.workspace-switch [data-page="review"]').click();
+  await expect(page.locator('#cycleState')).toHaveText('計測中');
+  await page.locator('.workspace-switch [data-page="results"]').click();
+  await page.locator('.workspace-switch [data-page="measure"]').click();
+  await expect(page.locator('#finishCycleButton')).toBeVisible();
+  await expect(page.locator('#markBoundaryButton')).toBeVisible();
+  await page.locator('.workspace-switch [data-page="review"]').click();
+  expect(await page.locator('#boundarySelect option').count()).toBe(before);
+  await expect(page.locator('#cycleState')).toHaveText('計測中');
+});
