@@ -76,3 +76,47 @@ test('desktop results management uses balanced columns without half-width orphan
   expect(Math.abs(cycles.y-analysis.y)).toBeLessThanOrEqual(4);
   expect(source.width).toBeGreaterThan(900);
 });
+
+
+test('desktop measure is a side-by-side workbench with the action dock beside the video', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openApp(page); await selectFixtureVideo(page);
+  const player=await page.locator('#playerRegion').boundingBox();
+  const measure=await page.locator('#measurePanel').boundingBox();
+  const action=await page.locator('#startCycleButton').boundingBox();
+  expect(player.width).toBeGreaterThan(700);
+  expect(measure.width).toBeGreaterThan(320);
+  expect(measure.x).toBeGreaterThanOrEqual(player.x+player.width-2);
+  expect(Math.abs(measure.y-player.y)).toBeLessThanOrEqual(4);
+  expect(action.width).toBeGreaterThan(300);
+  expect(action.height).toBeGreaterThanOrEqual(58);
+});
+
+test('desktop review keeps the record inspector beside the video editor', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openApp(page); await selectFixtureVideo(page);
+  const { measureFirstCycle } = await import('../helpers/app.mjs');
+  await measureFirstCycle(page);
+  await page.locator('.workspace-switch [data-page="review"]').click();
+  const player=await page.locator('.player-panel').boundingBox();
+  const record=await page.locator('#recordCard').boundingBox();
+  expect(record.x).toBeGreaterThan(player.x+player.width);
+  expect(record.width).toBeGreaterThanOrEqual(350);
+  expect(record.width).toBeLessThanOrEqual(430);
+  const overflow=await page.locator('.side-column').evaluate(el=>getComputedStyle(el).overflowY);
+  expect(['auto','scroll']).toContain(overflow);
+});
+
+test('desktop results uses the full main area with a sticky management rail', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openApp(page); await selectFixtureVideo(page);
+  const { measureFirstCycle } = await import('../helpers/app.mjs');
+  await measureFirstCycle(page);
+  await page.locator('.workspace-switch [data-page="results"]').click();
+  await expect(page.locator('#playerRegion')).toBeHidden();
+  const results=await page.locator('#resultsWorkspace').boundingBox();
+  const rail=await page.locator('.side-column').boundingBox();
+  expect(results.width).toBeGreaterThan(800);
+  expect(rail.x).toBeGreaterThan(results.x+results.width);
+  expect(rail.width).toBeGreaterThanOrEqual(310);
+});

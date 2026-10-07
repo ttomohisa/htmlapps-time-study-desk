@@ -441,6 +441,180 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   .cycle-complete-actions { display:grid; grid-template-columns:1fr 1fr; }
   .cycle-complete-actions .button { min-width:0; }
 }
+
+/* v0.9.0 workbench redesign: one screen = one job. */
+@media(min-width:981px) {
+  .main { width:min(1440px,100%); }
+  .page-intro,#restoreCard,.intro-note { width:min(1320px,100%); }
+  .desk { width:min(1320px,100%); gap:18px; }
+
+  body.has-source[data-current-page="measure"] .desk { width:min(1320px,100%); }
+  body.has-source[data-current-page="measure"] .player-panel {
+    display:grid;
+    grid-template-columns:minmax(0,1.75fr) minmax(340px,.72fr);
+    grid-template-areas:"head head" "player measure";
+    align-items:stretch;
+  }
+  body.has-source[data-current-page="measure"] .player-panel > .panel-head { grid-area:head; }
+  body.has-source[data-current-page="measure"] #playerRegion {
+    grid-area:player;
+    min-width:0;
+    border-right:1px solid var(--line);
+    background:var(--surface);
+  }
+  body.has-source[data-current-page="measure"] #measurePanel {
+    grid-area:measure;
+    align-self:stretch;
+    margin:0;
+    padding:24px;
+    border:0;
+    border-radius:0;
+    background:#f6faf8;
+    box-shadow:inset 1px 0 0 #ffffff80;
+  }
+  body.has-source[data-current-page="measure"] #videoHost video {
+    height:min(62vh,600px);
+    min-height:420px;
+  }
+  body.has-source[data-current-page="measure"] .preview { min-height:420px; }
+  body.has-source[data-current-page="measure"] .transport { padding:14px 18px 16px; }
+  body.has-source[data-current-page="measure"] .transport-hint { margin-top:8px; }
+  body.has-source[data-current-page="measure"] .measure-heading {
+    display:block;
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  body.has-source[data-current-page="measure"] .measure-procedure {
+    display:block;
+    max-width:none;
+    margin-top:5px;
+    text-align:left;
+    white-space:normal;
+  }
+  body.has-source[data-current-page="measure"] .measure-heading h2 { font-size:20px; }
+  body.has-source[data-current-page="measure"] .active-step-card {
+    margin-bottom:16px;
+    padding:18px;
+    border:0;
+    background:var(--surface);
+    box-shadow:0 1px 0 #191c1810,0 8px 22px #191c1808;
+  }
+  body.has-source[data-current-page="measure"] .active-step-card .current-step {
+    margin-top:6px;
+    font-size:26px;
+    line-height:1.25;
+  }
+  body.has-source[data-current-page="measure"] .measure-actions { margin-top:14px; }
+  body.has-source[data-current-page="measure"] .measure-actions .button {
+    min-height:60px;
+    border-radius:12px;
+    font-size:17px;
+  }
+  body.has-source[data-current-page="measure"] .measure-secondary-actions {
+    margin-top:8px;
+    border-top:1px solid var(--line);
+    padding-top:8px;
+  }
+  body.has-source[data-current-page="measure"] .exception-controls { margin-top:10px; }
+  body.has-source[data-current-page="measure"] .cycle-complete-card {
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:18px;
+  }
+  body.has-source[data-current-page="measure"] .cycle-complete-actions {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  body.has-source[data-current-page="measure"] .cycle-complete-actions .button { width:100%; }
+
+  body[data-current-page="review"] .desk {
+    width:min(1320px,100%);
+    grid-template-columns:minmax(0,1fr) minmax(360px,420px);
+    gap:18px;
+    align-items:start;
+  }
+  body[data-current-page="review"] .player-panel {
+    grid-column:1;
+    min-width:0;
+  }
+  body[data-current-page="review"] .side-column {
+    grid-column:2;
+    display:block;
+    position:sticky;
+    top:82px;
+    width:100%;
+    max-height:calc(100dvh - 98px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+  }
+  body[data-current-page="review"] #recordCard {
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:18px;
+    box-shadow:0 1px 2px #191c1814,0 10px 30px #191c1808;
+  }
+  body[data-current-page="review"] #recordCard .phase-row {
+    display:block;
+    padding:12px 0 6px;
+  }
+  body[data-current-page="review"] #recordCard .notes-details,
+  body[data-current-page="review"] #recordCard .resolution-details { margin:8px 0; }
+  body[data-current-page="review"] #videoHost video {
+    height:min(46vh,430px);
+    min-height:300px;
+  }
+  body[data-current-page="review"] .review-editor {
+    margin:0;
+    border:0;
+    border-top:1px solid var(--line);
+    border-radius:0;
+    padding:20px;
+  }
+  body[data-current-page="review"] .interval-review { margin-bottom:2px; }
+
+  body[data-current-page="results"] .desk {
+    width:min(1380px,100%);
+    grid-template-columns:minmax(0,1fr) minmax(320px,360px);
+    gap:18px;
+    align-items:start;
+  }
+  body[data-current-page="results"] .player-panel {
+    grid-column:1;
+    min-width:0;
+  }
+  body[data-current-page="results"] #playerRegion { display:none; }
+  body[data-current-page="results"] .results-workspace {
+    margin:0;
+    padding:22px;
+    border:0;
+    border-radius:0;
+  }
+  body[data-current-page="results"] .side-column {
+    grid-column:2;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+    position:sticky;
+    top:82px;
+    width:100%;
+    max-height:calc(100dvh - 98px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    padding-right:2px;
+  }
+  body[data-current-page="results"] #cyclesCard,
+  body[data-current-page="results"] #analysisCard,
+  body[data-current-page="results"] #sourceCard { grid-column:auto; width:100%; }
+  body[data-current-page="results"] .side-card { box-shadow:0 1px 2px #191c1812; }
+  body[data-current-page="results"] .phase-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-current-page="results"] .result-count-grid,
+  body[data-current-page="results"] .result-stat-grid,
+  body[data-current-page="results"] .result-breakdown { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
 </style>
 </head>
 <body data-current-page="measure">

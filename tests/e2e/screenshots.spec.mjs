@@ -12,6 +12,7 @@ test('capture actual exception-aware repeated-cycle UI using synthetic non-perso
   if(start===2){await seekVideo(page,2.15);await page.locator('#exceptionsDetails summary').click();await page.locator('#beginUnobservedButton').click();await seekVideo(page,2.25);await page.locator('#exceptionReturnButton').click();}
   await seekVideo(page,start+.4);await page.locator('#markBoundaryButton').click();await seekVideo(page,start+.8);await page.locator('#markBoundaryButton').click();
  }
+ await page.locator('.workspace-switch [data-page="measure"]').click();await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/screenshots/screenshot-measure-workbench.png',fullPage:true});
  await page.locator('.workspace-switch [data-page="review"]').click();await page.locator('#phaseList .phase-name').first().fill('準備');await page.locator('#phaseList .phase-name').first().press('Tab');
  await page.locator('#phaseList .phase-name').nth(1).fill('確認');await page.locator('#phaseList .phase-name').nth(1).press('Tab');
  await page.locator('#boundarySelect').selectOption({index:1});await page.evaluate(()=>window.scrollTo(0,0));
