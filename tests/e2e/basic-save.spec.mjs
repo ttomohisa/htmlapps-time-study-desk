@@ -10,7 +10,7 @@ test('saved schema1 has real boundaries, no video, safe edited filename and lite
  const pending=page.waitForEvent('download'); await page.locator('#saveAnalysisButton').click(); const download=await pending;
  expect(download.suggestedFilename()).toBe('-CON.tsd.json');
  const text=await readFile(await download.path(),'utf8'), saved=JSON.parse(text);
- expect(saved.schemaVersion).toBe(1);expect(saved.appVersion).toBe('0.9.0');expect(saved.phases[0].label).toBe(name);
+ expect(saved.schemaVersion).toBe(1);expect(saved.appVersion).toBe('1.0.0');expect(saved.phases[0].label).toBe(name);
  expect(saved.cycles[0].boundaries.map(b=>b.timeUs)).toEqual([0,600000,1800000,2800000,3400000]);
  expect(text).not.toMatch(/blob:|"video"|"undo"|"currentTime"/);
  await expect(page.locator('#saveStatus')).toContainText('ダウンロードを開始しました');
