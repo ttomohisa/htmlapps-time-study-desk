@@ -2,112 +2,164 @@
 
 [![App tests](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml/badge.svg)](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Single HTML](https://img.shields.io/badge/distribution-single%20HTML-16624F)](https://github.com/ttomohisa/htmlapps-time-study-desk/actions)
+[![Single HTML](https://img.shields.io/badge/distribution-single%20HTML-16624F)](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/build-standalone.yml)
 
 [日本語版 README](README.ja.md)
 
-**Mark work steps while watching a video and compare durations across repeated cycles.** Click a result to return to its exact recorded video range. No account or installation is needed, and the app does not upload selected videos or analysis data.
+Measure the time spent on each step of a repeated task **from a recorded video**. Mark step boundaries, review and correct the records, compare cycles, and jump from a result back to the corresponding video interval. No account or installation is required; the app does not upload your videos or observations.
 
-## Demo and screenshots
+## 🚀 Live demo
 
-When GitHub Pages is enabled, [open Time Study Desk](https://ttomohisa.github.io/htmlapps-time-study-desk/). If Pages is not configured, download the generated HTML from a successful GitHub Actions build artifact.
+### [Open Time Study Desk on GitHub Pages](https://ttomohisa.github.io/htmlapps-time-study-desk/)
 
-On desktop, Measure puts the video and main action side by side; Edit records shows a video editor and a step inspector; Results separates statistics from saving and cycle management. Mobile uses Measure / Edit records / Results navigation. **Screenshots of the current tested build** are in `test-results/screenshots/` inside the `time-study-evidence-*` artifact of [app test runs](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml). The tiny video is synthetic test footage, not a real work-time observation.
+GitHub Pages serves the initial HTML **if Pages is enabled for this repository**. After the page loads, the app processes your video and observation records in your browser. If the demo is unavailable, use the downloadable standalone HTML under **Quick start**.
+
+[![Time Study Desk v1.0.0 — edit records and local video player](assets/screenshot-en.png)](https://ttomohisa.github.io/htmlapps-time-study-desk/)
+
+*Actual v1.0.0 Chromium test capture, using short synthetic video rather than a real work observation. [Mobile screenshot](assets/screenshot-mobile.png).*
 
 ## Features
 
-- **Mark steps in one video** — Record the start, step boundaries and end while playing/seeking. You can start the first cycle without naming the steps in advance.
-- **Compare repeated cycles** — Reuse a procedure, explicitly start each cycle, and keep gaps between cycles out of work time.
-- **Keep observation exceptions distinct** — Record interruptions, unobserved portions and steps not performed without converting unknowns to zero seconds.
-- **Correct records** — Adjust shared boundaries, split/merge/reassign intervals, resolve statuses, edit notes and undo/redo.
-- **See the underlying evidence** — View cycle and step statistics with their own denominators (n), a time table, chart and links back to video ranges.
-- **Save and export on-device** — Analysis-only JSON, browser-local autosave when supported, and time-table/summary/interval-detail CSV.
+- **Measure steps from a video** — Play or seek to the start, each transition and the end; the first cycle does not require a predefined step list.
+- **Compare repeated work** — Start each cycle explicitly, reuse the procedure and exclude between-cycle gaps from recorded work time.
+- **Record what was not measured** — Distinguish work interruptions, unobserved intervals and steps not performed; missing measurements are not counted as zero.
+- **Correct records without restarting** — Rename steps, move shared boundaries, split/merge/reassign intervals, change statuses and notes, and undo/redo edits.
+- **Check the evidence behind a number** — Inspect cycle and step statistics, counts (n), a chart and time table; select a result to seek to its source video interval.
+- **Keep and export an analysis locally** — Save analysis-only JSON, restore a browser-local autosave when available, or export time-table, summary and interval-detail CSV files.
 
 ## Quick start
 
-### Web version
+### Use the web demo
 
-If GitHub Pages is configured, [open the app](https://ttomohisa.github.io/htmlapps-time-study-desk/). Downloading the initial HTML requires a network request; after loading, user data is processed locally by the app.
+[Open the demo](https://ttomohisa.github.io/htmlapps-time-study-desk/) if GitHub Pages has been enabled. No login or installation is necessary. The site must be loaded over the network initially, but video analysis does not require a server.
 
-### Standalone file
+### Use the download file
 
-Download a successful build artifact from [GitHub Actions](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/build-standalone.yml) and open `dist/index.html`. It is a standalone HTML file. The smaller `dist/index.self-extract.html` also runs without runtime downloads but requires browser `DecompressionStream` support. Neither requires an application server or runtime library installation.
+1. Open the [standalone build workflow](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/build-standalone.yml) and choose a successful run.
+2. Download its **standalone-html-…** artifact ZIP (GitHub may require sign-in to download an Actions artifact).
+3. Extract and open `dist/index.html` in a compatible browser. The generated `time-study-desk.html` is an identical readable copy.
+4. Optionally use `dist/index.self-extract.html`, which is smaller but requires browser `DecompressionStream` support.
 
-### Typical workflow
+The files do not require a local application server or runtime library download. Save the HTML to your device for later offline use.
 
-1. **Choose a video** using the file picker or drag-and-drop.
-2. **Measure** — Seek to the start and press **Start cycle here**. Press **Mark boundary** whenever the step changes, then **Finish cycle here** at the end.
-3. **Repeat** — The app stays on Measure and offers **Start next cycle here**, **Edit record** or **View results**. It never automatically starts the next cycle.
-4. **Edit records** — Select a cycle, change step names, boundaries, intervals and statuses. Changing procedure order or start/end conditions creates a new procedure while preserving older cycles.
-5. **Results** — Choose a procedure, inspect totals, per-step means and the time table. A reason is required when excluding a completed cycle from statistics.
-6. **Save** — Download `.tsd.json` or one of the three CSV views.
+### Build an offline copy (advanced)
 
-### Interruptions, unknowns and not performed
+1. Download or clone this repository.
+2. On Windows, run `build-standalone.bat` (PowerShell is required).
+3. Open the generated `dist/index.html`, or copy it to another device for offline use.
 
-Under **More recording options**, start an interruption or unobserved period and use **Resume step** when it ends. Pausing the video is **not** the same as recording a work interruption. Mark **Not performed** only when no work or unobserved span is already assigned. Incomplete cycles do not silently become complete.
+Node.js and Playwright are **not** required to run the app; they are used for development and testing.
 
-### Editing and video evidence
+## Usage
 
-A shared boundary affects the durations of both adjacent steps. Split, merge and reassignment preserve observed time rather than inventing or dropping it. When sufficient evidence for a step is removed, that step becomes unresolved.
+1. **Load a video.** Choose one seekable video file using the file picker or drag and drop. Move the playhead to the start of the work.
+2. **Measure the first cycle.** Select **Start cycle here**; at each step change, select **Mark boundary**; at the end, select **Finish cycle here**.
+3. **Record another cycle.** Select **Start next cycle here**. The next cycle never begins automatically; time between cycles is not silently added to a step.
+4. **Edit records.** Open **Edit records** to name steps, adjust boundaries and correct intervals or observation statuses. A changed procedure order or start/end condition becomes a new procedure, leaving earlier records intact.
+5. **Inspect results.** Select a procedure in **Results** to view cycle durations, step-level statistics and the time table. Excluding a completed cycle from statistics requires a reason.
+6. **Save your work.** Download an analysis `.tsd.json` file or export the time-table, summary or interval-detail CSV separately.
 
-Click a recorded number in Results to open its range in Edit records. The player seeks to the start **without autoplay**. Playback of the selected range requires an explicit **Play this interval** click and is not guaranteed frame-accurate.
+### Interruptions and incomplete observations
+
+Open **More recording options** to record an interruption or unobserved interval; use **Resume step** to return. Pausing video playback does **not** record an interruption. **Not performed** is a distinct step state, not a measured zero. Incomplete cycles remain incomplete until resolved.
+
+### Editing and evidence playback
+
+Moving a shared boundary updates the durations of both adjacent steps. Split, merge and reassignment preserve observed spans and do not invent missing time. A step without sufficient supporting observation may become unresolved.
+
+Select a numeric result to open the associated interval in **Edit records**. The video seeks to the saved start position **without autoplay**. Select **Play this interval** to start playback of that segment. Exact frame-level seeking or stopping is not guaranteed.
 
 ### Keyboard shortcuts
 
 | Shortcut | Action |
 | --- | --- |
-| `Space` when player focused | Play / pause |
-| `←` / `→` when player focused | Seek by 0.1 seconds |
-| `Shift` + arrow | Seek by 1 second |
-| `Ctrl` / `⌘` + `Z` | Undo record operation (native text Undo inside text fields) |
-| `Ctrl` / `⌘` + `Shift` + `Z` | Redo record operation |
+| `Space` with video player focused | Play / pause |
+| `←` / `→` with player focused | Seek 0.1 seconds |
+| `Shift` + arrow | Seek 1 second |
+| `Ctrl` / `⌘` + `Z` | Undo a record edit (native text undo inside text inputs) |
+| `Ctrl` / `⌘` + `Shift` + `Z` | Redo a record edit |
 | `Esc` | Close a dialog |
 
-## Saving, restoring and CSV
+### Saving, reopening and CSV
 
-An **analysis JSON (`.tsd.json`)** contains steps, procedures, cycles, boundaries, statuses and notes, **not the video**. On import the app validates the complete file before replacing the current analysis. Reconnect the source video separately. Size, dimensions and duration are compared, but matching metadata is not proof of file identity, so confirmation is still required.
+- **Analysis JSON (`.tsd.json`)** holds procedures, cycle/step boundaries, statuses and notes, **not the video itself**. Reconnect the original video after reopening. The app checks file metadata and asks for confirmation; metadata matching alone cannot prove file identity.
+- **Browser autosave** stores analysis data in IndexedDB when supported. It does not store the video. Local storage may be unavailable or cleared, and is not guaranteed durable or encrypted; download JSON for an important analysis. Older tabs cannot silently overwrite newer recovery data.
+- **CSV** exports three separate views: time table, summary and interval details. Output uses UTF-8 BOM, CRLF and quoted cells. Unknown values remain different from zero, and user-authored formula-like text is escaped for spreadsheet import. See [CSV format](docs/CSV_FORMAT.md).
 
-**Autosave** stores the analysis only in the browser's IndexedDB when available. It is enabled by default, but availability depends on the browser and local settings. Stale tabs cannot silently overwrite newer recovery data. Browser storage is not promised to be durable or encrypted: download an additional JSON copy for anything important.
+A “download started” message confirms the handoff to the browser, not that a file was written to a particular folder.
 
-**CSV** exports time table, summary or interval detail separately, one file per action. CSV uses UTF-8 BOM, CRLF and quoted cells; missing values remain distinct from zero. States, exclusions and reasons are preserved. User text at risk of spreadsheet formula interpretation is escaped in CSV only. See [CSV format](docs/CSV_FORMAT.md). A “Download started” notification means browser handoff, not verified disk persistence.
+## Publish with GitHub Pages
 
-## Privacy and processing location
+The repository includes a workflow to build a single HTML page and deploy it when GitHub Pages is enabled.
 
-Generated HTML uses a CSP including `connect-src 'none'`. The app has no analytics, external API, remote CDN, fonts or ad scripts at runtime. Video uses local File and Blob URL references. Autosave stays in IndexedDB; JSON/CSV output is a local download. The app does not transmit the video, filenames, step names or notes.
+1. In repository **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**.
+2. Push to `main` or run **Deploy standalone app to GitHub Pages** in [Actions](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/deploy-pages.yml).
+3. When the deployment job succeeds, the app is served at `https://ttomohisa.github.io/htmlapps-time-study-desk/`.
 
-Visiting GitHub Pages or GitHub itself requires requests to deliver the page and repository. For disconnected use, open a downloaded standalone HTML. Details are in [SECURITY.md](SECURITY.md).
+If Pages is not enabled, the workflow builds the standalone artifact but skips deployment. Deployment and its live URL should not be assumed merely from a successful app-test run.
 
-## Limitations and test coverage
+## Development and build layout
 
-- One non-empty, seekable video; application limits are 8 GiB and 24 hours. The browser must support the file's codec; there is no transcoding.
-- Video `currentTime` is rounded and stored as integer microseconds. **This is not a microsecond- or frame-accuracy claim.** Slow motion/time-lapse and edited speed changes are not reconstructed into real time.
-- Observed time in a video is not a standard time, worker performance rating or staffing calculation.
-- Automated Chromium testing covers narrow widths, Japanese/English, keyboard, JSON compatibility, CSV and generated HTML. **Real Android/iPhone devices, soft keyboards, screen readers, Safari/Firefox/Edge and actual large-media end-to-end runs remain unverified.**
-- `file://` IndexedDB availability is browser-dependent. The self-extracting variant requires `DecompressionStream`.
-- Schema **1** is separate from app version **1.0.0**. A retained v0.2.0 schema-1 fixture is used for compatibility regression.
+```text
+.
+├─ app.config.json                   # App metadata and build options
+├─ src/index.template.html           # Editable application source
+├─ build-standalone.bat              # Windows build entry point
+├─ build-standalone.ps1              # Standalone HTML builder
+├─ scripts/check-repository.ps1      # Build and release verification
+├─ dist/index.html                   # Generated readable HTML
+├─ dist/index.self-extract.html      # Generated compressed HTML
+├─ time-study-desk.html              # Generated root copy (same as readable)
+└─ .github/workflows/
+   ├─ build-standalone.yml          # Standalone build validation
+   ├─ test-app.yml                  # Unit and Chromium browser tests
+   └─ deploy-pages.yml              # Conditional GitHub Pages deployment
+```
 
-## Development and build
-
-Edit `src/index.template.html`, not generated HTML. On Windows run `build-standalone.bat`, or use PowerShell:
+Edit the source template and rebuild; **do not manually edit generated HTML**. To build and verify on Windows:
 
 ```powershell
 pwsh -NoProfile -File ./scripts/check-powershell-syntax.ps1
 pwsh -NoProfile -File ./scripts/check-repository.ps1
 ```
 
-Build outputs are `dist/index.html`, `dist/index.self-extract.html` and the readable-equivalent `time-study-desk.html`. Node.js 22 and Playwright 1.57.0 are used **only for development/testing**:
+Development tests use Node.js 22 and pinned Playwright 1.57.0:
 
-```text
+```sh
 npm ci
 npx playwright install chromium
 npm run test:unit
 npm run test:e2e -- --project=chromium
 ```
 
-Product requirements are in [APP_SPEC.md](APP_SPEC.md), save format in [docs/SAVE_FORMAT.md](docs/SAVE_FORMAT.md), and verification evidence in [docs/QA_RESULTS.md](docs/QA_RESULTS.md). See the matching GitHub Actions run for exact test results and screenshots.
+Builds produce two self-contained HTML variants, verify their relationship and check the runtime network policy. Read [APP_SPEC.md](APP_SPEC.md), [save format](docs/SAVE_FORMAT.md) and [QA results](docs/QA_RESULTS.md) for details. Browser-test screenshots and results are also available in the **time-study-evidence-…** artifact of the [app-test workflow](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml).
 
-## Issues and license
+## Privacy and runtime network protection
 
-Report non-sensitive bugs and feature requests via [Issues](https://github.com/ttomohisa/htmlapps-time-study-desk/issues). Do not upload private videos or analysis data to public issues. For contributions, see [CONTRIBUTING.md](CONTRIBUTING.md).
+The generated app has a restrictive Content Security Policy including `connect-src 'none'` and does not request remote APIs, runtime CDNs, fonts, analytics or telemetry. The selected video is accessed with browser File/Blob URLs. Records are analyzed locally and, where supported, autosaved in local IndexedDB; export only happens when you choose to download.
 
-[MIT License](LICENSE) © 2026 ttomohisa.
+Accessing GitHub or the Pages site still transfers the initial page and ordinary site requests. **The app does not send your selected video, filenames, step labels or notes to a server.** For use without an internet connection, open a downloaded HTML locally. See [SECURITY.md](SECURITY.md) and [VERIFY_OFFLINE.md](VERIFY_OFFLINE.md).
+
+## Limitations
+
+- One seekable, nonempty video is supported at a time, with application limits of **8 GiB and 24 hours**. Its codec must be supported by the browser; the app does not transcode.
+- Video positions come from the browser's `currentTime`. Storing them as integer microseconds **does not** imply microsecond precision, frame accuracy or reconstruction of real-world duration from a sped-up video.
+- Statistics describe **observed video time**, not standard time, worker rating or staffing requirements. Excluded, unobserved and not-performed cases remain distinguishable.
+- Automated testing has covered Chromium on desktop and mobile-sized viewports, both languages, JSON migration, CSV and both standalone variants. **Real Android/iPhone hardware, screen readers, Safari/Firefox/Edge, large real-world videos and spreadsheet-app CSV import remain unverified**.
+- Browser IndexedDB support for local `file://` pages varies. The self-extracting HTML needs `DecompressionStream` support.
+
+The persisted analysis schema remains **schemaVersion 1** independently of the app's **v1.0.0** version.
+
+## Dependencies
+
+The distributed application has **no bundled third-party runtime libraries**; it uses native browser APIs and system fonts. Playwright 1.57.0 is pinned for development-only browser testing. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for notices.
+
+## Contributing
+
+Bug reports and feature proposals are welcome in [GitHub Issues](https://github.com/ttomohisa/htmlapps-time-study-desk/issues). Please do not attach private videos or analyses to public issues. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+Copyright © 2026 ttomohisa
+
+Licensed under the [MIT License](LICENSE).
