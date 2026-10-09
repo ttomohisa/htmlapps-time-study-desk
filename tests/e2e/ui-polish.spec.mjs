@@ -84,15 +84,25 @@ test('desktop results keeps management cards in a narrow rail beside the statist
 test('desktop measure is a side-by-side workbench with the action dock beside the video', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openApp(page); await selectFixtureVideo(page);
-  const player=await page.locator('#playerRegion').boundingBox();
-  const measure=await page.locator('#measurePanel').boundingBox();
-  const action=await page.locator('#startCycleButton').boundingBox();
-  expect(player.width).toBeGreaterThan(700);
-  expect(measure.width).toBeGreaterThan(320);
-  expect(measure.x).toBeGreaterThanOrEqual(player.x+player.width-2);
-  expect(Math.abs(measure.y-player.y)).toBeLessThanOrEqual(4);
-  expect(action.width).toBeGreaterThan(300);
-  expect(action.height).toBeGreaterThanOrEqual(58);
+  await page.waitForFunction(() => document.querySelector('#mediaStatus')?.dataset.state==='ready');
+  // The player's video metadata may resize the grid after the file picker resolves.
+  // Measure all boxes in a single animation frame and wait for the settled layout.
+  const geometry=()=>page.evaluate(()=>{
+    const player=document.querySelector('#playerRegion').getBoundingClientRect();
+    const measure=document.querySelector('#measurePanel').getBoundingClientRect();
+    const action=document.querySelector('#startCycleButton').getBoundingClientRect();
+    return {playerWidth:player.width,measureWidth:measure.width,
+      sideBySide:measure.left>=player.right-2,topGap:Math.abs(measure.top-player.top),
+      actionWidth:action.width,actionHeight:action.height};
+  });
+  await expect.poll(async()=> (await geometry()).sideBySide,{timeout:8000}).toBe(true);
+  const g=await geometry();
+  expect(g.playerWidth).toBeGreaterThan(700);
+  expect(g.measureWidth).toBeGreaterThan(320);
+  expect(g.sideBySide).toBe(true);
+  expect(g.topGap).toBeLessThanOrEqual(4);
+  expect(g.actionWidth).toBeGreaterThan(300);
+  expect(g.actionHeight).toBeGreaterThanOrEqual(58);
 });
 
 test('desktop review keeps the record inspector beside the video editor', async ({ page }) => {
