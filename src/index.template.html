@@ -60,6 +60,12 @@ select { min-width:0; min-height:44px; border:1px solid var(--line); border-radi
 details { border:1px solid var(--line); border-radius:12px; background:var(--surface); overflow:hidden; } summary { cursor:pointer; padding:14px 16px; font-weight:700; }
 .adjustment { margin-top:12px; } .adjustment summary { min-height:44px; padding:10px 12px; font-size:12px; }
 .adjust-inner { padding:0 12px 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .adjust-inner .button { flex:1; min-width:56px; padding-inline:6px; min-height:44px; }
+.seek-time-row { display:flex; align-items:end; flex-wrap:wrap; gap:8px; padding:0 12px 8px; }
+.seek-time-field { display:grid; gap:4px; flex:1 1 120px; min-width:0; font-size:12px; }
+#seekTime { width:100%; min-width:0; min-height:44px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:8px; }
+#seekTime[aria-invalid="true"] { border-color:var(--danger); }
+.seek-time-note { padding:0 12px 12px; margin:0; font-size:12px; color:var(--muted); }
+#seekTimeError { color:var(--danger); }
 .audio-row { display:flex; align-items:center; gap:12px; padding:0 12px 12px; } #volume { flex:1; } .audio-row label { font-size:12px; }
 .transport-hint { margin:12px 0 0; color:var(--muted); font-size:12px; }
 .side-card { border:1px solid var(--line); border-radius:14px; padding:18px; background:var(--surface); margin-bottom:14px; }
@@ -308,7 +314,7 @@ textarea { font:inherit; resize:vertical; min-height:76px; }
  .results-workspace { border-top:0; }
 }
 
-/* v1.0.0 visual hierarchy / desktop workspace polish. */
+/* v1.0.1 visual hierarchy / desktop workspace polish. */
 h1 { font-size:clamp(22px,3vw,28px); line-height:1.25; letter-spacing:-.025em; }
 .header-inner { width:min(1280px,100%); gap:14px; }
 .main { width:min(1280px,100%); padding:22px clamp(14px,2.5vw,30px) 48px; }
@@ -357,7 +363,7 @@ footer { width:min(1280px,100%); }
  .measurement { padding-top:8px; }
 }
 
-/* v1.0.0 progressive disclosure: show the next useful action, not every capability. */
+/* v1.0.1 progressive disclosure: show the next useful action, not every capability. */
 .intro-note { display:none; }
 body:not(.has-source):not(.has-analysis) .panel-head,
 body:not(.has-source):not(.has-analysis) .transport,
@@ -448,7 +454,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   body[data-current-page="results"] #sourceCard { grid-column:1/-1; }
 }
 
-/* v1.0.0 workbench redesign: one screen = one job. */
+/* v1.0.1 workbench redesign: one screen = one job. */
 @media(min-width:981px) {
   .main { width:min(1440px,100%); }
   .page-intro,#restoreCard,.intro-note { width:min(1320px,100%); }
@@ -624,7 +630,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 </style>
 </head>
 <body data-current-page="measure">
-<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v1.0.0</span></p><p class="brand-meta" data-i18n="brandMeta">動画から工程・回ごとの時間を記録して比較</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1"/><circle class="help-dot" cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg></button></div></div></header>
+<header class="app-header"><div class="header-inner"><div class="brand"><div class="brand-mark" aria-hidden="true"><img id="appBrandIcon" src="__APP_ICON_DATA_URI__" alt=""></div><div class="brand-copy"><p class="brand-name"><span id="brandName">Time Study Desk</span><span class="version-badge" id="versionBadge">v1.0.1</span></p><p class="brand-meta" data-i18n="brandMeta">動画から工程・回ごとの時間を記録して比較</p></div></div><div class="header-actions"><button class="language-button" id="languageButton" type="button" aria-label="英語に切り替え">EN</button><button class="icon-button header-icon-button" id="helpButton" type="button" data-i18n-aria-label="helpTitle" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1"/><circle class="help-dot" cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg></button></div></div></header>
 <main class="main">
 <section class="page-intro" aria-labelledby="heroTitle"><div><h1 id="heroTitle" data-i18n="introTitle">作業動画を工程ごとに区切って時間を比較</h1><p data-i18n="introBody">動画を見ながら工程の区切りを記録し、回ごと・工程ごとの時間を比較できます。気になる数値から該当区間へ戻れます。</p></div><div class="local-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM8 12l3 3 5-6"/></svg><span data-i18n="localBadge">完全ローカル処理</span></div></section>
 <!-- APP:BEGIN Time Study Desk First Measurement -->
@@ -635,7 +641,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 <div id="backgroundNotice" class="notice" role="status" aria-live="polite" aria-atomic="true" hidden data-i18n="backgroundHint">画面を離れたため再生を停止しました。位置を確認してから再生してください。</div>
 <div class="desk"><section class="player-panel" aria-labelledby="playerTitle"><div class="panel-head"><h2 id="playerTitle" data-i18n="playerTitle">作業動画</h2><div class="workspace-switch"><button type="button" data-page="measure" aria-controls="measurePanel" aria-current="page" data-i18n="tabMeasure">計測</button><button type="button" data-page="review" aria-controls="reviewPanel" data-i18n="tabReview">記録を編集</button><button type="button" data-page="results" aria-controls="resultsWorkspace" data-i18n="tabResults">結果</button></div><span id="mediaStatus" class="status" role="status" data-state="empty">動画未選択</span></div><div id="playerRegion" tabindex="0" role="group" aria-keyshortcuts="Space ArrowLeft ArrowRight" data-i18n-aria-label="playerKeyboard" aria-label="動画プレイヤー。スペースで再生、左右キーで位置を調整。"><div class="preview" id="dropZone"><div id="emptyView" class="empty-view"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="12" width="54" height="40" rx="6"/><path d="m27 23 15 9-15 9z"/></svg><strong data-i18n="choosePrompt">まず、作業を撮影した動画を開く</strong><p data-i18n="dropHint">ファイルをここへドラッグ＆ドロップすることもできます。</p><button id="chooseVideoButton" class="button primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h8v2"/></svg><span data-i18n="chooseVideo">動画を選択</span></button><button id="openAnalysisInlineButton" class="button empty-secondary-button" type="button" data-i18n="openAnalysis" data-i18n-aria-label="openAnalysisStartAria" aria-label="保存した分析を開く（開始画面）">保存した分析を開く</button><details id="startStorageSettings" class="start-storage-settings"><summary data-i18n="storageSettings">保存設定</summary><label class="start-autosave-row"><input id="autosaveStartToggle" type="checkbox" checked><span data-i18n="autosaveLabel">分析データをこのブラウザに自動保存する</span></label></details><button id="reconnectInlineButton" class="button primary" type="button" hidden data-i18n="reconnectOriginal">元動画を選び直す</button></div><div id="videoHost" hidden></div></div>
 <div class="transport"><div class="seek-row"><label class="sr-only" for="seekBar" data-i18n="seekLabel">動画の再生位置</label><input id="seekBar" type="range" min="0" max="1" step="0.1" value="0" disabled><div class="time-readout"><span id="position">00:00.0</span> / <span id="duration">00:00.0</span></div></div><div class="transport-row"><button id="playButton" type="button" class="button primary" disabled><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="m8 4 12 8-12 8z"/></svg><span id="playLabel" data-i18n="play">再生</span></button><label class="rate-field" for="playbackRate"><span data-i18n="speed">再生速度</span><select id="playbackRate" disabled><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
-<details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
+<details class="adjustment" id="adjustments"><summary data-i18n="fineAdjust">位置の微調整・音量</summary><div class="adjust-inner"><button class="button" type="button" data-seek="-1" disabled>−1 s</button><button class="button" type="button" data-seek="-0.1" disabled>−0.1 s</button><button class="button" type="button" data-seek="0.1" disabled>＋0.1 s</button><button class="button" type="button" data-seek="1" disabled>＋1 s</button></div><div class="seek-time-row"><label class="seek-time-field" for="seekTime"><span data-i18n="seekTimeLabel">移動先の動画内時刻（秒）</span><input id="seekTime" type="text" inputmode="decimal" autocomplete="off" aria-describedby="seekTimeHint seekTimeError" disabled></label><button id="seekTimeButton" class="button" type="button" disabled data-i18n="seekTimeAction">この位置へ移動</button></div><p id="seekTimeHint" class="seek-time-note" data-i18n="seekTimeHint">小数6桁まで。再生位置だけを移動し、記録は変更しません。</p><p id="seekTimeError" class="seek-time-note" role="alert" hidden></p><div class="audio-row"><button id="muteButton" class="button" type="button" aria-pressed="false" disabled data-i18n="mute">ミュート</button><label for="volume" data-i18n="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.05" value="1" disabled></div></details><p class="transport-hint" data-i18n="timeHint">表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。</p></div></div><div class="measurement app-mobile-page is-mobile-active" data-screen="measure" id="measurePanel" aria-labelledby="measureTitle">
   <div class="measure-heading"><div><span id="measureKicker" class="measure-kicker"></span><h2 id="measureTitle" data-i18n="measureTitle">作業を計測</h2></div><span id="measureProcedure" class="measure-procedure"></span></div>
   <div id="activeStepCard" class="active-step-card" hidden><div class="active-step-meta"><span data-i18n="currentStepLabel">現在の工程</span><span id="stepProgress"></span></div><strong id="currentStep" class="current-step"></strong><span id="nextStep" class="active-step-next"></span></div>
   <div id="cycleCompleteCard" class="cycle-complete-card" hidden><div class="cycle-complete-copy"><strong id="cycleCompleteTitle"></strong><p data-i18n="cycleCompleteBody">次の回を続けて計測するか、記録を編集・結果確認へ進めます。</p><div class="cycle-complete-summary"><strong id="cycleCompleteDuration"></strong><span id="cycleCompleteBreakdown"></span></div></div><div class="cycle-complete-actions"><button id="reviewCompletedButton" class="button" type="button" data-i18n="editCompletedRecord">記録を編集</button><button id="viewResultsButton" class="button" type="button" data-i18n="viewResults">結果を見る</button></div></div>
@@ -707,7 +713,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 <label class="export-field" for="outputFilename"><span class="export-label" data-i18n="outputFilename">出力のベース名</span><span class="filename-control"><input class="filename-input" id="outputFilename" type="text" maxlength="160" autocomplete="off" spellcheck="false" value="time-study" aria-describedby="savePlanned"><span class="filename-extension" data-i18n="outputSuffixHint">拡張子は自動</span></span></label>
 <p id="savePlanned" data-i18n="savePlanned">JSONとCSVは一回の操作で一ファイルずつ保存します。動画は含まれません。</p><button id="saveAnalysisButton" class="button primary" type="button" disabled data-i18n="saveAnalysis">分析データを保存</button><p id="saveStatus" class="save-status" role="status"></p>
 <div class="csv-export-box"><h3 data-i18n="csvTitle">CSV出力</h3><p class="small-note" data-i18n="csvHint">画面と同じ集計規則で、時間表・集計・区間明細を一つずつ保存します。</p><div class="csv-export-actions"><button id="exportTimeTableCsvButton" class="button" type="button" disabled data-i18n="exportTimeTableCsv">時間表CSVを保存</button><button id="exportSummaryCsvButton" class="button" type="button" disabled data-i18n="exportSummaryCsv">集計CSVを保存</button><div class="csv-scope-row"><label class="field"><span data-i18n="intervalCsvScope">区間明細の範囲</span><select id="intervalCsvScope"><option value="selected-procedure" data-i18n="scopeSelectedProcedure">選択手順</option><option value="analysis" data-i18n="scopeAnalysis">分析全体</option></select></label><button id="exportIntervalsCsvButton" class="button" type="button" disabled data-i18n="exportIntervalsCsv">区間明細CSVを保存</button></div></div><p id="csvStatus" class="save-status" role="status"></p></div>
-<button id="openAnalysisButton" class="button" type="button" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importReady">.tsd.jsonを検証して開きます。元動画は別に選び直します。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：リリース候補の統合検証</strong><span data-i18n="nextStageBody">v1.0.0でセキュリティ、生成HTML、実機・大容量・資料を統合確認します。</span></p></section>
+<button id="openAnalysisButton" class="button" type="button" data-i18n="openAnalysis">保存した分析を開く</button><p id="openAnalysisHint" data-i18n="importReady">.tsd.jsonを検証して開きます。元動画は別に選び直します。</p><p class="flow-note"><strong data-i18n="nextStage">次の段階：リリース候補の統合検証</strong><span data-i18n="nextStageBody">v1.0.1でセキュリティ、生成HTML、実機・大容量・資料を統合確認します。</span></p></section>
 <section class="side-card" id="sourceCard" aria-labelledby="sourceTitle"><h2 id="sourceTitle" data-i18n="sourceTitle">選択した動画</h2><p id="noSource" data-i18n="noSource">一本の動画を選ぶと、長さとサイズをここで確認できます。</p><div id="sourceInfo" hidden><p id="sourceConnectionState" class="small-note source-connection"></p><span id="sourceName" class="source-name"></span><dl class="source-facts"><dt data-i18n="length">動画の長さ</dt><dd id="sourceDuration"></dd><dt data-i18n="dimensions">縦横サイズ</dt><dd id="sourceDimensions"></dd><dt data-i18n="fileSize">ファイルサイズ</dt><dd id="sourceSize"></dd></dl><p id="largeVideoHint" hidden data-i18n="largeVideoHint">1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。</p><div class="source-actions"><button id="reconnectOriginalButton" type="button" class="button primary" hidden data-i18n="reconnectOriginal">元動画を選び直す</button><button id="replaceVideoButton" type="button" class="button" data-i18n="newAnalysisVideo">別の動画で新しい分析を始める</button></div><p id="sourceMatchError" class="field-error" role="alert" hidden></p></div><p data-i18n="formatHint">再生可否はブラウザとコーデックによります。動画の変換は行いません。</p></section></aside></div>
 <input id="videoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
 <input id="reconnectVideoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
@@ -721,7 +727,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 <button type="button" data-page="results" aria-controls="resultsWorkspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"/></svg><span data-i18n="tabResults">結果</span></button></nav>
 <div id="screenStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <footer><span>Time Study Desk</span> · <span data-i18n="footer">動画を送信せず、ブラウザで確認</span></footer>
-<div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" data-tone="default"><span class="app-toast-message" id="appToastMessage"></span><button class="app-toast-action" id="appToastAction" type="button" hidden></button></div>
+<div class="app-toast" id="appToast" hidden role="status" aria-live="polite" aria-atomic="true" data-tone="default"><span class="app-toast-message" id="appToastMessage"></span><button class="app-toast-action" id="appToastAction" type="button" hidden></button></div>
 <dialog class="app-confirm-dialog" id="appConfirmDialog" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage"><div class="app-confirm-header"><h2 class="app-confirm-title" id="appConfirmTitle">確認</h2><button class="app-confirm-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="app-confirm-body"><p class="app-confirm-message" id="appConfirmMessage"></p><div class="app-confirm-actions"><button class="app-confirm-button" id="appConfirmCancel" type="button">キャンセル</button><button class="app-confirm-button primary" id="appConfirmOk" type="button">実行する</button></div></div></dialog>
 <dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-header"><h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2><button class="icon-button" id="closeHelpButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-body">
 <!-- APP:HELP:BEGIN -->
@@ -784,17 +790,17 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   // I18N
   const translations = {
     ja: {
-      introTitle:'作業動画を工程ごとに区切って時間を比較', introBody:'動画を見ながら工程の区切りを記録し、回ごと・工程ごとの時間を比較できます。気になる数値から該当区間へ戻れます。', brandMeta:'動画から工程・回ごとの時間を記録して比較', localBadge:'完全ローカル処理', stage:"Time Study Desk · v1.0.0", versionLimit:"セキュリティ、生成HTML、規模試験、資料を統合確認するリリース候補です。実機で未確認の項目は未確認のまま明記します。",
-      playerTitle:'作業動画', choosePrompt:'動画を選んで計測を始める', dropHint:'動画は端末内で処理します。ドラッグ＆ドロップでも開けます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
+      introTitle:'作業動画を工程ごとに区切って時間を比較', introBody:'動画を見ながら工程の区切りを記録し、回ごと・工程ごとの時間を比較できます。気になる数値から該当区間へ戻れます。', brandMeta:'動画から工程・回ごとの時間を記録して比較', localBadge:'完全ローカル処理', stage:"Time Study Desk · v1.0.1", versionLimit:"セキュリティ、生成HTML、規模試験、資料を統合確認するリリース候補です。実機で未確認の項目は未確認のまま明記します。",
+      playerTitle:'作業動画', choosePrompt:'動画を選んで計測を始める', dropHint:'動画は端末内で処理します。ドラッグ＆ドロップでも開けます。', chooseVideo:'動画を選択', replaceVideo:'別の動画を選択', play:'再生', pause:'再生を一時停止', speed:'再生速度', seekLabel:'動画の再生位置', fineAdjust:'位置の微調整・音量', seekTimeLabel:'移動先の動画内時刻（秒）', seekTimeAction:'この位置へ移動', seekTimeHint:'小数6桁まで。再生位置だけを移動し、記録は変更しません。', seekTimeInvalid:'0〜{duration}秒の範囲で、小数6桁以内の秒数を入力してください。', volume:'音量', mute:'ミュート', unmute:'ミュート解除', playerKeyboard:'動画プレイヤー。スペースで再生、左右キーで位置を調整。', timeHint:'表示は動画内の時刻です。再生速度を変えても、作業時間の基準は変わりません。',
       sourceTitle:'選択した動画', noSource:'一本の動画を選ぶと、長さとサイズをここで確認できます。', length:'動画の長さ', dimensions:'縦横サイズ', fileSize:'ファイルサイズ', formatHint:'再生可否はブラウザとコーデックによります。動画の変換は行いません。', largeVideoHint:'1 GiB以上の動画です。端末によって再生や移動に時間がかかることがあります。',
       analysisTitle:'分析データ', storageSettings:'保存設定', openAnalysis:'保存した分析を開く', importReady:'.tsd.jsonを検証して開きます。元動画は別に選び直します。', savePreparation:'保存名の準備', outputFilename:'出力のベース名', outputSuffixHint:'拡張子は自動', savePlanned:"JSONとCSVは一回の操作で一ファイルずつ保存します。動画は含まれません。", saveAnalysis:'分析データを保存', csvTitle:'CSV出力', csvHint:'画面と同じ集計規則で、時間表・集計・区間明細を一つずつ保存します。', exportTimeTableCsv:'時間表CSVを保存', exportSummaryCsv:'集計CSVを保存', exportIntervalsCsv:'区間明細CSVを保存', intervalCsvScope:'区間明細の範囲', scopeSelectedProcedure:'選択手順', scopeAnalysis:'分析全体', csvExportFailed:'CSVを保存できませんでした。現在の分析は保持しています。', nextStage:"分析データの保管", nextStageBody:"自動保存はこのブラウザ内のみです。大切な分析はJSONでも保存してください。動画は含まれません。",
       buildInfo:'ビルド情報', appVersion:'アプリ版', builtAt:'生成日時', dependencies:'実行時の外部依存', footer:'動画を送信せず、ブラウザで確認', empty:'動画未選択', ready:'操作できます', loading:'読み込み中', seeking:'位置を移動中', error:'再生できません', loadingHint:'動画を確認しています。現在の動画は交換するまで保持されます。', backgroundHint:'画面を離れたため再生を停止しました。位置を確認してから再生してください。',
       confirmTitle:'動画を入れ替えますか？', replaceMessage:"現在の動画と分析を、新しい動画の空の分析へ置き換えます。この操作は取り消せません。必要な分析データは先に保存してください。", confirmAction:'この動画を使う', cancel:'キャンセル', close:'閉じる', helpTitle:'使い方と注意事項',
       helpBasicsTitle:'このアプリでできること', helpBasicsBody:"動画を再生しながら工程を区切り、回別・工程別の時間を比較します。中断・未観測、記録の見直し、根拠映像、JSONでの保存・再開、CSV出力に対応します。実機や一部ブラウザでの未確認事項はREADMEに記載します。",
-      helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。動画の「再生を一時停止」と作業の「中断を記録」は別の操作です。",
+      helpControlsTitle:'動画の操作', helpControlsBody:"再生／一時停止、再生位置、速度、微調整、音量を使えます。「位置の微調整・音量」で秒数を入力し、「この位置へ移動」かEnterを押すと指定位置で停止します。記録済み境界は変わりません。プレイヤー領域にフォーカスするとSpaceで再生／停止、左右で0.1秒、Shift＋左右で1秒移動します。境界は秒数入力、現在位置、スライダーで修正できます。Ctrl/Cmd＋Zで取り消し、Shiftも押すとやり直し。文字入力中は文字編集のUndoを優先します。微調整はフレーム送りではありません。動画の「再生を一時停止」と作業の「中断を記録」は別の操作です。",
       helpPrivacyTitle:'データの扱い', helpPrivacyBody:"動画・名前・メモは外部送信しません。動画はFile参照とBlob URLで扱い、全バイトをJavaScript配列へ複製しません。分析データは手動JSONまたはIndexedDBへ保存できますが、どちらにも動画は含めません。自動保存は端末内のブラウザ保存領域で、設定は端末側に保持します。保存領域は永久保管や暗号化保管を保証しません。元動画は変更・削除しません。",
       helpLimitsTitle:'形式・時間・精度', helpLimitsBody:'8 GiB以下、長さが正の有限値で24時間以下、映像とシーク可能な位置を持つ動画が対象です。拡張子だけで再生対応を保証しません。音声のみ、破損、未対応コーデックは扱えません。通常速度で撮影された動画を前提とし、スロー撮影・タイムラプス・編集で変更した速度から実時間を復元しません。動画内時刻はブラウザの精度に依存し、フレーム単位の精度は保証しません。',
-      helpRecoveryTitle:'保存・復元と元動画', helpRecoveryBody:"前回の自動保存がある場合は開始画面から明示的に復元できます。保存JSONを開いても動画は自動接続・自動再生しません。元動画候補はサイズ・縦横・長さを照合し、候補情報が一致しても同一動画の証明とはせず、確認後に接続します。不一致では既存分析を変更しません。自動保存できない環境では警告し、手動保存と計測は続けられます。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン幅・短い横画面・キーボード操作は自動試験しますが、Android/iPhone実機、ソフトキーボード、スクリーンリーダー、大容量動画は未検証です。',
+      helpRecoveryTitle:'保存・復元と元動画', helpRecoveryBody:"前回の自動保存がある場合は開始画面から明示的に復元できます。保存JSONを開いても動画は自動接続・自動再生しません。動画・分析を続けて選ぶと最後の選択だけを処理します。読込失敗やキャンセルでは現在の分析を保持します。元動画候補はサイズ・縦横・長さを照合し、候補情報が一致しても同一動画の証明とはせず、確認後に接続します。不一致では既存分析を変更しません。自動保存できない環境では警告し、手動保存と計測は続けられます。", helpOffline:'通常HTMLは直接開けます。自己展開HTMLはDecompressionStream対応環境が必要です。スマートフォン幅・短い横画面・キーボード操作は自動試験しますが、Android/iPhone実機、ソフトキーボード、スクリーンリーダー、大容量動画は未検証です。',
       FILE_EMPTY:'0バイトのファイルは開けません。動画を選び直してください。', FILE_LARGE:'8 GiBを超えるファイルは対象外です。', INVALID_FILE:'有効なファイルを一本選択してください。', INVALID_DURATION:'動画の長さを取得できないか、24時間の上限を超えています。', AUDIO_ONLY:'映像のないファイルは対象外です。動画を選択してください。', UNSUPPORTED:'このブラウザでは動画を読み込めません。形式やコーデックを確認して、別の動画を選択してください。', TIMEOUT:'動画の読み込みが完了しませんでした。別の動画で試してください。', PLAY_FAILED:'再生できませんでした。再生ボタンを押し直すか、別の動画を選択してください。', SEEK_FAILED:'この位置へ移動できませんでした。もう一度操作してください。', NOT_READY:'動画の読み込み・移動が完了してから操作してください。', BACKGROUND:'画面へ戻ってから操作してください。', MULTIPLE_FILES:'動画は一本ずつ選択してください。', INVALID_TIME:'動画内の有効な時刻ではありません。',
       screenNavigation:"分析画面",
       tabMeasure:"計測",
@@ -985,17 +991,17 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
       STALE_EDIT:"編集中に分析が変更されました。対象を選び直してから操作してください。"
     },
     en: {
-      introTitle:'Compare work times by splitting a video into steps', introBody:'Mark step boundaries while watching a video, compare cycles and step times, and jump from a result back to its evidence.', brandMeta:'Record and compare step and cycle times from a local video', localBadge:'Fully local processing', stage:"Time Study Desk · v1.0.0", versionLimit:"This candidate integrates security, generated-HTML, scale and documentation checks. Items not verified on real devices remain explicitly unverified.",
-      playerTitle:'Work video', choosePrompt:'Choose a video to start measuring', dropHint:'The video stays on this device. You can also drag and drop it here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
+      introTitle:'Compare work times by splitting a video into steps', introBody:'Mark step boundaries while watching a video, compare cycles and step times, and jump from a result back to its evidence.', brandMeta:'Record and compare step and cycle times from a local video', localBadge:'Fully local processing', stage:"Time Study Desk · v1.0.1", versionLimit:"This candidate integrates security, generated-HTML, scale and documentation checks. Items not verified on real devices remain explicitly unverified.",
+      playerTitle:'Work video', choosePrompt:'Choose a video to start measuring', dropHint:'The video stays on this device. You can also drag and drop it here.', chooseVideo:'Choose video', replaceVideo:'Choose a different video', play:'Play', pause:'Pause video', speed:'Speed', seekLabel:'Video position', fineAdjust:'Fine adjustment & audio', seekTimeLabel:'Go to video time (seconds)', seekTimeAction:'Go to position', seekTimeHint:'Up to six decimals. Moves playback only; records stay unchanged.', seekTimeInvalid:'Enter seconds from 0 to {duration}, using up to six decimal places.', volume:'Volume', mute:'Mute', unmute:'Unmute', playerKeyboard:'Video player. Space to play, arrow keys to adjust position.', timeHint:'The position is time inside the video. Changing playback speed does not change the measurement timebase.',
       sourceTitle:'Selected video', noSource:'Choose one video to check its duration, dimensions and file size.', length:'Duration', dimensions:'Dimensions', fileSize:'File size', formatHint:'Playback depends on the browser and codec. This app does not convert videos.', largeVideoHint:'This video is at least 1 GiB. Playback and seeking may take longer on some devices.',
-      analysisTitle:'Analysis data', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Output base name', outputSuffixHint:'Extension is automatic', savePlanned:"JSON and CSV are downloaded one file per action and never include the video.", saveAnalysis:'Save analysis', csvTitle:'CSV export', csvHint:'Save the time table, summary, or interval details one file at a time using the same aggregation rules as the screen.', exportTimeTableCsv:'Save time-table CSV', exportSummaryCsv:'Save summary CSV', exportIntervalsCsv:'Save interval-detail CSV', intervalCsvScope:'Interval detail scope', scopeSelectedProcedure:'Selected procedure', scopeAnalysis:'Whole analysis', csvExportFailed:'Could not save the CSV. The current analysis has been kept.', nextStage:"Keep a copy of your analysis", nextStageBody:"Autosave stays in this browser only. Save important analyses as JSON too; video is never included.",
+      analysisTitle:'Analysis data', storageSettings:'Save settings', openAnalysis:'Open analysis', importReady:'Validates and opens a .tsd.json file. Reconnect the original video separately.', savePreparation:'Prepare a save name', outputFilename:'Output base name', outputSuffixHint:'Extension is automatic', savePlanned:"JSON and CSV are downloaded one file per action and never include the video.", saveAnalysis:'Save analysis', csvTitle:'CSV export', csvHint:'Save the time table, summary, or interval details one file at a time using the same aggregation rules as the screen.', exportTimeTableCsv:'Save time-table CSV', exportSummaryCsv:'Save summary CSV', exportIntervalsCsv:'Save interval-detail CSV', intervalCsvScope:'Interval detail scope', scopeSelectedProcedure:'Selected procedure', scopeAnalysis:'Whole analysis', csvExportFailed:'Could not save the CSV. The current analysis has been kept.', nextStage:"Keep a copy of your analysis", nextStageBody:"Autosave stays in this browser only. Save important analyses as JSON too; video is never included.",
       buildInfo:'Build information', appVersion:'App version', builtAt:'Built at', dependencies:'Runtime dependencies', footer:'Video and analysis stay on this device', empty:'No video selected', ready:'Ready', loading:'Loading video', seeking:'Seeking', error:'Playback error', loadingHint:'Checking the video. Your current video is kept until you confirm replacement.', backgroundHint:'Playback paused because the page was hidden. Check the position before playing again.',
       confirmTitle:'Replace the video?', replaceMessage:"Replace the current video and analysis with an empty analysis for this video? This cannot be undone. Save any analysis you need first.", confirmAction:'Use this video', cancel:'Cancel', close:'Close', helpTitle:'How to use & notes',
       helpBasicsTitle:'What the app does', helpBasicsBody:"Mark steps while viewing a video and compare times across cycles. Interruption/unobserved records, review, video evidence, JSON save/reopen, and CSV are supported. Real-device and some-browser limitations are documented in README.",
-      helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping. Pausing video playback and marking a work interruption are separate operations.",
+      helpControlsTitle:'Player controls', helpControlsBody:"Use play/pause, the seek bar, speed, fine adjustment and audio. Under Fine adjustment & audio, type seconds and press Go to position or Enter to seek and pause without changing any recorded boundary. With focus on the player region, Space plays/pauses, arrows move 0.1 seconds, and Shift+arrows move 1 second. Edit a boundary by typing seconds, using the current position or moving its slider. Ctrl/Cmd+Z undoes; add Shift to redo. Text fields keep native text undo. Fine adjustment is not frame stepping. Pausing video playback and marking a work interruption are separate operations.",
       helpPrivacyTitle:'Your data', helpPrivacyBody:"Videos, names and notes are not sent to a server. Video uses a File reference and Blob URL without a full copy into a JavaScript array. Analysis can be saved manually as JSON or locally in IndexedDB; neither includes video. Autosave is a device-side setting. Browser storage is not a guarantee of permanent or encrypted retention. Original videos are never modified or deleted.",
       helpLimitsTitle:'Formats, time and precision', helpLimitsBody:'Videos must be at most 8 GiB, have a positive finite duration up to 24 hours, contain video and support seeking. A file extension alone does not guarantee support. Audio-only, damaged and unsupported media cannot be used. Normally recorded video is assumed: real time is not reconstructed from slow-motion, timelapse or edited speed changes. Browser media timing is not a guarantee of frame accuracy.',
-      helpRecoveryTitle:'Saving, restoring and the original video', helpRecoveryBody:"A previous autosave can be restored explicitly from the start screen. Opening saved JSON never reconnects or autoplays video. A candidate original video is compared by size, dimensions and duration; even matching metadata does not prove file identity, so you must confirm before attachment. A mismatch leaves the analysis unchanged. If autosave is unavailable, manual saving and measurement remain available.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Automated checks cover phone widths, short landscape layouts and keyboard behavior; Android/iPhone hardware, soft keyboards, screen readers and large videos are still unverified.',
+      helpRecoveryTitle:'Saving, restoring and the original video', helpRecoveryBody:"A previous autosave can be restored explicitly from the start screen. Opening saved JSON never reconnects or autoplays video. When choices overlap, only the latest video or analysis choice remains active; failed or canceled choices keep the current analysis. A candidate original video is compared by size, dimensions and duration; even matching metadata does not prove file identity, so you must confirm before attachment. A mismatch leaves the analysis unchanged. If autosave is unavailable, manual saving and measurement remain available.", helpOffline:'The readable HTML can open directly. The self-extracting HTML requires DecompressionStream. Automated checks cover phone widths, short landscape layouts and keyboard behavior; Android/iPhone hardware, soft keyboards, screen readers and large videos are still unverified.',
       FILE_EMPTY:'A zero-byte file cannot be opened. Choose another video.', FILE_LARGE:'Files larger than 8 GiB are not supported.', INVALID_FILE:'Choose one valid local file.', INVALID_DURATION:'The duration is unavailable, invalid or longer than 24 hours.', AUDIO_ONLY:'This file has no video track. Choose a video.', UNSUPPORTED:'This browser could not load the video. Check the format/codec or choose another file.', TIMEOUT:'The video did not finish loading. Try another video.', PLAY_FAILED:'Playback failed. Try Play again or choose another video.', SEEK_FAILED:'Could not seek to this position. Please try again.', NOT_READY:'Wait for the video to finish loading or seeking before this operation.', BACKGROUND:'Return to this page before using this operation.', MULTIPLE_FILES:'Choose one video at a time.', INVALID_TIME:'This is not a valid position inside the video.',
       screenNavigation:"Analysis screens",
       tabMeasure:"Measure",
@@ -1225,9 +1231,9 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   const AppToast = (() => {
     let timer = 0, actionHandler = null;
     const root = $('#appToast'), action = $('#appToastAction');
-    function dismiss() { clearTimeout(timer); timer = 0; root.classList.remove('show'); actionHandler = null; }
+    function dismiss() { clearTimeout(timer); timer = 0; root.classList.remove('show'); root.hidden=true; $('#appToastMessage').textContent=''; action.hidden=true; action.textContent=''; actionHandler = null; }
     function show({message = '', actionLabel = '', onAction = null, duration = 3200, tone = 'default'} = {}) {
-      clearTimeout(timer); $('#appToastMessage').textContent = String(message); root.dataset.tone = tone;
+      clearTimeout(timer); root.hidden=false; $('#appToastMessage').textContent = String(message); root.dataset.tone = tone;
       actionHandler = typeof onAction === 'function' ? onAction : null; action.textContent = actionLabel; action.hidden = !actionHandler || !actionLabel;
       root.classList.add('show'); if (duration > 0) timer = setTimeout(dismiss, duration);
       return Object.freeze({dismiss});
@@ -1397,7 +1403,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
     }
     function createProject(source,context) {
       const language = context.language === 'en' ? 'en' : 'ja', now = context.nowIso();
-      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'1.0.0',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
+      const project = {format:'time-study-desk',schemaVersion:1,appVersion:'1.0.1',projectId:context.makeId(),createdAt:now,updatedAt:now,title:'',note:'',source:{name:source.name,size:source.size,lastModified:source.lastModified,durationUs:source.durationUs,width:source.width,height:source.height},phases:[],procedures:[],cycles:[],settings:{language,selectedProcedureId:null,outputBaseName:sanitizeFilename(source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9)}};
       assert(validateProject(project).ok); return project;
     }
     // Patches retain only changed scalar fields or changed array tails, not two project snapshots.
@@ -1925,7 +1931,11 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
           if (this.active !== item || this.pending) return;
           if (item.video.error) this.state = 'error';
           else if (!this.pendingSeek) this.state = item.video.seeking ? 'seeking' : 'ready';
-          this.notify(event);
+          // A paused seek can emit ended too. Only actual playback may close an
+          // unfinished measurement; seeking alone must never add a boundary.
+          let notification=event;
+          if(event==='ended'){if(!item.wantPlaying)notification=undefined;item.wantPlaying=false;}
+          this.notify(notification);
         },{signal:events.signal});
       }
       this.host.replaceChildren(item.video); this.release(old); this.notify();
@@ -2159,32 +2169,44 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
     if(detached){media.dispose();attachedSource=null;displayedSource=null;}
     project=next;projectRevision++;history=TsdCore.createHistory();selectedBoundaryId=null;selectedSpanId=null;selectedCycleId=project.cycles.at(-1)?.id || null;recordingCycleId=null;resultsProcedureId=null;resultsCycleId=null;selectedEvidence=null;evidencePlaybackToken++;
     suspended=Boolean(project.cycles.some(c=>c.status==='open'));storageRevision=revision;autosaveConflict=false;savedSnapshot=durable?JSON.stringify(project):null;
+    if(!autosaveEnabled)setAutosaveStatus('autosaveDisabled','default');
+    else if(storageAvailable)setAutosaveStatus(revision>0?'autosaveSaved':'autosaveReady',revision>0?'saved':'default');
+    else if(autosaveStatusState==='checking')setAutosaveStatus('autosaveChecking','checking');
+    else setAutosaveStatus('autosaveUnavailable','unavailable');
     outputFilename.value=project.settings.outputBaseName || TsdCore.sanitizeFilename(project.source.name.replace(/\.[^.]+$/,'')+'-time-study','.tsd.json').slice(0,-9);
     document.querySelectorAll('input,textarea').forEach(input=>{input.setCustomValidity('');input.removeAttribute('aria-invalid');});
-    $('#boundaryError').hidden=true;$('#sourceMatchError').hidden=true;$('#saveStatus').textContent='';$('#backgroundNotice').hidden=true;
+    $('#seekTime').value='';clearSeekTimeError();
+    $('#boundaryError').hidden=true;$('#sourceMatchError').hidden=true;$('#saveStatus').textContent='';$('#csvStatus').textContent='';$('#backgroundNotice').hidden=true;
     renderProject();renderMedia(media);renderRestoreCard();
   }
   function maxRecordedBoundaryUs(value=project) { return Math.max(0,...(value?.cycles || []).map(c=>c.boundaries.at(-1)?.timeUs || 0)); }
+  // One user-intent token spans JSON, new video, and reconnect operations.
+  // Invalidate before canceling a dialog so its continuation cannot commit old work.
+  function beginSourceLoad() {
+    const generation=++analysisLoadGeneration;AppConfirm.cancel();media.cancelCandidate();clearError();return generation;
+  }
   async function openAnalysisFile(file) {
-    const generation=++analysisLoadGeneration;clearError();
+    const generation=beginSourceLoad();
     if(!file || file.size>10*1024*1024){setError({code:'ANALYSIS_FILE_LARGE'});return;}
-    let textValue;try{textValue=await file.text();}catch{setError({code:'INVALID_JSON'});return;}
+    let textValue;try{textValue=await file.text();}catch{if(generation===analysisLoadGeneration)setError({code:'INVALID_JSON'});return;}
     if(generation!==analysisLoadGeneration)return;
     const parsed=TsdCore.parseProject(textValue);
     if(!parsed.ok){setError({code:parsed.issues?.[0]?.code || 'INVALID_PROJECT'});return;}
     const identity=project?.projectId || null,revision=projectRevision;
     if(project){
       const accepted=await AppConfirm.ask({title:translate('importReplaceTitle'),message:translate('importReplaceBody'),confirmLabel:translate('importReplaceAction'),cancelLabel:translate('cancel')});
-      if(!accepted)return;if(generation!==analysisLoadGeneration || project?.projectId!==identity || projectRevision!==revision){setError({code:'STALE_EDIT'});return;}
+      if(generation!==analysisLoadGeneration || !accepted)return;
+      if(project?.projectId!==identity || projectRevision!==revision){setError({code:'STALE_EDIT'});return;}
     }
     if($('#procedureDialog').open)$('#procedureDialog').close();
     resetRuntimeForProject(parsed.value,{revision:0,durable:true,detached:true});$('#saveStatus').textContent=translate('importLoaded');selectPage('results');
   }
   async function reconnectFile(file) {
-    if(!project || media.source)return;clearError();$('#sourceMatchError').hidden=true;
+    if(!project || media.source)return;const generation=beginSourceLoad();$('#sourceMatchError').hidden=true;
     const identity=project.projectId,revision=projectRevision;
     try {
       const candidate=await media.loadCandidate(file);
+      if(generation!==analysisLoadGeneration)return;
       if(project?.projectId!==identity || projectRevision!==revision){media.cancelCandidate();setError({code:'STALE_EDIT'});return;}
       const match=TsdCore.matchSource(project.source,candidate.source,maxRecordedBoundaryUs(project));
       if(!match.compatible){
@@ -2192,10 +2214,11 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
       }
       const warnings=[];if(match.warnings.includes('NAME_CHANGED'))warnings.push(translate('sourceNameWarning'));if(match.warnings.includes('LAST_MODIFIED_CHANGED'))warnings.push(translate('sourceModifiedWarning'));
       const accepted=await AppConfirm.ask({title:translate('reconnectConfirmTitle'),message:[translate('reconnectConfirmBody'),...warnings].join('\n'),confirmLabel:translate('reconnectConfirmAction'),cancelLabel:translate('cancel')});
-      if(project?.projectId!==identity || projectRevision!==revision || candidate.generation!==media.generation)return;
+      if(generation!==analysisLoadGeneration || candidate.generation!==media.generation)return;
+      if(project?.projectId!==identity || projectRevision!==revision){media.cancelCandidate();setError({code:'STALE_EDIT'});return;}
       if(!accepted){media.cancelCandidate();return;}
       media.commitCandidate(candidate);attachedSource=media.source;$('#sourceMatchError').hidden=true;$('#backgroundNotice').hidden=true;renderMedia(media);
-    } catch(error){setError(error);}
+    } catch(error){if(generation===analysisLoadGeneration)setError(error);}
   }
   function onMediaChange(controller,event) {
     renderMedia(controller);
@@ -2220,7 +2243,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
     $('#sourceInfo').hidden=!displaySource;$('#noSource').hidden=Boolean(displaySource);
     $('#reconnectOriginalButton').hidden=!project || Boolean(source);
     $('#sourceConnectionState').textContent=source?translate('sourceAttached'):(project?translate('sourceDetached'):'');
-    for(const element of document.querySelectorAll('#playButton, #playbackRate, #volume, #muteButton, [data-seek]'))element.disabled=!ready;
+    for(const element of document.querySelectorAll('#playButton, #playbackRate, #volume, #muteButton, #seekTime, #seekTimeButton, [data-seek]'))element.disabled=!ready;
     $('#seekBar').disabled=!source || Boolean(controller.pending) || controller.state==='error';
     if(displaySource){
       $('#sourceName').textContent=displaySource.name;$('#sourceName').title=displaySource.name;
@@ -2749,25 +2772,40 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
     if (matchMedia('(max-width:600px)').matches) window.scrollTo({top:0,behavior:'instant'});
   }
   async function chooseFile(file) {
-    analysisLoadGeneration++;AppConfirm.cancel();clearError();
+    const generation=beginSourceLoad();
     try {
       const candidate=await media.loadCandidate(file);
+      if(generation!==analysisLoadGeneration)return;
       if(project) {
         const identity=project.projectId,revision=projectRevision;
         const accepted=await AppConfirm.ask({message:`${translate('replaceMessage')}\n\n${candidate.source.name}`});
-        if(candidate.generation!==media.generation)return;
+        if(generation!==analysisLoadGeneration || candidate.generation!==media.generation)return;
         if(!accepted){media.cancelCandidate();return;}
         if(project?.projectId!==identity || projectRevision!==revision){media.cancelCandidate();setError({code:'STALE_EDIT'});return;}
       }
       const next=TsdCore.createProject(candidate.source,commandContext);media.commitCandidate(candidate);
       if($('#procedureDialog').open)$('#procedureDialog').close();
       resetRuntimeForProject(next,{revision:0,durable:false,detached:false});attachedSource=media.source;displayedSource=media.source;renderMedia(media);selectPage('measure');
-    } catch(error){setError(error);}
+    } catch(error){if(generation===analysisLoadGeneration)setError(error);}
   }
   function seekBy(delta) {
     cancelEvidencePlayback();if(!media.source) return;
     const target=Math.max(0,Math.min(media.source.durationUs,Math.round((media.video.currentTime+delta)*1000000)));
     media.seekTo(target).catch(setError);
+  }
+  function clearSeekTimeError() {
+    $('#seekTime').removeAttribute('aria-invalid');$('#seekTimeError').hidden=true;
+  }
+  function renderSeekTimeError() {
+    if(!$('#seekTimeError').hidden)$('#seekTimeError').textContent=message('seekTimeInvalid',{duration:exactSeconds(media.source?.durationUs || 0)});
+  }
+  async function seekTypedPosition() {
+    if(!media.source || media.pending || media.state!=='ready')return;
+    const input=$('#seekTime'),result=TsdCore.parseTimeInput(input.value);
+    // Playback-only validation must not make a valid analysis unsaveable.
+    if(!result.ok || result.value>media.source.durationUs){input.setAttribute('aria-invalid','true');$('#seekTimeError').hidden=false;renderSeekTimeError();return;}
+    clearSeekTimeError();cancelEvidencePlayback();
+    try{await media.seekTo(result.value);}catch(error){setError(error);}
   }
   function normalizeOutputBaseName() {
     let base=String(outputFilename.value||'').trim().replace(/(?:\.tsd\.json|-time-table\.csv|-summary\.csv|-intervals\.csv)$/i,'');
@@ -2816,11 +2854,12 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
     document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=translate(node.dataset.i18n);});
     document.querySelectorAll('[data-i18n-aria-label]').forEach(node=>{node.setAttribute('aria-label',translate(node.dataset.i18nAriaLabel));});
     $('#languageButton').textContent=language==='ja' ? 'EN' : '日本語';
-    $('#languageButton').setAttribute('aria-label',language==='ja' ? '英語に切り替え' : 'Switch to Japanese');
+    const languageDestination=language==='ja' ? '英語に切り替え' : 'Switch to Japanese';
+    $('#languageButton').setAttribute('aria-label',languageDestination);$('#languageButton').title=languageDestination;
     document.title=language==='ja' ? 'Time Study Desk / 動画作業分析' : 'Time Study Desk / Video work analysis';
     if(project){const changed=project.settings.language!==language;project.settings.language=language;if(changed){projectRevision++;scheduleAutosave();}}
     if(errorCode)$('#errorMessage').textContent=translate(errorCode);
-    renderMedia(media);renderProject();renderPersistenceText();
+    renderMedia(media);renderProject();renderPersistenceText();renderSeekTimeError();
   }
   $('#chooseVideoButton').addEventListener('click',()=>$('#videoInput').click());
   $('#replaceVideoButton').addEventListener('click',()=>$('#videoInput').click());
@@ -2837,10 +2876,13 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   function applyAutosavePreference(enabled){autosaveEnabled=enabled;$('#autosaveToggle').checked=enabled;$('#autosaveStartToggle').checked=enabled;try{localStorage.setItem('time-study-desk:autosave',enabled?'on':'off');}catch{/* Session-only preference. */}if(!enabled){cancelAutosave(true);setAutosaveStatus('autosaveDisabled','default');}else if(storageAvailable){autosaveConflict=false;setAutosaveStatus('autosaveReady','default');if(project)scheduleAutosave();}else setAutosaveStatus('autosaveUnavailable','unavailable');}
   $('#autosaveToggle').addEventListener('change',event=>applyAutosavePreference(event.target.checked));
   $('#autosaveStartToggle').addEventListener('change',event=>applyAutosavePreference(event.target.checked));
-  $('#cancelLoadButton').addEventListener('click',()=>{AppConfirm.cancel();media.cancelCandidate();clearError();});
+  $('#cancelLoadButton').addEventListener('click',beginSourceLoad);
   $('#playButton').addEventListener('click',()=>{cancelEvidencePlayback();clearError();if(media.video?.paused) media.play().catch(setError);else media.pause();});
   $('#seekBar').addEventListener('change',event=>{cancelEvidencePlayback();media.seekTo(Math.round(Number(event.target.value)*1000000)).catch(setError);});
   document.querySelectorAll('[data-seek]').forEach(button=>button.addEventListener('click',()=>seekBy(Number(button.dataset.seek))));
+  $('#seekTimeButton').addEventListener('click',seekTypedPosition);
+  $('#seekTime').addEventListener('input',clearSeekTimeError);
+  $('#seekTime').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();if(!event.repeat)seekTypedPosition();}});
   $('#playbackRate').addEventListener('change',event=>{if(media.video) media.video.playbackRate=Number(event.target.value);});
   $('#muteButton').addEventListener('click',()=>{if(media.video) media.video.muted=!media.video.muted;});
   $('#volume').addEventListener('input',event=>{if(media.video) media.video.volume=Number(event.target.value);});

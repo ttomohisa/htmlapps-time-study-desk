@@ -69,6 +69,8 @@ Moving a shared boundary updates the durations of both adjacent steps. Split, me
 
 Select a numeric result to open the associated interval in **Edit records**. The video seeks to the saved start position **without autoplay**. Select **Play this interval** to start playback of that segment. Exact frame-level seeking or stopping is not guaranteed.
 
+Under **Fine adjustment & audio**, enter a video time in seconds and choose **Go to position** (or press Enter). Values from 0 to the video duration, with up to six decimal places, seek and pause without changing recorded boundaries. Invalid input stays editable and does not prevent saving an analysis.
+
 ### Keyboard shortcuts
 
 | Shortcut | Action |
@@ -148,7 +150,7 @@ Accessing GitHub or the Pages site still transfers the initial page and ordinary
 - Automated testing has covered Chromium on desktop and mobile-sized viewports, both languages, JSON migration, CSV and both standalone variants. **Real Android/iPhone hardware, screen readers, Safari/Firefox/Edge, large real-world videos and spreadsheet-app CSV import remain unverified**.
 - Browser IndexedDB support for local `file://` pages varies. The self-extracting HTML needs `DecompressionStream` support.
 
-The persisted analysis schema remains **schemaVersion 1** independently of the app's **v1.0.0** version.
+The persisted analysis schema remains **schemaVersion 1** independently of the app's **v1.0.1** version.
 
 ## Dependencies
 

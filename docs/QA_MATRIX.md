@@ -1,5 +1,7 @@
 # QA matrix — staged acceptance
 
+v1.0.1 adds regression coverage for shared JSON/video/reconnect intent, late errors and confirmations, exact seconds input (valid/invalid/endpoints/Enter), unchanged saved records, and complete EN/JA labels.
+
 The complete release matrix is APP_SPEC.md section 17. v1.0.0 is the release preparation and saved-data compatibility stage; Automated standalone/privacy/security and synthetic scale coverage can close only the rows they actually exercise; real-device, screen-reader, multi-browser, published-HTTPS and large-real-media requirements stay unverified until run on those targets.
 
 | Area | Current evidence target | Remaining work |

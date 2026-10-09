@@ -3,7 +3,7 @@
   "name": "Time Study Desk",
   "nameJa": "動画作業分析",
   "slug": "time-study-desk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Measure repeated work in a local video with accessible mobile review, count-aware statistics, evidence playback, local save/resume, and spreadsheet-safe CSV exports.",
   "descriptionJa": "作業動画を工程・回ごとに記録し、スマートフォンでも操作しやすい日英UIで、統計・根拠映像・保存再開・安全なCSV出力まで端末内で行えます。",
   "defaultLanguage": "auto",

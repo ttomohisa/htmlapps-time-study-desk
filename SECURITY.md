@@ -47,3 +47,7 @@ Tests distinguish actual network requests from attempted network API calls and C
 ## Reporting
 
 Do not post private video, analysis data or sensitive vulnerability details in a public issue. Contact the repository owner through a private channel or GitHub private vulnerability reporting when enabled. Include the affected commit/version, a minimal non-sensitive reproduction, expected/actual behavior, and impact. Public development dependencies are pinned in `package-lock.json`; review any dependency change rather than silently updating it.
+
+## v1.0.1 source-choice isolation
+
+JSON reads, video candidates and reconnect confirmations now share a latest-choice token. Superseded success/error paths are ignored and canceled candidates are released; invalid or canceled replacements preserve the current analysis. Exact seconds input is transient playback state, validated locally without altering saved records. No new network, storage, or permission capability is introduced.

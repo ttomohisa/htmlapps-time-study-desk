@@ -2,6 +2,15 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 1.0.1 — 2026-10-09 — Safe source changes and exact seeking
+
+- Clear stale autosave/CSV status and fully hide dismissed Undo notifications when switching analyses; preserve disabled/unavailable storage states.
+- Make JSON import, new-video selection and original-video reconnect share one latest-choice guard. Late reads, decoder failures and replacement confirmations cannot overwrite a newer choice; stale reconnect candidates are released.
+- Distinguish genuine playback completion from a paused seek to the video end, so seeking alone never appends an incomplete boundary.
+- Add a local seconds-based Go to position control with Enter support, explicit range validation and paused seeking. It never edits measured boundaries or prevents saving valid analysis data.
+- Fix the missing English Save settings label and give the EN/JA switch a destination tooltip in the current UI language.
+- Keep schemaVersion 1, the approved icon, local processing, export formats and existing workbench unchanged. Bump the app once from 1.0.0 to 1.0.1.
+
 ## 1.0.0 — 2026-10-09 — Release preparation
 
 - Rebuild Japanese and English README around the PDF Organizer's practical quick-start, features, instructions, privacy/limitations and development format. Describe actual desktop workbench and phone flow rather than stale early-v0.9 layout.
