@@ -58,7 +58,7 @@ test('zero-result and phone layouts remain readable without page overflow',async
   await page.setViewportSize({width:320,height:740});
   const empty=makeFixture('F1');empty.cycles=[];
   await openApp(page);await page.locator('#analysisInput').setInputFiles({name:'empty.tsd.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(empty))});
-  await page.locator('.mobile-tabs [data-page="results"]').click();
+  await expect(page.locator('body')).toHaveAttribute('data-current-page','results');
   await expect(page.locator('#resultsEmpty')).toBeVisible();
   await expect(page.locator('#resultOverallMean')).toContainText('—');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

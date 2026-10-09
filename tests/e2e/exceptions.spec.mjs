@@ -4,7 +4,7 @@ import {openApp,selectFixtureVideo,seekVideo} from '../helpers/app.mjs';
 async function prepare(page,names='準備\n確認') {
  await page.locator('#predefineButton').click();await page.locator('#presetNames').fill(names);await page.locator('#saveProcedureButton').click();await page.locator('#startCycleButton').click();
 }
-async function saved(page){const wait=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();return JSON.parse(await readFile(await (await wait).path(),'utf8'));}
+async function saved(page){await page.locator('.workspace-switch [data-page="results"]').click();const wait=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();return JSON.parse(await readFile(await (await wait).path(),'utf8'));}
 for(const variant of ['readable','self-extract'])test(`interruption and missing observation retain exact spans: ${variant}`,async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await openApp(page,variant);await selectFixtureVideo(page);await prepare(page);

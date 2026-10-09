@@ -1,6 +1,6 @@
 # QA matrix — staged acceptance
 
-The complete release matrix is APP_SPEC.md section 17. v0.7.0 targets CSV / Export while retaining all earlier gates. Later mobile/accessibility/release-candidate requirements are not marked complete merely because source data exists.
+The complete release matrix is APP_SPEC.md section 17. v0.9.0 is the Release Candidate integration stage. Automated standalone/privacy/security and synthetic scale coverage can close only the rows they actually exercise; real-device, screen-reader, multi-browser, published-HTTPS and large-real-media requirements stay unverified until run on those targets.
 
 | Area | Current evidence target | Remaining work |
 |---|---|---|
@@ -12,10 +12,10 @@ The complete release matrix is APP_SPEC.md section 17. v0.7.0 targets CSV / Expo
 | AC15 evidence | Result numbers open exact saved ranges; detached analysis keeps results readable; reconnect gates playback | Real-device file picker/reconnect |
 | AC16–18 | Strict import/source match plus IndexedDB unavailable/disabled/clear/conflict paths | Real browser storage policies / mobile |
 | AC19–21 | Three CSV types, blank vs zero, states/reasons, UTF-8 BOM/CRLF/quoted cells, edited/sanitized names, actual one-file downloads and failure handoff | Excel/other spreadsheet manual import remains release verification |
-| AC22 / AC26 / AC27 | Runtime external-network boundary and source lifecycle regressions retained | Full release-candidate security sweep |
-| AC23–24 partial | 320+ widths, phone Results cards, keyboard focus, help, both languages | Actual phone keyboards, screen readers, 200% zoom sweep |
+| AC22 / AC26 / AC27 | Consolidated runtime network-attempt/CSP/security/standalone tests plus source-lifecycle regressions | Additional browser engines / published HTTPS |
+| AC23–24 partial | 320+ widths, short-phone primary controls, 200%-equivalent zoom, keyboard focus, help, both languages | Actual phone keyboards and screen readers |
 | AC25 | Canonical PowerShell build/readable/self-extract/root checks in Windows CI | HTTPS variants and more browsers |
-| AC28–29 | No real-device/large-media pass claimed | Release-candidate hardware and performance gate |
-| AC30 | README/help/version/scope aligned for v0.6 | Final assets, release matrix and device coverage |
+| AC28–29 | Synthetic 1,000-cycle / 10,000-span summary regression; no real-media/real-device pass claimed | PC ~2 GiB / phone ~500 MiB real media and Android/iPhone hardware |
+| AC30 | README/help/version/scope aligned for v0.9; user-approved favicon source retained | Final screenshots and unresolved device/browser coverage |
 
 Record the exact OS/browser, variant, URL scheme and commit for each canonical test run. Do not substitute generated-file existence or viewport emulation for successful browser/real-device execution.

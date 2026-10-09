@@ -13,10 +13,11 @@ for (const variant of ['readable','self-extract']) test(`three cycles without re
   await expect(page.locator('#markBoundaryButton')).toHaveText('この回を終了');
   await seekVideo(page,start+.8);await page.locator('#markBoundaryButton').click();await expect(page.locator('#cycleState')).toHaveText('完了');
  }
+ await page.locator('.workspace-switch [data-page="review"]').click();
  await expect(page.locator('#cycleList .cycle-row')).toHaveCount(3);
  await expect(page.locator('#cycleSelect option')).toHaveCount(3);
  await page.locator('#cycleSelect').selectOption({index:0});await expect(page.locator('#cycleDuration')).toHaveText('0.8 秒');
- const pending=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();const d=await pending;
+ await page.locator('.workspace-switch [data-page="results"]').click();const pending=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();const d=await pending;
  const p=JSON.parse(await readFile(await d.path(),'utf8'));expect(p.phases).toHaveLength(2);expect(p.procedures).toHaveLength(1);expect(p.cycles).toHaveLength(3);expect(p.cycles.every(c=>c.status==='complete')).toBe(true);
  expect(p.cycles.map(c=>c.boundaries.map(b=>b.timeUs))).toEqual([[0,400000,800000],[1000000,1400000,1800000],[2000000,2400000,2800000]]);
 });

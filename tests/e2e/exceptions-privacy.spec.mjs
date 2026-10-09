@@ -20,9 +20,11 @@ for(const variant of ['readable','self-extract'])test(`exception capture, interv
  await seekVideo(page,1);await page.locator('#markBoundaryButton').click();await seekVideo(page,1.3);
  await page.locator('#exceptionsDetails summary').click();await page.locator('#beginUnobservedButton').click();await seekVideo(page,1.8);await page.locator('#exceptionReturnButton').click();
  await seekVideo(page,2.2);await page.locator('#finishCycleButton').click();
+ await page.locator('.workspace-switch [data-page="review"]').click();
  await page.locator('#intervalDetails > summary').click();await page.locator('#spanSelect').selectOption({index:0});
  await page.locator('#splitTime').fill('0.1');await page.locator('#splitSpanButton').click();await page.locator('#mergeSpanButton').click();
  await page.locator('#spanKind').selectOption('unobserved');await page.locator('#assignSpanButton').click();await page.locator('#undoButton').click();
+ await page.locator('.workspace-switch [data-page="results"]').click();
  const pending=page.waitForEvent('download');await page.locator('#saveAnalysisButton').click();await pending;
  expect(requests).toEqual([]);expect(errors).toEqual([]);
  expect(await page.evaluate(()=>window.__testCsp)).toEqual([]);expect(await page.evaluate(()=>window.__testNetworkAttempts)).toEqual([]);
