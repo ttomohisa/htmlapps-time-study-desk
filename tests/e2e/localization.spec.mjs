@@ -1,14 +1,13 @@
 import {test,expect} from '@playwright/test';
 import {openApp} from '../helpers/app.mjs';
 
-test('Japanese and English expose the v0.9 release-candidate scope without stale mobile-stage copy',async({page})=>{
+test('v1.0.0 shows useful local-save help rather than release-candidate instructions in both languages',async({page})=>{
   await openApp(page);
-  await expect(page.locator('#versionBadge')).toHaveText('v0.9.0');
-  await expect(page.locator('[data-i18n="stage"]')).toContainText('リリース候補');
-  await expect(page.locator('[data-i18n="nextStage"]')).not.toContainText('モバイル・アクセシビリティ');
+  await expect(page.locator('#versionBadge')).toHaveText('v1.0.0');
+  await expect(page.locator('[data-i18n="nextStage"]')).toContainText('分析データの保管');
   await page.locator('#languageButton').click();
-  await expect(page.locator('[data-i18n="stage"]')).toContainText('Release candidate');
-  await expect(page.locator('[data-i18n="nextStage"]')).not.toContainText('Mobile & accessibility');
+  await expect(page.locator('[data-i18n="nextStage"]')).toContainText('Keep a copy');
+  await expect(page.locator('[data-i18n="nextStage"]')).not.toContainText('release-candidate');
 });
 
 test('playback pause and work interruption remain distinct bilingual labels',async({page})=>{

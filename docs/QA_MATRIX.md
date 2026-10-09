@@ -1,6 +1,6 @@
 # QA matrix — staged acceptance
 
-The complete release matrix is APP_SPEC.md section 17. v0.9.0 is the Release Candidate integration stage. Automated standalone/privacy/security and synthetic scale coverage can close only the rows they actually exercise; real-device, screen-reader, multi-browser, published-HTTPS and large-real-media requirements stay unverified until run on those targets.
+The complete release matrix is APP_SPEC.md section 17. v1.0.0 is the release preparation and saved-data compatibility stage; Automated standalone/privacy/security and synthetic scale coverage can close only the rows they actually exercise; real-device, screen-reader, multi-browser, published-HTTPS and large-real-media requirements stay unverified until run on those targets.
 
 | Area | Current evidence target | Remaining work |
 |---|---|---|

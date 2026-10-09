@@ -2,6 +2,14 @@
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
+## 1.0.0 — 2026-10-09 — Release preparation
+
+- Rebuild Japanese and English README around the PDF Organizer's practical quick-start, features, instructions, privacy/limitations and development format. Describe actual desktop workbench and phone flow rather than stale early-v0.9 layout.
+- Align application, package, generated UI and test metadata at 1.0.0 while preserving independent schemaVersion 1 and the original v0.2.0 saved-analysis fixture.
+- Add readable/self-extract end-to-end regression: import historical schema-1 JSON → export v1 JSON → reopen → CSV. Keep browser-local processing and the same JSON/CSV rules.
+- Audit README/platform claims against actual files and CI evidence. Real mobile hardware, screen readers, other browsers and large real videos are still explicitly unverified; do not call an unperformed check "passed".
+- No tag, published release, Browser Kitty main-site change or PR merge in release preparation.
+
 ## 0.9.0 — 2026-10-06 — Release Candidate
 
 - Rework the opening hierarchy after comparison with the current PDF Pipeline Builder: concise task-oriented heading/body, `完全ローカル処理 / Fully local processing`, and a smaller 22–28px hero scale.

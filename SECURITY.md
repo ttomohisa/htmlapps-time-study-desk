@@ -1,6 +1,6 @@
 # Security and privacy — Time Study Desk
 
-This repository contains a static browser app. v0.9.0 is a release candidate, not a security certification or a formal release.
+This repository contains a static browser app. v1.0.0 release preparation is not a security certification; a version bump and CI success do not establish untested browser/device behavior.
 
 ## Data boundary
 
@@ -38,7 +38,7 @@ Result statistics are derived only from validated integer boundaries and explici
 
 ## Interaction and accessibility boundary
 
-v0.9.0 adds no runtime network or persistence capability. It consolidates generated-HTML network/CSP/standalone regressions and the v0.8 mobile/focus behavior. UI layout changes do not alter the saved schema or the local-data boundary. The application does not announce continuously changing media time through `aria-live`. Backgrounding pauses playback and requires explicit resume; it does not synthesize a work interruption. Automated browser checks are not a substitute for Android/iPhone hardware, soft-keyboard or screen-reader user testing.
+v1.0.0 adds no runtime network or persistence capability. It consolidates generated-HTML network/CSP/standalone regressions and the v0.8 mobile/focus behavior. UI layout changes do not alter the saved schema or the local-data boundary. The application does not announce continuously changing media time through `aria-live`. Backgrounding pauses playback and requires explicit resume; it does not synthesize a work interruption. Automated browser checks are not a substitute for Android/iPhone hardware, soft-keyboard or screen-reader user testing.
 
 ## Verification
 
