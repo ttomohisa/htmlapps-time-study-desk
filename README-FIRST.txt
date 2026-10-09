@@ -4,8 +4,8 @@ Time Study Desk / Video work analysis
 Read README.md or README.ja.md for the current development scope.
 Read AGENTS.md, APP_SPEC.md, and the plan under docs/superpowers/plans/ before editing.
 
-v0.9.0 is the release-candidate integration stage. It retains the complete measurement/results/export flow, the v0.8 mobile/accessibility work, and the user-approved Time Study Desk icon.
-The opening hierarchy and desktop workspace are refined to match current Browser Kitty apps, while standalone privacy/security, scale and documentation regressions are consolidated.
+v1.0.0 release preparation retains the complete local video workbench, repeated-cycle measurement, results and CSV workflow, the v0.8 mobile/accessibility work, and the user-approved Time Study Desk icon.
+The schemaVersion remains 1. Android/iPhone hardware, screen readers, other browsers and large media are not represented as tested.
 Real-device, screen-reader, published-HTTPS and large-real-media checks remain explicit release gates and must not be inferred from emulation.
 
 Edit src/index.template.html, not generated HTML.

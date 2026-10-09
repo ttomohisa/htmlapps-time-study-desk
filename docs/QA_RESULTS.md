@@ -1,4 +1,18 @@
-# QA results — v0.9.0 Release Candidate
+# QA results — v1.0.0 release preparation
+
+## Current milestone — v1.0.0
+
+- Base: merged main `84e0461395d78d8f9d6472587965fca58735921c`; source tree verified byte-identical to the previously tested v0.9.0 head.
+- Local baseline on Node 22.16.0: **79/79 unit tests passed** before version changes.
+- Release regression added for both standalone variants: v0.2.0 schema-1 JSON import → v1.0.0 export → reimport → time-table CSV, without attaching video. Earlier unit schema-1 fixture checks are retained.
+- README Japanese/English is reorganized using the current PDF Organizer README as a structural reference, without copying product-specific claims.
+- Version/metadata, readable and self-extract builds, CSP, favicon, generated root copy, keyboard/mobile workflow, CSV and network controls must be confirmed for the new v1.0.0 HEAD by GitHub Actions; **results are pending until that workflow succeeds**.
+- Release criterion still not satisfied on real hardware: Android/iPhone, physical soft keyboards, VoiceOver/TalkBack/NVDA, Safari/Firefox/Edge, large real video, initial spreadsheet-import programs and published HTTPS interactions are **not yet verified**. Record them as remaining release checks, not as passed.
+- No application tag/release/Pages publishing, Browser Kitty main-site update or PR merge is performed by this branch.
+
+---
+
+# Historical QA results — v0.9.0 Release Candidate
 
 ## Current milestone — v0.9.0
 

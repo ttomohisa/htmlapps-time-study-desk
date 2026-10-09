@@ -12,7 +12,7 @@
 
 When GitHub Pages is enabled, [open Time Study Desk](https://ttomohisa.github.io/htmlapps-time-study-desk/). If Pages is not configured, download the generated HTML from a successful GitHub Actions build artifact.
 
-On desktop, Measure puts the video and main action side by side; Edit records shows a video editor and a step inspector; Results separates statistics from saving and cycle management. Mobile uses Measure / Edit records / Results navigation. **Screenshots of the current tested build** are in \`test-results/screenshots/\` inside the \`time-study-evidence-*\` artifact of [app test runs](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml). The tiny video is synthetic test footage, not a real work-time observation.
+On desktop, Measure puts the video and main action side by side; Edit records shows a video editor and a step inspector; Results separates statistics from saving and cycle management. Mobile uses Measure / Edit records / Results navigation. **Screenshots of the current tested build** are in `test-results/screenshots/` inside the `time-study-evidence-*` artifact of [app test runs](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/test-app.yml). The tiny video is synthetic test footage, not a real work-time observation.
 
 ## Features
 
@@ -31,7 +31,7 @@ If GitHub Pages is configured, [open the app](https://ttomohisa.github.io/htmlap
 
 ### Standalone file
 
-Download a successful build artifact from [GitHub Actions](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/build-standalone.yml) and open \`dist/index.html\`. It is a standalone HTML file. The smaller \`dist/index.self-extract.html\` also runs without runtime downloads but requires browser \`DecompressionStream\` support. Neither requires an application server or runtime library installation.
+Download a successful build artifact from [GitHub Actions](https://github.com/ttomohisa/htmlapps-time-study-desk/actions/workflows/build-standalone.yml) and open `dist/index.html`. It is a standalone HTML file. The smaller `dist/index.self-extract.html` also runs without runtime downloads but requires browser `DecompressionStream` support. Neither requires an application server or runtime library installation.
 
 ### Typical workflow
 
@@ -40,7 +40,7 @@ Download a successful build artifact from [GitHub Actions](https://github.com/tt
 3. **Repeat** — The app stays on Measure and offers **Start next cycle here**, **Edit record** or **View results**. It never automatically starts the next cycle.
 4. **Edit records** — Select a cycle, change step names, boundaries, intervals and statuses. Changing procedure order or start/end conditions creates a new procedure while preserving older cycles.
 5. **Results** — Choose a procedure, inspect totals, per-step means and the time table. A reason is required when excluding a completed cycle from statistics.
-6. **Save** — Download \`.tsd.json\` or one of the three CSV views.
+6. **Save** — Download `.tsd.json` or one of the three CSV views.
 
 ### Interruptions, unknowns and not performed
 
@@ -56,16 +56,16 @@ Click a recorded number in Results to open its range in Edit records. The player
 
 | Shortcut | Action |
 | --- | --- |
-| \`Space\` when player focused | Play / pause |
-| \`←\` / \`→\` when player focused | Seek by 0.1 seconds |
-| \`Shift\` + arrow | Seek by 1 second |
-| \`Ctrl\` / \`⌘\` + \`Z\` | Undo record operation (native text Undo inside text fields) |
-| \`Ctrl\` / \`⌘\` + \`Shift\` + \`Z\` | Redo record operation |
-| \`Esc\` | Close a dialog |
+| `Space` when player focused | Play / pause |
+| `←` / `→` when player focused | Seek by 0.1 seconds |
+| `Shift` + arrow | Seek by 1 second |
+| `Ctrl` / `⌘` + `Z` | Undo record operation (native text Undo inside text fields) |
+| `Ctrl` / `⌘` + `Shift` + `Z` | Redo record operation |
+| `Esc` | Close a dialog |
 
 ## Saving, restoring and CSV
 
-An **analysis JSON (\`.tsd.json\`)** contains steps, procedures, cycles, boundaries, statuses and notes, **not the video**. On import the app validates the complete file before replacing the current analysis. Reconnect the source video separately. Size, dimensions and duration are compared, but matching metadata is not proof of file identity, so confirmation is still required.
+An **analysis JSON (`.tsd.json`)** contains steps, procedures, cycles, boundaries, statuses and notes, **not the video**. On import the app validates the complete file before replacing the current analysis. Reconnect the source video separately. Size, dimensions and duration are compared, but matching metadata is not proof of file identity, so confirmation is still required.
 
 **Autosave** stores the analysis only in the browser's IndexedDB when available. It is enabled by default, but availability depends on the browser and local settings. Stale tabs cannot silently overwrite newer recovery data. Browser storage is not promised to be durable or encrypted: download an additional JSON copy for anything important.
 
@@ -73,36 +73,36 @@ An **analysis JSON (\`.tsd.json\`)** contains steps, procedures, cycles, boundar
 
 ## Privacy and processing location
 
-Generated HTML uses a CSP including \`connect-src 'none'\`. The app has no analytics, external API, remote CDN, fonts or ad scripts at runtime. Video uses local File and Blob URL references. Autosave stays in IndexedDB; JSON/CSV output is a local download. The app does not transmit the video, filenames, step names or notes.
+Generated HTML uses a CSP including `connect-src 'none'`. The app has no analytics, external API, remote CDN, fonts or ad scripts at runtime. Video uses local File and Blob URL references. Autosave stays in IndexedDB; JSON/CSV output is a local download. The app does not transmit the video, filenames, step names or notes.
 
 Visiting GitHub Pages or GitHub itself requires requests to deliver the page and repository. For disconnected use, open a downloaded standalone HTML. Details are in [SECURITY.md](SECURITY.md).
 
 ## Limitations and test coverage
 
 - One non-empty, seekable video; application limits are 8 GiB and 24 hours. The browser must support the file's codec; there is no transcoding.
-- Video \`currentTime\` is rounded and stored as integer microseconds. **This is not a microsecond- or frame-accuracy claim.** Slow motion/time-lapse and edited speed changes are not reconstructed into real time.
+- Video `currentTime` is rounded and stored as integer microseconds. **This is not a microsecond- or frame-accuracy claim.** Slow motion/time-lapse and edited speed changes are not reconstructed into real time.
 - Observed time in a video is not a standard time, worker performance rating or staffing calculation.
 - Automated Chromium testing covers narrow widths, Japanese/English, keyboard, JSON compatibility, CSV and generated HTML. **Real Android/iPhone devices, soft keyboards, screen readers, Safari/Firefox/Edge and actual large-media end-to-end runs remain unverified.**
-- \`file://\` IndexedDB availability is browser-dependent. The self-extracting variant requires \`DecompressionStream\`.
+- `file://` IndexedDB availability is browser-dependent. The self-extracting variant requires `DecompressionStream`.
 - Schema **1** is separate from app version **1.0.0**. A retained v0.2.0 schema-1 fixture is used for compatibility regression.
 
 ## Development and build
 
-Edit \`src/index.template.html\`, not generated HTML. On Windows run \`build-standalone.bat\`, or use PowerShell:
+Edit `src/index.template.html`, not generated HTML. On Windows run `build-standalone.bat`, or use PowerShell:
 
-\`\`\`powershell
+```powershell
 pwsh -NoProfile -File ./scripts/check-powershell-syntax.ps1
 pwsh -NoProfile -File ./scripts/check-repository.ps1
-\`\`\`
+```
 
-Build outputs are \`dist/index.html\`, \`dist/index.self-extract.html\` and the readable-equivalent \`time-study-desk.html\`. Node.js 22 and Playwright 1.57.0 are used **only for development/testing**:
+Build outputs are `dist/index.html`, `dist/index.self-extract.html` and the readable-equivalent `time-study-desk.html`. Node.js 22 and Playwright 1.57.0 are used **only for development/testing**:
 
-\`\`\`text
+```text
 npm ci
 npx playwright install chromium
 npm run test:unit
 npm run test:e2e -- --project=chromium
-\`\`\`
+```
 
 Product requirements are in [APP_SPEC.md](APP_SPEC.md), save format in [docs/SAVE_FORMAT.md](docs/SAVE_FORMAT.md), and verification evidence in [docs/QA_RESULTS.md](docs/QA_RESULTS.md). See the matching GitHub Actions run for exact test results and screenshots.
 
