@@ -36,3 +36,12 @@ test('a reconnect attempt supersedes an older pending analysis read even if reco
  await expect(page.locator('#appConfirmDialog')).not.toBeVisible();await expect(page.locator('#sourceName')).toHaveText('landscape.mp4');await expect(page.locator('#resultOverallMean')).toContainText('3.4');
  await expect(page.locator('video')).toHaveCount(0);
 });
+
+test('successful analysis import clears the previous record Undo toast and CSV status',async({page})=>{
+ await openApp(page);await selectFixtureVideo(page);await measureFirstCycle(page);
+ await page.locator('.workspace-switch [data-page="review"]').click();await page.locator('#boundarySelect').selectOption({index:1});await page.locator('#boundaryTime').fill('0.7');await page.locator('#applyBoundaryButton').click();
+ await expect(page.locator('#appToastAction')).toBeVisible();
+ await page.locator('.workspace-switch [data-page="results"]').click();const download=page.waitForEvent('download');await page.locator('#exportTimeTableCsvButton').click();await download;await expect(page.locator('#csvStatus')).not.toBeEmpty();
+ await page.locator('#analysisInput').setInputFiles(resolve('tests/fixtures/v0.2.0-first-cycle.tsd.json'));await page.locator('#appConfirmOk').click();
+ await expect(page.locator('#appToast')).toBeHidden();await expect(page.locator('#appToastMessage')).toBeEmpty();await expect(page.locator('#appToastAction')).toBeHidden();await expect(page.locator('#csvStatus')).toBeEmpty();
+});

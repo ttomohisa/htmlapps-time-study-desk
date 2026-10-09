@@ -2,9 +2,10 @@
 
 - Baseline main: `5d2c91b7d48b2572c7da176198de94cae026ff83`; the existing 79 unit tests passed before editing.
 - Six new actual-source controller regressions failed before the loading fix and pass afterward. Four exact-seek function tests failed for the missing feature and pass after implementation. Translation coverage reproduced the missing English Save settings label.
-- Latest local actual-source suite: **93 passed, 0 failed/skipped** on Node 24.19.0. Paused endpoint seeking and genuine playback completion also have failing-before/fixed-after MediaController regressions.
+- Latest local actual-source suite: **96 passed, 0 failed/skipped** on Node 24.19.0. Paused endpoint seeking and genuine playback completion also have failing-before/fixed-after MediaController regressions.
 - Local PowerShell 7 syntax/encoding preflight and canonical repository build passed with writable temporary caches and the existing `tar.exe` alias on Linux. No build verifier is weakened.
 - Local Playwright Chromium could not launch because the executor denied its local process socket, including the approved escalation attempt. This is an environment limit, not a passed browser test. Canonical Windows CI and separate native cloud-browser QA are required before handoff.
+- Native cloud-browser QA found stale status/Undo accessibility remnants after project replacement. Three failing-before/fixed-after unit cases and generated-HTML regressions cover the follow-up fix.
 - CI and native-browser results are recorded on the Draft PR after execution. Real Android/iPhone, screen readers, Safari/Firefox/Edge, spreadsheet applications and large real media remain unverified.
 
 ---
