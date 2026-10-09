@@ -14,7 +14,7 @@ test('root HTML is byte-identical to readable standalone and self-extract declar
 for (const variant of ['readable','self-extract']) {
   test(`generated ${variant} opens the approved icon and local video path`, async ({page}) => {
     await openApp(page,variant);
-    await expect(page.locator('#versionBadge')).toHaveText('v1.0.0');
+    await expect(page.locator('#versionBadge')).toHaveText('v1.0.1');
     await expect(page.locator('.local-badge')).toContainText('完全ローカル処理');
     const icon=await page.locator('#appBrandIcon').getAttribute('src');
     const favicon=await page.locator('link[rel="icon"]').getAttribute('href');

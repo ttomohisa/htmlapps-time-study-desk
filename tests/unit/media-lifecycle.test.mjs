@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 import { loadCore } from '../helpers/load-core.mjs';
 function setup() {
-  const videos = [], revoked = [], hidden = { hidden: false };
+  const videos = [], revoked = [], changes = [], hidden = { hidden: false };
   class Video extends EventTarget {
     constructor() { super(); this.readyState = 0; this.seeking = false; this.paused = true; this.currentTime = 0; this.error = null; this.playbackRate = 1; this.volume = 1; }
     setAttribute() {} removeAttribute() { this.src = ''; } load() {}
@@ -19,10 +19,10 @@ function setup() {
     URL: { createObjectURL: () => `blob:test-${videos.length}`, revokeObjectURL: url => revoked.push(url) }
   });
   const host = { children: [], replaceChildren(...children) { this.children = children; } };
-  const media = new Controller(host, () => {});
+  const media = new Controller(host, (controller,event) => changes.push(event));
   const file = { name: 'test.mp4', size: 100, lastModified: 1 };
   async function connect() { const ready = media.loadCandidate(file); videos.at(-1).ready(); const candidate = await ready; media.commitCandidate(candidate); return candidate; }
-  return { media, videos, revoked, hidden, file, host, connect };
+  return { media, videos, revoked, hidden, file, host, connect, changes };
 }
 test('captureTime reads currentTime and refuses empty, seeking, hidden and error states', async () => {
   const { media, hidden, connect } = setup();
@@ -73,4 +73,16 @@ test('a new play promise that resolves after background pause must not restart p
   old.play = () => new Promise(resolve => { finish = () => { old.paused = false; resolve(); }; });
   const playing = media.play(); hidden.hidden = true; media.pause(); finish(); await playing;
   assert.equal(old.paused, true); media.dispose();
+});
+
+test('a paused seek to the endpoint must not signal natural playback completion',async()=>{
+ const {media,connect,changes}=setup();await connect();
+ const seeking=media.seekTo(4000000);media.video.dispatchEvent(new Event('seeked'));await seeking;
+ media.video.dispatchEvent(new Event('ended'));
+ assert.ok(!changes.includes('ended'),'seeking alone must not close an active measurement');media.dispose();
+});
+test('natural playback completion is still signaled once',async()=>{
+ const {media,connect,changes}=setup();await connect();await media.play();
+ media.video.currentTime=4;media.video.dispatchEvent(new Event('ended'));media.video.dispatchEvent(new Event('ended'));
+ assert.equal(changes.filter(event=>event==='ended').length,1);media.dispose();
 });

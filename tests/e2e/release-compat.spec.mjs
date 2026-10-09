@@ -5,7 +5,7 @@ import {openApp} from '../helpers/app.mjs';
 
 // Historical schema-1 data must remain readable even though the appVersion changes.
 for(const variant of ['readable','self-extract']) {
- test('v0.2.0 schema-1 JSON imports, exports as v1.0.0, reopens and produces CSV: '+variant,async({page})=>{
+ test('v0.2.0 schema-1 JSON imports, exports as v1.0.1, reopens and produces CSV: '+variant,async({page})=>{
   await openApp(page,variant);
   await page.locator('#analysisInput').setInputFiles(resolve('tests/fixtures/v0.2.0-first-cycle.tsd.json'));
   await expect(page.locator('#resultsWorkspace')).toBeVisible();
@@ -18,7 +18,7 @@ for(const variant of ['readable','self-extract']) {
   const saved=JSON.parse(await readFile(await (await downloadPromise).path(),'utf8'));
   expect(saved.format).toBe('time-study-desk');
   expect(saved.schemaVersion).toBe(1);
-  expect(saved.appVersion).toBe('1.0.0');
+  expect(saved.appVersion).toBe('1.0.1');
   expect(saved.cycles).toHaveLength(1);
   expect(saved.cycles[0].boundaries.map(b=>b.timeUs)).toEqual([0,6000000,18000000,28000000,34000000]);
   expect(JSON.stringify(saved)).not.toMatch(/blob:|"video"|"undo"/);
