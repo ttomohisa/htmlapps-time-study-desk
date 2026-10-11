@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Keep Japanese and English help focused on usage and practical limitations; remove developer implementation and verification-status notes.
+
 App versions use Semantic Versioning; the analysis format has its own integer schema version.
 
 ## 1.0.1 — 2026-10-09 — Safe source changes and exact seeking
