@@ -21,6 +21,9 @@ if(await page.locator('html').getAttribute('lang')!==language)await page.locator
 assert.equal((await page.locator('[data-i18n="localBadge"]').textContent()).trim(),language==='ja'?'完全ローカル処理':'Fully local processing');if(await page.locator('.local-badge').isVisible())await bounds(page.locator('.local-badge'),width,height,label,false);
 assert.equal(await page.locator('body > footer').isVisible(),width>cfg.bp,label+': informational footer');
 assert.equal(await page.locator('#chooseVideoButton').isVisible(),true);
+assert.equal(await page.locator(cfg.nav).isVisible(),false,label+': empty state has no cycle navigation');
+await page.locator('#analysisInput').setInputFiles(path.resolve('tests/fixtures/v0.2.0-first-cycle.tsd.json'));await page.waitForFunction(()=>document.body.classList.contains('has-cycles'));
+if(await page.locator('html').getAttribute('lang')!==language)await page.locator('#languageButton').click();
 if(cfg.nav){assert.equal(await page.locator(cfg.nav).isVisible(),width<=cfg.bp,label+': functional navigation');if(width<=cfg.bp)await bounds(page.locator(cfg.nav),width,height,label);}
 for(const w of [cfg.bp+1,cfg.bp,width]){await page.setViewportSize({width:w,height});assert.equal(await page.locator('body > footer').isVisible(),w>cfg.bp,label+': footer resize');}
 await page.evaluate(()=>scrollTo({left:0,top:0,behavior:'instant'}));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
