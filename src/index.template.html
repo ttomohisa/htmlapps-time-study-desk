@@ -627,6 +627,11 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   body[data-current-page="results"] .result-stat-grid,
   body[data-current-page="results"] .result-breakdown { grid-template-columns:repeat(4,minmax(0,1fr)); }
 }
+
+    @media (max-width: 600px) { body > footer { display: none; } }
+#helpDialog .help-build { margin-top: 18px; color: var(--muted); font-size: 11px; box-shadow: none; }
+#helpDialog .help-build summary { font: inherit; }
+#helpDialog .help-build .build-item strong { font-size: 11px; font-weight: 400; }
 </style>
 </head>
 <body data-current-page="measure">
@@ -719,7 +724,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 <input id="reconnectVideoInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.ogv,.avi,.mkv" hidden>
 <input id="analysisInput" type="file" accept="application/json,.json,.tsd.json" hidden>
 <!-- APP:END -->
-<section class="build-section"><details><summary data-i18n="buildInfo">ビルド情報</summary><div class="build-grid"><div class="build-item"><span data-i18n="appVersion">アプリ版</span><strong id="buildVersion"></strong></div><div class="build-item"><span data-i18n="builtAt">生成日時</span><strong id="builtAt"></strong></div><div class="build-item"><span data-i18n="dependencies">実行時の外部依存</span><strong id="dependencyCount"></strong></div></div></details></section>
+
 </main>
 <nav class="mobile-tabs" aria-label="分析画面" data-i18n-aria-label="screenNavigation">
 <button type="button" data-page="measure" aria-controls="measurePanel" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4z"/></svg><span data-i18n="tabMeasure">計測</span></button>
@@ -733,6 +738,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
 <!-- APP:HELP:BEGIN -->
 <h3 data-i18n="helpBasicsTitle"></h3><p data-i18n="helpBasicsBody"></p><h3 data-i18n="helpControlsTitle"></h3><p data-i18n="helpControlsBody"></p><h3 data-i18n="helpPrivacyTitle"></h3><p data-i18n="helpPrivacyBody"></p><h3 data-i18n="helpLimitsTitle"></h3><p data-i18n="helpLimitsBody"></p><h3 data-i18n="helpRecoveryTitle"></h3><p data-i18n="helpRecoveryBody"></p><p class="dialog-note" data-i18n="helpOffline"></p>
 <!-- APP:HELP:END -->
+<section class="build-section help-build"><details><summary data-i18n="buildInfo">ビルド情報</summary><div class="build-grid"><div class="build-item"><span data-i18n="appVersion">アプリ版</span><strong id="buildVersion"></strong></div><div class="build-item"><span data-i18n="builtAt">生成日時</span><strong id="builtAt"></strong></div><div class="build-item"><span data-i18n="dependencies">実行時の外部依存</span><strong id="dependencyCount"></strong></div></div></details></section>
 </div></dialog>
 <dialog id="procedureDialog" aria-labelledby="procedureDialogTitle"><div class="dialog-header"><h2 id="procedureDialogTitle" data-i18n="procedureDialogTitle">次の回の手順</h2><button id="closeProcedureButton" type="button" class="icon-button" data-i18n-aria-label="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="dialog-body">
 <p class="dialog-note" data-i18n="procedureChangeHint">保存すると別の手順を作ります。過去の回の工程順・条件は変わりません。</p><label class="field"><span data-i18n="procedureLabel">手順の名前</span><input id="procedureDraftName" type="text" autocomplete="off"></label>
@@ -2936,7 +2942,7 @@ body[data-current-page="measure"] #recordCard .record-status { margin-top:2px; }
   $('#helpButton').addEventListener('click',()=>{media.pause();helpDialog.showModal();});
   $('#closeHelpButton').addEventListener('click',()=>helpDialog.close());
   helpDialog.addEventListener('close',()=>$('#helpButton').focus({preventScroll:true}));
-  helpDialog.addEventListener('click',event=>{const r=helpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)helpDialog.close();});
+  helpDialog.addEventListener('click',event=>{if(event.target!==helpDialog)return;const r=helpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)helpDialog.close();});
   document.addEventListener('dragover',event=>{if(!event.dataTransfer.types.includes('Files'))return;event.preventDefault();$('#dropZone').classList.add('drag-over');});
   document.addEventListener('dragleave',event=>{if(!event.relatedTarget)$('#dropZone').classList.remove('drag-over');});
   document.addEventListener('drop',event=>{event.preventDefault();$('#dropZone').classList.remove('drag-over');const files=[...event.dataTransfer.files];if(files.length===1){if(project && !media.source)reconnectFile(files[0]);else chooseFile(files[0]);}else if(files.length)setError({code:'MULTIPLE_FILES'});});
