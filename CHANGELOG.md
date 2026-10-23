@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Hide only the informational footer at the existing 600px phone breakpoint; preserve functional controls and canonical Fully local processing wording. Move unchanged build metadata to the final Help content, retaining IDs and existing visibility conditions.
+
+
 - Keep Japanese and English help focused on usage and practical limitations; remove developer implementation and verification-status notes.
 
 App versions use Semantic Versioning; the analysis format has its own integer schema version.

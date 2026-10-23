@@ -857,3 +857,7 @@ v0.2.0で初めて出力するschemaVersion=1のファイルから、v1.0.0ま�
 - **W8:** MDN `CSP: media-src`。メディア読み込み元の指定。`https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/media-src`
 - **W9:** Playwright `Emulation`。エミュレーションで扱う条件。`https://playwright.dev/docs/emulation`
 - **W10:** Playwright `Command line`。計画内の試験実行コマンド。`https://playwright.dev/docs/test-cli`
+
+## Shared phone layout
+
+- Hide only the informational footer at the existing 600px phone breakpoint; preserve functional controls and canonical Fully local processing wording. Move unchanged build metadata to the final Help content, retaining IDs and existing visibility conditions.
