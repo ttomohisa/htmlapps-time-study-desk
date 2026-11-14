@@ -45,7 +45,12 @@ h1 { margin:0; font-size:clamp(24px,4vw,32px); letter-spacing:-.035em; }
 .preview { background:#192522; min-height:240px; display:grid; place-items:center; position:relative; }
 .preview.drag-over { outline:4px solid var(--accent); outline-offset:-4px; }
 #videoHost { width:100%; } #videoHost video { display:block; width:100%; height:min(48vh,400px); min-height:180px; object-fit:contain; background:#111a17; }
-.file-fallback-button{display:none;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer}.file-fallback-button.block{width:100%;margin-top:10px}@media (max-width:767px),(pointer:coarse) and (max-height:600px){.file-fallback-button{display:inline-flex}.file-fallback-button.block{display:flex}}.empty-view { min-height:320px; padding:32px 18px; display:grid; align-content:center; justify-items:center; gap:12px; color:#f2f7f4; text-align:center; }
+/* Alternative file picker stays visually secondary to the main video action. */
+.file-fallback-button { display:none; align-items:center; justify-content:center; justify-self:center; min-height:44px; max-width:100%; padding:8px 12px; border:0; border-radius:8px; background:transparent; color:var(--muted); font-size:12px; font-weight:500; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.file-fallback-button:hover { color:var(--accent); background:var(--surface-muted); }
+.empty-view .file-fallback-button { color:#cbd6d0; }
+.empty-view .file-fallback-button:hover { color:#fff; background:#ffffff12; }
+@media (max-width:767px),(pointer:coarse) and (max-height:600px) { .file-fallback-button { display:inline-flex; } }.empty-view { min-height:320px; padding:32px 18px; display:grid; align-content:center; justify-items:center; gap:12px; color:#f2f7f4; text-align:center; }
 .empty-view>svg { width:62px; height:62px; opacity:.6; } .empty-view p { margin:0; max-width:34em; color:#cbd6d0; font-size:13px; } .empty-view .button { margin-top:8px; }
 .button { min-height:48px; padding:8px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface); font-weight:700; display:inline-flex; justify-content:center; align-items:center; gap:8px; }
 .button:hover:not(:disabled) { border-color:var(--line-strong); background:var(--surface-hover); }
